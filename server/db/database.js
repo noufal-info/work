@@ -1,9 +1,13 @@
-const db = {
-    students: [{ email: 'student@example.com', password: 'password123', name: 'Alex Student' }],
-    admins: [{ email: 'master@example.com', role: 'Master Admin' }],
-    subAdmins: [],
-    partners: [],
-    otps: {} // Store OTPs temporarily
-};
+const mysql = require('mysql2/promise');
 
-module.exports = db;
+const pool = mysql.createPool({
+    host: 'localhost', // or the hostname provided by Hostinger
+    user: 'u999617803_knowlipop',
+    password: 'Knowlipop@2026',
+    database: 'u999617803_knowlipop',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
+module.exports = pool;

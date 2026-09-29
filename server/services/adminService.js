@@ -2,56 +2,96 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
 
-router.post('/login', (req, res) => {
-    const { email } = req.body;
-    const admin = db.admins.find(a => a.email === email) || db.subAdmins.find(a => a.email === email);
-    if (admin) {
-        const otp = '123456'; // Fixed for demo purposes
-        db.otps[email] = otp;
-        console.log(`[MOCK EMAIL] OTP for ${email} is ${otp}`);
-        res.json({ success: true, message: 'OTP sent' });
-    } else {
-        res.status(401).json({ success: false, message: 'Admin not found' });
+router.post('/login', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const [admins] = await db.execute('SELECT * FROM admins WHERE email = ?', [email]);
+        const [subAdmins] = await db.execute('SELECT * FROM sub_admins WHERE email = ?', [email]);
+        
+        if (admins.length > 0 || subAdmins.length > 0) {
+            const otp = '123456'; // Fixed for demo purposes
+            await db.execute('INSERT INTO otps (email, otp) VALUES (?, ?) ON DUPLICATE KEY UPDATE otp = VALUES(otp)', [email, otp]);
+            console.log(`[MOCK EMAIL] OTP for ${email} is ${otp}`);
+            res.json({ success: true, message: 'OTP sent' });
+        } else {
+            res.status(401).json({ success: false, message: 'Admin not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
-router.post('/verify-otp', (req, res) => {
-    const { email, otp } = req.body;
-    if (db.otps[email] && db.otps[email] === otp) {
-        delete db.otps[email];
-        res.json({ success: true, message: 'Logged in successfully' });
-    } else {
-        res.status(401).json({ success: false, message: 'Invalid OTP' });
+router.post('/verify-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const [rows] = await db.execute('SELECT * FROM otps WHERE email = ? AND otp = ?', [email, otp]);
+        if (rows.length > 0) {
+            await db.execute('DELETE FROM otps WHERE email = ?', [email]);
+            res.json({ success: true, message: 'Logged in successfully' });
+        } else {
+            res.status(401).json({ success: false, message: 'Invalid OTP' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
-router.post('/subadmins', (req, res) => {
-    const { name, email } = req.body;
-    db.subAdmins.push({ name, email, role: 'Sub-Admin' });
-    res.json({ success: true, message: 'Sub-admin created successfully' });
+router.post('/subadmins', async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        await db.execute('INSERT INTO sub_admins (name, email, role) VALUES (?, ?, ?)', [name, email, 'Sub-Admin']);
+        res.json({ success: true, message: 'Sub-admin created successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
-router.get('/subadmins', (req, res) => {
-    res.json(db.subAdmins);
+router.get('/subadmins', async (req, res) => {
+    try {
+        const [rows] = await db.execute('SELECT * FROM sub_admins');
+        res.json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
-router.post('/partners', (req, res) => {
-    const { name, domain, email, password } = req.body;
-    db.partners.push({ name, domain, adminEmail: email, password });
-    res.json({ success: true, message: 'Partner created successfully' });
+router.post('/partners', async (req, res) => {
+    try {
+        const { name, domain, email, password } = req.body;
+        await db.execute('INSERT INTO partners (name, domain, adminEmail, password) VALUES (?, ?, ?, ?)', [name, domain, email, password]);
+        res.json({ success: true, message: 'Partner created successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
-router.get('/partners', (req, res) => {
-    res.json(db.partners);
+router.get('/partners', async (req, res) => {
+    try {
+        const [rows] = await db.execute('SELECT * FROM partners');
+        res.json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
-router.post('/partners/impersonate', (req, res) => {
-    const { domain } = req.body;
-    const partner = db.partners.find(p => p.domain === domain);
-    if(partner) {
-        res.json({ success: true, domain: partner.domain });
-    } else {
-        res.status(404).json({ success: false, message: 'Partner not found' });
+router.post('/partners/impersonate', async (req, res) => {
+    try {
+        const { domain } = req.body;
+        const [rows] = await db.execute('SELECT * FROM partners WHERE domain = ?', [domain]);
+        if (rows.length > 0) {
+            res.json({ success: true, domain: rows[0].domain });
+        } else {
+            res.status(404).json({ success: false, message: 'Partner not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
