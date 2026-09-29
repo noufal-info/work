@@ -34,6 +34,30 @@ app.get('/AnalogiX/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'admin', 'index.html'));
 });
 
+app.get('/AnalogiX/admin/teachers', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'teachers.html'));
+});
+
+app.get('/AnalogiX/admin/courses', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'courses.html'));
+});
+
+app.get('/AnalogiX/admin/calendar', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'calendar.html'));
+});
+
+app.get('/AnalogiX/admin/messages', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'messages.html'));
+});
+
+app.get('/AnalogiX/admin/reports', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'reports.html'));
+});
+
+app.get('/AnalogiX/admin/settings', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'settings.html'));
+});
+
 app.get('/AnalogiX/partner/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'partner', 'login.html'));
 });
