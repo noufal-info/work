@@ -96,7 +96,7 @@
             <div id="section-courses" class="content-section dashboard-content" >
                 <div class="page-header">
                     <h1>Courses Management</h1>
-                    <button class="btn-primary" onclick="alert('Create New Course wizard opened')">
+                    <button class="btn-primary" onclick="openModal('courseModal')">
                         <ion-icon name="add-outline"></ion-icon>
                         Create New Course
                     </button>
@@ -125,10 +125,60 @@
                 </div>
             </div>
 
+            <!-- Course Modal -->
+            <div class="modal-overlay" id="courseModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Create New Course</h2>
+                        <button class="modal-close" onclick="closeModal('courseModal')"><ion-icon name="close-outline"></ion-icon></button>
+                    </div>
+                    <form onsubmit="handleCourseSubmit(event)">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Course Title</label>
+                                <input type="text" id="courseTitle" placeholder="e.g. Python for Beginners" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="courseDescription" rows="3" placeholder="Brief description of the course..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Assign Instructor</label>
+                                <select id="courseInstructor">
+                                    <option value="john">John Smith</option>
+                                    <option value="other">Unassigned</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Price (₹)</label>
+                                <input type="number" id="coursePrice" placeholder="e.g. 1999" required min="0">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-secondary" onclick="closeModal('courseModal')">Cancel</button>
+                            <button type="submit" class="btn-primary">Publish Course</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             </main>
     </div>
 
     <script>
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function handleCourseSubmit(e) {
+            e.preventDefault();
+            alert("Success! The new course has been created and published.");
+            closeModal('courseModal');
+        }
         // Extra Javascript logic will be added here as needed
 
         // Logout functionality
