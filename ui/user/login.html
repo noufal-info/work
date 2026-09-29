@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LMS - Student Login</title>
+    <link rel="stylesheet" href="/user/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            background-color: var(--bg-color);
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 40px;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        h1 {
+            font-size: 24px;
+            color: var(--blue-dark);
+            margin-bottom: 8px;
+        }
+        p {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--blue-dark);
+            margin-bottom: 8px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--blue-light);
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus {
+            border-color: var(--green-primary);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--green-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            margin-top: 10px;
+        }
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+        .forgot-password {
+            display: block;
+            margin-top: 24px;
+            color: var(--green-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <ion-icon name="book"></ion-icon>
+        </div>
+        <h1>Welcome Back</h1>
+        <p>Login to continue your learning journey</p>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required value="student@example.com">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required value="password123">
+            </div>
+            
+            <button type="submit" class="btn-login">Login to Dashboard</button>
+        </form>
+        
+        <a href="#" class="forgot-password">Forgot Password?</a>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Login successful!');
+                    window.location.href = '/';
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert('Error logging in');
+            }
+        });
+    </script>
+</body>
+</html>

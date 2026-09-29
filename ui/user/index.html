@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LMS - Student App</title>
+    <link rel="stylesheet" href="/user/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <!-- Ionicons for mobile app icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="user-profile">
+            <div class="avatar">
+                <ion-icon name="person-outline"></ion-icon>
+            </div>
+            <div class="greeting">
+                <p>Hello,</p>
+                <h1>Alex Student</h1>
+            </div>
+        </div>
+        <button class="notification-btn">
+            <ion-icon name="notifications-outline"></ion-icon>
+            <span class="badge">2</span>
+        </button>
+    </header>
+
+    <main class="app-content">
+        <section class="metrics-section">
+            <h2 class="section-title">Your Progress</h2>
+            <div class="metrics-grid">
+                <div class="metric-card primary">
+                    <div class="metric-icon">
+                        <ion-icon name="book-outline"></ion-icon>
+                    </div>
+                    <div class="metric-info">
+                        <h3>Active Courses</h3>
+                        <p class="value">4</p>
+                    </div>
+                </div>
+                <div class="metric-card secondary">
+                    <div class="metric-icon">
+                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    </div>
+                    <div class="metric-info">
+                        <h3>Completed</h3>
+                        <p class="value">12</p>
+                    </div>
+                </div>
+                <div class="metric-card accent-blue">
+                    <div class="metric-icon">
+                        <ion-icon name="time-outline"></ion-icon>
+                    </div>
+                    <div class="metric-info">
+                        <h3>Study Hours</h3>
+                        <p class="value">34h</p>
+                    </div>
+                </div>
+                <div class="metric-card accent-green">
+                    <div class="metric-icon">
+                        <ion-icon name="trophy-outline"></ion-icon>
+                    </div>
+                    <div class="metric-info">
+                        <h3>Certificates</h3>
+                        <p class="value">3</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="recent-activity">
+            <h2 class="section-title">Continue Learning</h2>
+            <div class="course-card">
+                <div class="course-image">
+                    <ion-icon name="logo-nodejs"></ion-icon>
+                </div>
+                <div class="course-details">
+                    <h3>Advanced Node.js</h3>
+                    <p>Module 4: Express APIs</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 65%;"></div>
+                    </div>
+                    <span class="progress-text">65% Completed</span>
+                </div>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-image" style="background: var(--dark-blue);">
+                    <ion-icon name="logo-react"></ion-icon>
+                </div>
+                <div class="course-details">
+                    <h3>React Native Basics</h3>
+                    <p>Module 1: Introduction</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 15%;"></div>
+                    </div>
+                    <span class="progress-text">15% Completed</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <ion-icon name="home"></ion-icon>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item">
+            <ion-icon name="play-circle-outline"></ion-icon>
+            <span>Courses</span>
+        </a>
+        <a href="#" class="nav-item">
+            <ion-icon name="chatbubbles-outline"></ion-icon>
+            <span>Chat</span>
+        </a>
+        <a href="#" class="nav-item">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>Profile</span>
+        </a>
+    </nav>
+</body>
+</html>

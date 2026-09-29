@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        /* Reusing the beautiful old full-screen style with floating sidebar */
+        :root {
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --blue-dark: #0f172a;
+            --primary: #4f5be8; /* Partner Primary Color */
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; min-height: 100vh; }
+        
+        /* Floating sidebar style from previous iteration */
+        .sidebar {
+            width: 90px; background-color: transparent; border-right: none;
+            display: flex; flex-direction: column; align-items: center;
+            position: fixed; height: 100vh; z-index: 100; padding: 24px 0;
+        }
+        .logo-icon {
+            width: 56px; height: 56px; background-color: white; color: var(--primary);
+            border-radius: 16px; display: flex; justify-content: center; align-items: center;
+            font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 24px;
+        }
+        .sidebar-nav {
+            padding: 16px 0; display: flex; flex-direction: column; align-items: center; gap: 12px;
+            background-color: white; border-radius: 40px; width: 64px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .sidebar-nav .nav-item {
+            display: flex; justify-content: center; align-items: center; width: 44px; height: 44px;
+            border-radius: 50%; color: var(--text-muted); text-decoration: none; transition: all 0.2s ease;
+        }
+        .sidebar-nav .nav-item.active { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 91, 232, 0.3); }
+        .sidebar-nav ion-icon { font-size: 20px; }
+
+        .main-content { flex: 1; margin-left: 90px; padding: 32px; display: flex; flex-direction: column; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .page-header h1 { font-size: 28px; font-weight: 700; color: var(--blue-dark); }
+        
+        .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px; }
+        .metric-card {
+            background-color: white; border-radius: 24px; padding: 24px;
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.08); display: flex; flex-direction: column; justify-content: space-between; min-height: 160px;
+        }
+        .metric-icon {
+            width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 20px; border: 1px solid #e2e8f0; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .metric-body h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+        .metric-body .value { font-size: 32px; font-weight: 700; color: var(--text-main); }
+        
+        .empty-state { text-align: center; padding: 64px; background: white; border-radius: 24px; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.08); }
+        .empty-state ion-icon { font-size: 64px; color: #cbd5e1; margin-bottom: 16px; }
+        .empty-state h2 { color: var(--blue-dark); margin-bottom: 8px; }
+        .empty-state p { color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo-icon"><ion-icon name="business"></ion-icon></div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')"><ion-icon name="grid-outline"></ion-icon></a>
+            <a href="#" class="nav-item" id="nav-students" onclick="switchTab('students')"><ion-icon name="people-outline"></ion-icon></a>
+            <a href="#" class="nav-item" id="nav-courses" onclick="switchTab('courses')"><ion-icon name="library-outline"></ion-icon></a>
+            <a href="#" class="nav-item" id="nav-live" onclick="switchTab('live')"><ion-icon name="videocam-outline"></ion-icon></a>
+            <a href="#" class="nav-item" id="nav-revenue" onclick="switchTab('revenue')"><ion-icon name="cash-outline"></ion-icon></a>
+            <a href="/partner/login" class="nav-item" style="color: #ef4444; margin-top: 100px;"><ion-icon name="log-out-outline"></ion-icon></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Partner Dashboard</h1>
+            <span id="partnerDomainBadge" style="background: #e0e7ff; color: #4f5be8; padding: 8px 16px; border-radius: 20px; font-weight: 600;">Loading...</span>
+        </div>
+
+        <div id="section-dashboard" class="content-section">
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-icon"><ion-icon name="people"></ion-icon></div>
+                    <div class="metric-body"><h3>Total Students</h3><p class="value">0</p></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><ion-icon name="library"></ion-icon></div>
+                    <div class="metric-body"><h3>Courses Offered</h3><p class="value">0</p></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><ion-icon name="videocam"></ion-icon></div>
+                    <div class="metric-body"><h3>Live Classes</h3><p class="value">0</p></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><ion-icon name="cash"></ion-icon></div>
+                    <div class="metric-body"><h3>Total Revenue</h3><p class="value">₹0</p></div>
+                </div>
+            </div>
+
+            <div class="empty-state">
+                <ion-icon name="rocket-outline"></ion-icon>
+                <h2>Welcome to your fully isolated LMS</h2>
+                <p>Your tenant environment is ready. Start by adding courses and students.</p>
+            </div>
+        </div>
+
+        <div id="section-students" class="content-section" style="display: none;">
+            <div class="empty-state">
+                <ion-icon name="people-outline"></ion-icon>
+                <h2>Student Management</h2>
+                <p>Register new students and manage existing individual panels.</p>
+                <button style="margin-top: 16px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">Add Student</button>
+            </div>
+        </div>
+
+        <div id="section-courses" class="content-section" style="display: none;">
+            <div class="empty-state">
+                <ion-icon name="library-outline"></ion-icon>
+                <h2>Course Management</h2>
+                <p>Create new courses and learning materials for your students.</p>
+                <button style="margin-top: 16px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">Add Course</button>
+            </div>
+        </div>
+
+        <div id="section-live" class="content-section" style="display: none;">
+            <div class="empty-state">
+                <ion-icon name="videocam-outline"></ion-icon>
+                <h2>Live Class Calendar</h2>
+                <p>Schedule video classes and manage class links.</p>
+                <button style="margin-top: 16px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">Schedule Class</button>
+            </div>
+        </div>
+
+        <div id="section-revenue" class="content-section" style="display: none;">
+            <div class="empty-state">
+                <ion-icon name="cash-outline"></ion-icon>
+                <h2>Fees & Payments</h2>
+                <p>Track student payments and online transactions.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const domain = localStorage.getItem('partnerDomain');
+        if(!domain) window.location.href = '/partner/login';
+        document.getElementById('partnerDomainBadge').textContent = 'Tenant: ' + domain;
+
+        function switchTab(tabId) {
+            // Update sidebar active class
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav-' + tabId).classList.add('active');
+
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+            // Show target section
+            document.getElementById('section-' + tabId).style.display = 'block';
+        }
+    </script>
+</body>
+</html>
