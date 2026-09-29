@@ -4,18 +4,13 @@ const db = require('../db/database');
 
 router.post('/login', async (req, res) => {
     try {
-        const { email } = req.body;
-        const [admins] = await db.execute('SELECT * FROM admins WHERE email = ?', [email]);
-        const [subAdmins] = await db.execute('SELECT * FROM sub_admins WHERE email = ?', [email]);
+        const { email, password } = req.body;
         
-        if (admins.length > 0 || subAdmins.length > 0) {
-            const otp = '123456'; // Fixed for demo purposes
-            await db.execute('INSERT INTO otps (email, otp) VALUES (?, ?) ON DUPLICATE KEY UPDATE otp = VALUES(otp)', [email, otp]);
-            console.log(`[MOCK EMAIL] OTP for ${email} is ${otp}`);
-            res.json({ success: true, message: 'OTP sent' });
-        } else {
-            res.status(401).json({ success: false, message: 'Admin not found' });
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            return res.json({ success: true, message: 'Logged in successfully' });
         }
+        
+        res.status(401).json({ success: false, message: 'Invalid email or password' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Server error' });
