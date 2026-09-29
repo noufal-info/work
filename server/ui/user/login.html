@@ -24,18 +24,47 @@
             max-width: 400px;
             text-align: center;
         }
-        .logo-container {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 24px;
-            background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
-            border-radius: 20px;
+        .splash-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ffffff;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
-            font-size: 40px;
-            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .splash-logo {
+            height: 120px;
+            margin-bottom: 24px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .splash-text {
+            font-size: 20px;
+            color: #1f2937;
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-align: center;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .splash-partners {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 800px;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .splash-partners img {
+            height: 40px;
+            object-fit: contain;
+            filter: grayscale(100%);
+            opacity: 0.7;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         h1 {
             font-size: 24px;
@@ -150,10 +179,25 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo-container">
-            <ion-icon name="book"></ion-icon>
+    <div class="splash-screen" id="splashScreen">
+        <img src="/user/logo/semicon-keralam-logo (1).png" alt="AnalogiX Logo" class="splash-logo">
+        <div class="splash-text">AnalogiX – Semiconductor Industry Competence Centre (SICC)</div>
+        <div class="splash-partners">
+            <img src="/user/logo/TECHNOPARK.png" alt="Technopark">
+            <img src="/user/logo/digital university.png" alt="Digital University Kerala">
+            <img src="/user/logo/space.png" alt="SPACE">
+            <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
+            <img src="/user/logo/synopsys.png" alt="Synopsys">
+            <img src="/user/logo/marvell.png" alt="Marvell">
+            <img src="/user/logo/ivp.png" alt="IVP Semi">
+            <img src="/user/logo/innatera.png" alt="Innatera">
+            <img src="/user/logo/axiomise.png" alt="Axiomise">
+            <img src="/user/logo/xtra g club.png" alt="X-tra G club">
         </div>
+    </div>
+
+    <div class="login-container">
+        <img src="/user/logo/semicon-keralam-logo (1).png" alt="AnalogiX Logo" style="height: 80px; margin: 0 auto 24px; display: block;">
         <h1>Welcome Back</h1>
         <p>Login to continue your learning journey</p>
         
@@ -194,6 +238,14 @@
     </div>
 
     <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
+            }, 2500);
+        });
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
