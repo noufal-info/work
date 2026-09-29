@@ -17,7 +17,7 @@ app.use('/api/admin', adminService); // Mounts /api/admin/*
 app.use('/api/partner', partnerService); // Mounts /api/partner/*
 
 // HTML Routes
-app.get('/login', (req, res) => {
+app.get('/AnalogiX', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'user', 'login.html'));
 });
 
