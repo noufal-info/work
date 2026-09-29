@@ -133,6 +133,21 @@ router.post('/teachers', async (req, res) => {
     }
 });
 
+router.post('/teachers/impersonate', async (req, res) => {
+    try {
+        const { id } = req.body;
+        const [rows] = await db.execute('SELECT * FROM teachers WHERE id = ?', [id]);
+        if (rows.length > 0) {
+            res.json({ success: true, teacher: rows[0] });
+        } else {
+            res.status(404).json({ success: false, message: 'Teacher not found' });
+        }
+    } catch (error) {
+        console.error("Error impersonating teacher:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 router.get('/teachers', async (req, res) => {
     try {
         const [rows] = await db.execute('SELECT * FROM teachers ORDER BY id DESC');

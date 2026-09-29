@@ -21,12 +21,11 @@
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo">
-                <div class="logo-icon">
-                    <ion-icon name="shield"></ion-icon>
-                </div>
-                <span>Main Admin</span>
+            
+            <div class="logo" style="margin-bottom: 24px; display: flex; justify-content: center; width: 100%;">
+                <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" style="height: 32px; max-width: 100%; object-fit: contain;">
             </div>
+
             
             <nav class="sidebar-nav">
                 <a href="/AnalogiX/admin" class="nav-item" id="nav-dashboard">
@@ -230,7 +229,9 @@
                         <td>${teacher.course || 'Unassigned'}</td>
                         <td><span class="status-badge ${teacher.status === 'Active' ? 'active' : ''}">${teacher.status || 'Active'}</span></td>
                         <td>
-                            <button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button>
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;" onclick="impersonateTeacher(${teacher.id})">
+                                <ion-icon name="log-in-outline" style="margin-right: 4px;"></ion-icon> Super Access
+                            </button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -242,6 +243,31 @@
 
         // Load teachers when page loads
         document.addEventListener('DOMContentLoaded', loadTeachers);
+        
+        async function impersonateTeacher(id) {
+            try {
+                const res = await fetch('/api/admin/teachers/impersonate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    // Set teacher auth token and redirect to teacher dashboard
+                    localStorage.setItem('teacherAuth', 'true');
+                    // Store who we are impersonating if needed
+                    localStorage.setItem('currentTeacherId', data.teacher.id);
+                    localStorage.setItem('currentTeacherName', data.teacher.name);
+                    
+                    window.open('/AnalogiX/teacher', '_blank');
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (err) {
+                alert("Failed to connect to the server.");
+            }
+        }
         // Extra Javascript logic will be added here as needed
 
         // Logout functionality
