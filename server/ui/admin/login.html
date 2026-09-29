@@ -445,6 +445,7 @@
                 const data = await res.json();
                 
                 if (data.success) {
+                    localStorage.setItem('adminAuth', 'true');
                     window.location.href = '/AnalogiX/admin';
                 } else {
                     alert(data.message);
