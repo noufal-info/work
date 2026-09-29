@@ -22,7 +22,7 @@ app.get('/AnalogiX', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'ui', 'user', 'index.html'));
+    res.redirect('/AnalogiX');
 });
 
 app.get('/admin/login', (req, res) => {
