@@ -241,9 +241,94 @@
                 font-size: 9px !important;
             }
         }
+
+        .splash-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 9999;
+            padding: 40px 20px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .splash-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .splash-subtitle {
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .splash-featured {
+            text-align: center;
+            margin-top: 20px;
+            padding: 30px 20px;
+            background: #f8fafc;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+        }
+        .splash-footer {
+            width: 100%;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .splash-footer-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .splash-footer-logos img {
+            height: 24px;
+            object-fit: contain;
+            opacity: 0.8;
+            filter: grayscale(20%);
+        }
     </style>
 </head>
 <body>
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" style="height: 100px; margin-bottom: 12px;">
+            <div class="splash-subtitle">Semiconductor Industry Competence Centre (SICC)</div>
+            
+            <div class="splash-featured">
+                <span style="font-size: 13px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 16px;">Learning Platform</span>
+                <img src="/user/logo/xtra g club.png" alt="X-tra G club" style="height: 100px; object-fit: contain;">
+            </div>
+        </div>
+
+        <div class="splash-footer">
+            <div style="font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">Supported By</div>
+            <div class="splash-footer-logos">
+                <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam">
+                <img src="/user/logo/TECHNOPARK.png" alt="Technopark">
+                <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
+                <img src="/user/logo/digital university.png" alt="Digital University Kerala">
+                <img src="/user/logo/space.png" alt="SPACE">
+                <img src="/user/logo/synopsys.png" alt="Synopsys">
+                <img src="/user/logo/marvell.png" alt="Marvell">
+                <img src="/user/logo/ivp.png" alt="IVP Semi">
+                <img src="/user/logo/innatera.png" alt="Innatera">
+                <img src="/user/logo/axiomise.png" alt="Axiomise">
+            </div>
+        </div>
+    </div>
+
     <div class="login-container">
         <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" style="height: 80px; margin: 0 auto 24px; display: block;">
         <h1>Welcome Back</h1>
@@ -265,42 +350,19 @@
         <a href="#" class="forgot-password">Forgot Password?</a>
     </div>
 
-    <div class="partner-section">
-        <img src="/user/logo/AnalogiX.png" alt="AnalogiX" style="height: 60px; margin-bottom: 10px;">
-        <div class="initiative-text">Semiconductor Industry Competence Centre (SICC)</div>
-        
-        <div class="splash-partners" style="margin-top: 15px; margin-bottom: 30px;">
-            <div class="partner-item">
-                <span class="partner-role">Learning Platform</span>
-                <img src="/user/logo/xtra g club.png" alt="X-tra G club">
-            </div>
-        </div>
 
-        <div class="partner-categories" style="margin-top: 20px;">
-            <div class="partner-category">
-                <h4>Partners:</h4>
-                <div class="splash-partners">
-                    <div class="partner-item"><img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam"></div>
-                    <div class="partner-item"><img src="/user/logo/TECHNOPARK.png" alt="Technopark"></div>
-                    <div class="partner-item"><img src="/user/logo/iby infopark.svg" alt="i by Infopark"></div>
-                    <div class="partner-item"><img src="/user/logo/digital university.png" alt="Digital University Kerala"></div>
-                    <div class="partner-item"><img src="/user/logo/space.png" alt="SPACE"></div>
-                </div>
-            </div>
-            <div class="partner-category">
-                <h4>Industry Partners</h4>
-                <div class="splash-partners">
-                    <div class="partner-item"><span class="partner-role">EDA</span><img src="/user/logo/synopsys.png" alt="Synopsys"></div>
-                    <div class="partner-item"><span class="partner-role">Analog</span><img src="/user/logo/marvell.png" alt="Marvell"></div>
-                    <div class="partner-item"><span class="partner-role">Power</span><img src="/user/logo/ivp.png" alt="IVP Semi"></div>
-                    <div class="partner-item"><span class="partner-role">Neuromorphic</span><img src="/user/logo/innatera.png" alt="Innatera"></div>
-                    <div class="partner-item"><span class="partner-role">Verification</span><img src="/user/logo/axiomise.png" alt="Axiomise"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    splash.style.visibility = 'hidden';
+                }
+            }, 3000);
+        });
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
