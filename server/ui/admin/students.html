@@ -29,7 +29,7 @@
             </div>
             
             <nav class="sidebar-nav">
-                <a href="index.html" class="nav-item active" id="nav-dashboard">
+                <a href="index.html" class="nav-item" id="nav-dashboard">
                     <ion-icon name="grid-outline"></ion-icon>
                     <span>Dashboard</span>
                 </a>
@@ -37,7 +37,7 @@
                     <ion-icon name="school-outline"></ion-icon>
                     <span>Teachers</span>
                 </a>
-                <a href="students.html" class="nav-item" id="nav-students">
+                <a href="students.html" class="nav-item active" id="nav-students">
                     <ion-icon name="people-outline"></ion-icon>
                     <span>Students</span>
                 </a>
@@ -95,88 +95,24 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
-            <div id="section-dashboard" class="content-section dashboard-content">
+            <!-- Students Content -->
+            <div id="section-students" class="content-section dashboard-content" >
                 <div class="page-header">
-                    <h1>Dashboard Overview</h1>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn-primary" onclick="switchTab('courses')">
-                            <ion-icon name="add-outline"></ion-icon>
-                            Create Course
-                        </button>
-                    </div>
+                    <h1>Student Management</h1>
+                    <button class="btn-primary" onclick="alert('Add New Student form opened')">
+                        <ion-icon name="add-outline"></ion-icon>
+                        Add New Student
+                    </button>
                 </div>
-
-                <!-- KPI Cards -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon green">
-                                <ion-icon name="people"></ion-icon>
-                            </div>
-                            <span class="trend positive">+12%</span>
-                        </div>
-                        <div class="metric-body">
-                            <h3>Total Students</h3>
-                            <p class="value">2,451</p>
-                        </div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon blue">
-                                <ion-icon name="library"></ion-icon>
-                            </div>
-                            <span class="trend positive">+5%</span>
-                        </div>
-                        <div class="metric-body">
-                            <h3>Active Courses</h3>
-                            <p class="value">48</p>
-                        </div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon dark-blue">
-                                <ion-icon name="cash"></ion-icon>
-                            </div>
-                            <span class="trend positive">+24%</span>
-                        </div>
-                        <div class="metric-body">
-                            <h3>Total Revenue</h3>
-                            <p class="value">₹12,450</p>
-                        </div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon light">
-                                <ion-icon name="ribbon"></ion-icon>
-                            </div>
-                            <span class="trend neutral">0%</span>
-                        </div>
-                        <div class="metric-body">
-                            <h3>Certificates Issued</h3>
-                            <p class="value">845</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Users Table -->
                 <div class="data-section">
-                    <div class="section-header">
-                        <h2>Recent Activity</h2>
-                        <button class="btn-secondary">View All</button>
-                    </div>
-                    
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>User</th>
-                                    <th>Role</th>
-                                    <th>Date Joined</th>
-                                    <th>Status</th>
+                                    <th>Student</th>
+                                    <th>Score Sheet</th>
+                                    <th>Attendance</th>
+                                    <th>Certificate</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -185,28 +121,18 @@
                                     <td>
                                         <div class="user-cell">
                                             <div class="avatar-small">AS</div>
-                                            <span>Alex Student</span>
+                                            <span>Alex Student<br><small style="color: #64748b; font-weight: normal;">alex@example.com</small></span>
                                         </div>
                                     </td>
-                                    <td>Student</td>
-                                    <td>Oct 24, 2023</td>
-                                    <td><span class="status-badge active">Active</span></td>
+                                    <td><span class="status-badge active" style="background:#e0e7ff; color:#4f5be8;">A Grade (92%)</span></td>
+                                    <td>95%</td>
                                     <td>
-                                        <button class="icon-btn small"><ion-icon name="ellipsis-vertical"></ion-icon></button>
+                                        <button class="btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="alert('File selector opened for certificate upload')">
+                                            <ion-icon name="cloud-upload-outline"></ion-icon> Upload
+                                        </button>
                                     </td>
-                                </tr>
-                                <tr>
                                     <td>
-                                        <div class="user-cell">
-                                            <div class="avatar-small blue-bg">JS</div>
-                                            <span>John Smith</span>
-                                        </div>
-                                    </td>
-                                    <td>Teacher</td>
-                                    <td>Oct 23, 2023</td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td>
-                                        <button class="icon-btn small"><ion-icon name="ellipsis-vertical"></ion-icon></button>
+                                        <button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button>
                                     </td>
                                 </tr>
                             </tbody>

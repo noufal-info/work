@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS - Admin Dashboard</title>
+    <link rel="stylesheet" href="/admin/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        // Basic Route Protection
+        if (localStorage.getItem('adminAuth') !== 'true') {
+            window.location.href = '/AnalogiX/admin/login';
+        }
+    </script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <ion-icon name="shield"></ion-icon>
+                </div>
+                <span>Main Admin</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item" id="nav-dashboard">
+                    <ion-icon name="grid-outline"></ion-icon>
+                    <span>Dashboard</span>
+                </a>
+                <a href="teachers.html" class="nav-item" id="nav-teachers">
+                    <ion-icon name="school-outline"></ion-icon>
+                    <span>Teachers</span>
+                </a>
+                <a href="students.html" class="nav-item" id="nav-students">
+                    <ion-icon name="people-outline"></ion-icon>
+                    <span>Students</span>
+                </a>
+                <a href="courses.html" class="nav-item" id="nav-courses">
+                    <ion-icon name="library-outline"></ion-icon>
+                    <span>Courses</span>
+                </a>
+                <a href="calendar.html" class="nav-item" id="nav-calendar">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    <span>Calendar & Meets</span>
+                </a>
+                <a href="messages.html" class="nav-item" id="nav-messages">
+                    <ion-icon name="chatbubbles-outline"></ion-icon>
+                    <span>Communications</span>
+                </a>
+                <a href="reports.html" class="nav-item active" id="nav-reports">
+                    <ion-icon name="bar-chart-outline"></ion-icon>
+                    <span>Reports</span>
+                </a>
+                <a href="settings.html" class="nav-item" id="nav-settings">
+                    <ion-icon name="settings-outline"></ion-icon>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item logout">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="search-bar">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" placeholder="Search students, courses, batches...">
+                </div>
+                
+                <div class="header-actions">
+                    <button class="icon-btn">
+                        <ion-icon name="notifications-outline"></ion-icon>
+                        <span class="badge">5</span>
+                    </button>
+                    <div class="admin-profile">
+                        <img src="https://ui-avatars.com/api/?name=Main+Admin&background=10b981&color=fff" alt="Admin Avatar">
+                        <div class="profile-info">
+                            <span class="name">Super Admin</span>
+                            <span class="role">Administrator</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Reports Content -->
+            <div id="section-reports" class="content-section dashboard-content" >
+                <h1>Reports</h1><p>Placeholder for student progress and revenue reports.</p>
+            </div>
+            
+            </main>
+    </div>
+
+    <script>
+        // Extra Javascript logic will be added here as needed
+
+        // Logout functionality
+        document.querySelector('.logout').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('adminAuth');
+            window.location.href = '/AnalogiX/admin/login';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS - Admin Dashboard</title>
+    <link rel="stylesheet" href="/admin/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        // Basic Route Protection
+        if (localStorage.getItem('adminAuth') !== 'true') {
+            window.location.href = '/AnalogiX/admin/login';
+        }
+    </script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <ion-icon name="shield"></ion-icon>
+                </div>
+                <span>Main Admin</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item" id="nav-dashboard">
+                    <ion-icon name="grid-outline"></ion-icon>
+                    <span>Dashboard</span>
+                </a>
+                <a href="teachers.html" class="nav-item" id="nav-teachers">
+                    <ion-icon name="school-outline"></ion-icon>
+                    <span>Teachers</span>
+                </a>
+                <a href="students.html" class="nav-item" id="nav-students">
+                    <ion-icon name="people-outline"></ion-icon>
+                    <span>Students</span>
+                </a>
+                <a href="courses.html" class="nav-item" id="nav-courses">
+                    <ion-icon name="library-outline"></ion-icon>
+                    <span>Courses</span>
+                </a>
+                <a href="calendar.html" class="nav-item" id="nav-calendar">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    <span>Calendar & Meets</span>
+                </a>
+                <a href="messages.html" class="nav-item active" id="nav-messages">
+                    <ion-icon name="chatbubbles-outline"></ion-icon>
+                    <span>Communications</span>
+                </a>
+                <a href="reports.html" class="nav-item" id="nav-reports">
+                    <ion-icon name="bar-chart-outline"></ion-icon>
+                    <span>Reports</span>
+                </a>
+                <a href="settings.html" class="nav-item" id="nav-settings">
+                    <ion-icon name="settings-outline"></ion-icon>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item logout">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="search-bar">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" placeholder="Search students, courses, batches...">
+                </div>
+                
+                <div class="header-actions">
+                    <button class="icon-btn">
+                        <ion-icon name="notifications-outline"></ion-icon>
+                        <span class="badge">5</span>
+                    </button>
+                    <div class="admin-profile">
+                        <img src="https://ui-avatars.com/api/?name=Main+Admin&background=10b981&color=fff" alt="Admin Avatar">
+                        <div class="profile-info">
+                            <span class="name">Super Admin</span>
+                            <span class="role">Administrator</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Communications Content -->
+            <div id="section-messages" class="content-section dashboard-content" >
+                <div class="page-header">
+                    <h1>Send Notifications & Emails</h1>
+                </div>
+                <div class="data-section" style="padding: 24px; max-width: 800px;">
+                    <form onsubmit="event.preventDefault(); alert('Message successfully sent to the database and queued for email delivery!');">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Recipient(s)</label>
+                            <select style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                                <option>All Students (Bulk Notification)</option>
+                                <option>Alex Student (alex@example.com)</option>
+                                <option>Sarah Jenkins (sarah@example.com)</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Subject</label>
+                            <input type="text" placeholder="e.g. Upcoming Google Meet Session" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                        </div>
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Message</label>
+                            <textarea rows="6" placeholder="Type your message here... This will appear on the student UI." required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" style="padding: 12px 24px;">
+                            <ion-icon name="send-outline"></ion-icon> Send Email / Notification
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            </main>
+    </div>
+
+    <script>
+        // Extra Javascript logic will be added here as needed
+
+        // Logout functionality
+        document.querySelector('.logout').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('adminAuth');
+            window.location.href = '/AnalogiX/admin/login';
+        });
+    </script>
+</body>
+</html>
