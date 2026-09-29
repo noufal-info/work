@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../ui')));
+app.use(express.static(path.join(__dirname, 'ui')));
 
 // API Routes Mounted
 app.use('/api', userService); // Mounts /api/login
@@ -18,27 +18,27 @@ app.use('/api/partner', partnerService); // Mounts /api/partner/*
 
 // HTML Routes
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../ui', 'user', 'login.html'));
+    res.sendFile(path.join(__dirname, 'ui', 'user', 'login.html'));
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../ui', 'user', 'index.html'));
+    res.sendFile(path.join(__dirname, 'ui', 'user', 'index.html'));
 });
 
 app.get('/admin/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../ui', 'admin', 'login.html'));
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'login.html'));
 });
 
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '../ui', 'admin', 'index.html'));
+    res.sendFile(path.join(__dirname, 'ui', 'admin', 'index.html'));
 });
 
 app.get('/partner/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../ui', 'partner', 'login.html'));
+    res.sendFile(path.join(__dirname, 'ui', 'partner', 'login.html'));
 });
 
 app.get('/partner', (req, res) => {
-    res.sendFile(path.join(__dirname, '../ui', 'partner', 'index.html'));
+    res.sendFile(path.join(__dirname, 'ui', 'partner', 'index.html'));
 });
 
 app.listen(PORT, () => {
