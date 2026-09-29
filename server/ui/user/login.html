@@ -35,32 +35,80 @@
             z-index: 9999;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        .splash-logo {
-            height: 120px;
-            margin-bottom: 24px;
+        .analogix-title {
+            font-size: 48px;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -1.5px;
+            margin-bottom: 8px;
             animation: fadeIn 1s ease-in-out;
         }
-        .splash-text {
-            font-size: 20px;
-            color: #1f2937;
+        .powered-by {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+        .powered-by span {
+            font-size: 14px;
+            color: #6b7280;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .powered-logo {
+            height: 45px;
+        }
+        .splash-text {
+            font-size: 16px;
+            color: #4b5563;
+            font-weight: 500;
             margin-bottom: 40px;
             text-align: center;
             animation: fadeIn 1.5s ease-in-out;
+        }
+        .partner-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            width: 100%;
+            max-width: 900px;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .partner-category {
+            text-align: center;
+        }
+        .partner-category h4 {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
         .splash-partners {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            max-width: 800px;
-            animation: fadeIn 2s ease-in-out;
+            align-items: center;
+            gap: 30px;
+        }
+        .partner-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .partner-role {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
         }
         .splash-partners img {
-            height: 40px;
+            height: 50px;
             object-fit: contain;
-            filter: grayscale(100%);
-            opacity: 0.7;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -138,25 +186,13 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .partner-logos {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
         .partner-logos img {
-            height: 35px;
+            height: 50px;
             object-fit: contain;
-            filter: grayscale(100%);
-            opacity: 0.7;
             transition: all 0.3s ease;
         }
         .partner-logos img:hover {
-            filter: grayscale(0%);
-            opacity: 1;
+            transform: scale(1.05);
         }
         .main-logos {
             display: flex;
@@ -180,19 +216,34 @@
 </head>
 <body>
     <div class="splash-screen" id="splashScreen">
-        <img src="/user/logo/semicon-keralam-logo (1).png" alt="AnalogiX Logo" class="splash-logo">
-        <div class="splash-text">AnalogiX – Semiconductor Industry Competence Centre (SICC)</div>
-        <div class="splash-partners">
-            <img src="/user/logo/TECHNOPARK.png" alt="Technopark">
-            <img src="/user/logo/digital university.png" alt="Digital University Kerala">
-            <img src="/user/logo/space.png" alt="SPACE">
-            <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
-            <img src="/user/logo/synopsys.png" alt="Synopsys">
-            <img src="/user/logo/marvell.png" alt="Marvell">
-            <img src="/user/logo/ivp.png" alt="IVP Semi">
-            <img src="/user/logo/innatera.png" alt="Innatera">
-            <img src="/user/logo/axiomise.png" alt="Axiomise">
-            <img src="/user/logo/xtra g club.png" alt="X-tra G club">
+        <div class="analogix-title">AnalogiX</div>
+        <div class="powered-by">
+            <span>Powered by</span>
+            <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam" class="powered-logo">
+        </div>
+        <div class="splash-text">Semiconductor Industry Competence Centre (SICC)</div>
+        
+        <div class="partner-categories">
+            <div class="partner-category">
+                <h4>App & Location Partners</h4>
+                <div class="splash-partners">
+                    <div class="partner-item"><img src="/user/logo/TECHNOPARK.png" alt="Technopark"></div>
+                    <div class="partner-item"><img src="/user/logo/iby infopark.svg" alt="i by Infopark"></div>
+                    <div class="partner-item"><img src="/user/logo/digital university.png" alt="Digital University Kerala"></div>
+                    <div class="partner-item"><img src="/user/logo/space.png" alt="SPACE"></div>
+                </div>
+            </div>
+            <div class="partner-category">
+                <h4>Industry Partners</h4>
+                <div class="splash-partners">
+                    <div class="partner-item"><span class="partner-role">EDA</span><img src="/user/logo/synopsys.png" alt="Synopsys"></div>
+                    <div class="partner-item"><span class="partner-role">Analog</span><img src="/user/logo/marvell.png" alt="Marvell"></div>
+                    <div class="partner-item"><span class="partner-role">Power</span><img src="/user/logo/ivp.png" alt="IVP Semi"></div>
+                    <div class="partner-item"><span class="partner-role">Neuromorphic</span><img src="/user/logo/innatera.png" alt="Innatera"></div>
+                    <div class="partner-item"><span class="partner-role">Verification</span><img src="/user/logo/axiomise.png" alt="Axiomise"></div>
+                    <div class="partner-item"><span class="partner-role">Learning Platform</span><img src="/user/logo/xtra g club.png" alt="X-tra G club"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -218,22 +269,34 @@
     </div>
 
     <div class="partner-section">
-        <div class="main-logos">
-            <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam" style="height: 60px;">
-            <img src="/user/logo/TECHNOPARK.png" alt="Technopark">
-            <img src="/user/logo/digital university.png" alt="Digital University Kerala">
-            <img src="/user/logo/space.png" alt="SPACE">
-            <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
+        <div class="analogix-title" style="font-size: 28px; margin-bottom: 4px;">AnalogiX</div>
+        <div class="powered-by" style="justify-content: center;">
+            <span>Powered by</span>
+            <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam" class="powered-logo">
         </div>
-        <div class="initiative-text">AnalogiX – Semiconductor Industry Competence Centre (SICC)</div>
-        <h3>Proposed Industry Partners</h3>
-        <div class="partner-logos">
-            <img src="/user/logo/synopsys.png" alt="Synopsys" title="EDA">
-            <img src="/user/logo/marvell.png" alt="Marvell" title="Analog">
-            <img src="/user/logo/ivp.png" alt="IVP Semi" title="Power">
-            <img src="/user/logo/innatera.png" alt="Innatera" title="Neuromorphic">
-            <img src="/user/logo/axiomise.png" alt="Axiomise" title="Verification">
-            <img src="/user/logo/xtra g club.png" alt="X-tra G club" title="Learning Platform">
+        <div class="initiative-text">Semiconductor Industry Competence Centre (SICC)</div>
+        
+        <div class="partner-categories" style="margin-top: 40px;">
+            <div class="partner-category">
+                <h4>App & Location Partners</h4>
+                <div class="splash-partners">
+                    <div class="partner-item"><img src="/user/logo/TECHNOPARK.png" alt="Technopark"></div>
+                    <div class="partner-item"><img src="/user/logo/iby infopark.svg" alt="i by Infopark"></div>
+                    <div class="partner-item"><img src="/user/logo/digital university.png" alt="Digital University Kerala"></div>
+                    <div class="partner-item"><img src="/user/logo/space.png" alt="SPACE"></div>
+                </div>
+            </div>
+            <div class="partner-category">
+                <h4>Industry Partners</h4>
+                <div class="splash-partners">
+                    <div class="partner-item"><span class="partner-role">EDA</span><img src="/user/logo/synopsys.png" alt="Synopsys"></div>
+                    <div class="partner-item"><span class="partner-role">Analog</span><img src="/user/logo/marvell.png" alt="Marvell"></div>
+                    <div class="partner-item"><span class="partner-role">Power</span><img src="/user/logo/ivp.png" alt="IVP Semi"></div>
+                    <div class="partner-item"><span class="partner-role">Neuromorphic</span><img src="/user/logo/innatera.png" alt="Innatera"></div>
+                    <div class="partner-item"><span class="partner-role">Verification</span><img src="/user/logo/axiomise.png" alt="Axiomise"></div>
+                    <div class="partner-item"><span class="partner-role">Learning Platform</span><img src="/user/logo/xtra g club.png" alt="X-tra G club"></div>
+                </div>
+            </div>
         </div>
     </div>
 
