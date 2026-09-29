@@ -5,6 +5,7 @@ const path = require('path');
 const userService = require('./services/userService');
 const adminService = require('./services/adminService');
 const partnerService = require('./services/partnerService');
+const teacherService = require('./services/teacherService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'ui')));
 app.use('/api', userService); // Mounts /api/login
 app.use('/api/admin', adminService); // Mounts /api/admin/*
 app.use('/api/partner', partnerService); // Mounts /api/partner/*
+app.use('/api/teacher', teacherService); // Mounts /api/teacher/*
 
 // HTML Routes
 app.get('/AnalogiX', (req, res) => {
@@ -64,6 +66,15 @@ app.get('/AnalogiX/partner/login', (req, res) => {
 
 app.get('/AnalogiX/partner', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'partner', 'index.html'));
+});
+
+// Teacher Routes
+app.get('/AnalogiX/teacher/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'teacher', 'login.html'));
+});
+
+app.get('/AnalogiX/teacher', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'teacher', 'index.html'));
 });
 
 app.listen(PORT, () => {
