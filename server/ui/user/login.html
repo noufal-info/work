@@ -12,9 +12,10 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             padding: 20px;
             background-color: var(--bg-color);
         }
@@ -93,6 +94,59 @@
             font-weight: 500;
             font-size: 14px;
         }
+        .partner-section {
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .partner-section h3 {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .partner-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .partner-logos img {
+            height: 35px;
+            object-fit: contain;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        .partner-logos img:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+        .main-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 10px;
+        }
+        .main-logos img {
+            height: 50px;
+            object-fit: contain;
+        }
+        .initiative-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -117,6 +171,26 @@
         </form>
         
         <a href="#" class="forgot-password">Forgot Password?</a>
+    </div>
+
+    <div class="partner-section">
+        <div class="main-logos">
+            <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam" style="height: 60px;">
+            <img src="/user/logo/TECHNOPARK.png" alt="Technopark">
+            <img src="/user/logo/digital university.png" alt="Digital University Kerala">
+            <img src="/user/logo/space.png" alt="SPACE">
+            <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
+        </div>
+        <div class="initiative-text">AnalogiX – Semiconductor Industry Competence Centre (SICC)</div>
+        <h3>Proposed Industry Partners</h3>
+        <div class="partner-logos">
+            <img src="/user/logo/synopsys.png" alt="Synopsys" title="EDA">
+            <img src="/user/logo/marvell.png" alt="Marvell" title="Analog">
+            <img src="/user/logo/ivp.png" alt="IVP Semi" title="Power">
+            <img src="/user/logo/innatera.png" alt="Innatera" title="Neuromorphic">
+            <img src="/user/logo/axiomise.png" alt="Axiomise" title="Verification">
+            <img src="/user/logo/xtra g club.png" alt="X-tra G club" title="Learning Platform">
+        </div>
     </div>
 
     <script>
