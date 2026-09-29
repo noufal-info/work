@@ -246,86 +246,118 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
+            overflow-y: auto;
             z-index: 9999;
             padding: 40px 20px;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        .splash-content {
-            flex: 1;
+        .splash-container {
+            max-width: 800px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
+            gap: 50px;
         }
-        .splash-subtitle {
-            font-size: 14px;
-            color: #4b5563;
-            font-weight: 600;
+        .splash-header {
             text-align: center;
-            margin-bottom: 40px;
-        }
-        .splash-featured {
-            text-align: center;
-            margin-top: 20px;
-            padding: 30px 20px;
-            background: #f8fafc;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 320px;
-        }
-        .splash-footer {
-            width: 100%;
-            text-align: center;
-            padding-bottom: 20px;
-        }
-        .splash-footer-logos {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            gap: 15px;
-            max-width: 600px;
-            margin: 0 auto;
         }
-        .splash-footer-logos img {
-            height: 24px;
-            object-fit: contain;
-            opacity: 0.8;
-            filter: grayscale(20%);
+        .analogix-main-logo { height: 60px; margin-bottom: 16px; }
+        .sicc-title { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+        .initiative-text { font-size: 14px; color: #4b5563; margin-bottom: 24px; }
+        .semicon-main-logo { height: 120px; }
+        
+        .splash-section h3 {
+            font-size: 18px; color: #111827; font-weight: 700; margin-bottom: 24px; text-align: left;
+        }
+        .partners-row {
+            display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: 30px;
+        }
+        .partners-row img { height: 50px; object-fit: contain; }
+        
+        .industry-table {
+            display: flex; flex-direction: column;
+            border: 1px solid #111827; overflow: hidden;
+        }
+        .industry-row {
+            display: flex; border-bottom: 1px solid #111827;
+        }
+        .industry-row:last-child { border-bottom: none; }
+        .industry-col-title {
+            flex: 1; padding: 20px; font-weight: 700; color: #111827; background: #ffffff;
+            border-right: 1px solid #111827; display: flex; align-items: center; font-size: 18px;
+        }
+        .industry-col-logo {
+            flex: 2; padding: 20px; display: flex; align-items: center; justify-content: flex-start; background: #ffffff;
+        }
+        .industry-col-logo img { height: 50px; object-fit: contain; }
+        
+        .highlight-row { background: #ffffff; }
+        .xtra-logo { height: 80px !important; }
+        
+        @media (max-width: 600px) {
+            .industry-row { flex-direction: column; }
+            .industry-col-title { border-right: none; border-bottom: 1px solid #111827; text-align: center; justify-content: center; }
+            .industry-col-logo { justify-content: center; }
+            .semicon-main-logo { height: 80px; }
+            .partners-row { justify-content: center; }
+            .splash-section h3 { text-align: center; }
         }
     </style>
 </head>
 <body>
     <div class="splash-screen" id="splashScreen">
-        <div class="splash-content">
-            <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" style="height: 100px; margin-bottom: 12px;">
-            <div class="splash-subtitle">Semiconductor Industry Competence Centre (SICC)</div>
-            
-            <div class="splash-featured">
-                <span style="font-size: 13px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 16px;">Learning Platform</span>
-                <img src="/user/logo/xtra g club.png" alt="X-tra G club" style="height: 100px; object-fit: contain;">
+        <div class="splash-container">
+            <div class="splash-header">
+                <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" class="analogix-main-logo">
+                <h2 class="sicc-title">Semiconductor Industry Competence Centre (SICC)</h2>
+                <p class="initiative-text">A Flagship Initiative under Semicon Keralam</p>
+                <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam" class="semicon-main-logo">
             </div>
-        </div>
 
-        <div class="splash-footer">
-            <div style="font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">Supported By</div>
-            <div class="splash-footer-logos">
-                <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam">
-                <img src="/user/logo/TECHNOPARK.png" alt="Technopark">
-                <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
-                <img src="/user/logo/digital university.png" alt="Digital University Kerala">
-                <img src="/user/logo/space.png" alt="SPACE">
-                <img src="/user/logo/synopsys.png" alt="Synopsys">
-                <img src="/user/logo/marvell.png" alt="Marvell">
-                <img src="/user/logo/ivp.png" alt="IVP Semi">
-                <img src="/user/logo/innatera.png" alt="Innatera">
-                <img src="/user/logo/axiomise.png" alt="Axiomise">
+            <div class="splash-section">
+                <h3>Partners:</h3>
+                <div class="partners-row">
+                    <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
+                    <img src="/user/logo/TECHNOPARK.png" alt="Technopark">
+                    <img src="/user/logo/digital university.png" alt="Digital University Kerala">
+                    <img src="/user/logo/space.png" alt="SPACE">
+                </div>
             </div>
+
+            <div class="splash-section">
+                <h3>Proposed Industry Partners:</h3>
+                <div class="industry-table">
+                    <div class="industry-row">
+                        <div class="industry-col-title">EDA</div>
+                        <div class="industry-col-logo"><img src="/user/logo/synopsys.png" alt="Synopsys"></div>
+                    </div>
+                    <div class="industry-row">
+                        <div class="industry-col-title">Analog</div>
+                        <div class="industry-col-logo"><img src="/user/logo/marvell.png" alt="Marvell"></div>
+                    </div>
+                    <div class="industry-row">
+                        <div class="industry-col-title">Power</div>
+                        <div class="industry-col-logo"><img src="/user/logo/ivp.png" alt="IVP Semi"></div>
+                    </div>
+                    <div class="industry-row">
+                        <div class="industry-col-title">Neuromorphic</div>
+                        <div class="industry-col-logo"><img src="/user/logo/innatera.png" alt="Innatera"></div>
+                    </div>
+                    <div class="industry-row">
+                        <div class="industry-col-title">Verification</div>
+                        <div class="industry-col-logo"><img src="/user/logo/axiomise.png" alt="Axiomise"></div>
+                    </div>
+                    <div class="industry-row highlight-row">
+                        <div class="industry-col-title">Learning Platform</div>
+                        <div class="industry-col-logo"><img src="/user/logo/xtra g club.png" alt="X-tra G club" class="xtra-logo"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="skipSplashBtn" class="btn-login" style="max-width: 250px; margin: 0 auto; background: #111827;">Continue to Login</button>
         </div>
     </div>
 
@@ -353,14 +385,12 @@
 
 
     <script>
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                if (splash) {
-                    splash.style.opacity = '0';
-                    splash.style.visibility = 'hidden';
-                }
-            }, 3000);
+        document.getElementById('skipSplashBtn').addEventListener('click', () => {
+            const splash = document.getElementById('splashScreen');
+            if (splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.visibility = 'hidden', 500);
+            }
         });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
