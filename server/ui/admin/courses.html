@@ -112,13 +112,8 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Advanced Node.js</td>
-                                    <td>142 Students</td>
-                                    <td><span class="status-badge active">Published</span></td>
-                                    <td><button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button></td>
-                                </tr>
+                            <tbody id="coursesTableBody">
+                                <!-- Courses will be loaded here dynamically -->
                             </tbody>
                         </table>
                     </div>
@@ -174,11 +169,78 @@
             document.getElementById(id).classList.remove('active');
         }
 
-        function handleCourseSubmit(e) {
+        async function handleCourseSubmit(e) {
             e.preventDefault();
-            alert("Success! The new course has been created and published.");
-            closeModal('courseModal');
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Publishing...';
+            btn.disabled = true;
+
+            const title = document.getElementById('courseTitle').value;
+            const description = document.getElementById('courseDescription').value;
+            const instructor = document.getElementById('courseInstructor').options[document.getElementById('courseInstructor').selectedIndex].text;
+            const price = document.getElementById('coursePrice').value;
+
+            try {
+                const response = await fetch('/api/admin/courses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, instructor, price })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert("Success! The new course has been created and published.");
+                    closeModal('courseModal');
+                    e.target.reset();
+                    loadCourses();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                alert("Failed to connect to the server.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
+
+        async function loadCourses() {
+            const tbody = document.getElementById('coursesTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading courses...</td></tr>';
+            
+            try {
+                const response = await fetch('/api/admin/courses');
+                const courses = await response.json();
+                
+                if (courses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No courses found. Click "Create New Course" to publish one.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                courses.forEach(course => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <strong>${course.title}</strong><br>
+                            <small style="color:var(--text-muted)">Instructor: ${course.instructor}</small>
+                        </td>
+                        <td>0 Students (₹${course.price})</td>
+                        <td><span class="status-badge ${course.status === 'Published' ? 'active' : ''}">${course.status || 'Published'}</span></td>
+                        <td><button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error loading courses.</td></tr>';
+            }
+        }
+
+        // Load courses when page loads
+        document.addEventListener('DOMContentLoaded', loadCourses);
         // Extra Javascript logic will be added here as needed
 
         // Logout functionality

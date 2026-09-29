@@ -113,21 +113,8 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="user-cell">
-                                            <div class="avatar-small blue-bg">JS</div>
-                                            <span>John Smith</span>
-                                        </div>
-                                    </td>
-                                    <td>john.smith@example.com</td>
-                                    <td>3 Courses</td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td>
-                                        <button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button>
-                                    </td>
-                                </tr>
+                            <tbody id="teachersTableBody">
+                                <!-- Teachers will be loaded here dynamically -->
                             </tbody>
                         </table>
                     </div>
@@ -184,14 +171,85 @@
             document.getElementById(id).classList.remove('active');
         }
 
-        function handleTeacherSubmit(e) {
+        async function handleTeacherSubmit(e) {
             e.preventDefault();
-            // In a real app, you'd send this data to your backend API
-            alert("Success! Teacher account created and email invitation sent.");
-            closeModal('teacherModal');
             
-            // Optionally, refresh or dynamically add the new row to the table here
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Creating...';
+            btn.disabled = true;
+
+            const name = document.getElementById('teacherName').value;
+            const email = document.getElementById('teacherEmail').value;
+            const course = document.getElementById('teacherCourse').value;
+            const password = document.getElementById('teacherPassword').value;
+
+            try {
+                const response = await fetch('/api/admin/teachers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, course, password })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert("Success! Teacher account created and saved to database.");
+                    closeModal('teacherModal');
+                    e.target.reset();
+                    loadTeachers();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                alert("Failed to connect to the server.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
+
+        async function loadTeachers() {
+            const tbody = document.getElementById('teachersTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading teachers...</td></tr>';
+            
+            try {
+                const response = await fetch('/api/admin/teachers');
+                const teachers = await response.json();
+                
+                if (teachers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No teachers found. Click "Create New Teacher" to add one.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                teachers.forEach(teacher => {
+                    const initials = teacher.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-small blue-bg">${initials}</div>
+                                <span>${teacher.name}</span>
+                            </div>
+                        </td>
+                        <td>${teacher.email}</td>
+                        <td>${teacher.course || 'Unassigned'}</td>
+                        <td><span class="status-badge ${teacher.status === 'Active' ? 'active' : ''}">${teacher.status || 'Active'}</span></td>
+                        <td>
+                            <button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Error loading teachers.</td></tr>';
+            }
+        }
+
+        // Load teachers when page loads
+        document.addEventListener('DOMContentLoaded', loadTeachers);
         // Extra Javascript logic will be added here as needed
 
         // Logout functionality

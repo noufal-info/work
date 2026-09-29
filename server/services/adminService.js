@@ -2,6 +2,36 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
 
+// Initialize tables automatically
+(async function initTables() {
+    try {
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS teachers (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              name VARCHAR(255) NOT NULL,
+              email VARCHAR(255) UNIQUE NOT NULL,
+              course VARCHAR(255),
+              password VARCHAR(255) NOT NULL,
+              status VARCHAR(50) DEFAULT 'Active'
+            )
+        `);
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS courses (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              title VARCHAR(255) NOT NULL,
+              description TEXT,
+              instructor VARCHAR(255),
+              price DECIMAL(10,2) NOT NULL,
+              status VARCHAR(50) DEFAULT 'Published'
+            )
+        `);
+        console.log("Teachers and Courses tables initialized.");
+    } catch (err) {
+        console.error("Failed to initialize tables:", err);
+    }
+})();
+
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -86,6 +116,51 @@ router.post('/partners/impersonate', async (req, res) => {
         }
     } catch (error) {
         console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+
+// Teachers Routes
+router.post('/teachers', async (req, res) => {
+    try {
+        const { name, email, course, password } = req.body;
+        await db.execute('INSERT INTO teachers (name, email, course, password) VALUES (?, ?, ?, ?)', [name, email, course, password]);
+        res.json({ success: true, message: 'Teacher created successfully' });
+    } catch (error) {
+        console.error("Error creating teacher:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.get('/teachers', async (req, res) => {
+    try {
+        const [rows] = await db.execute('SELECT * FROM teachers ORDER BY id DESC');
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching teachers:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// Courses Routes
+router.post('/courses', async (req, res) => {
+    try {
+        const { title, description, instructor, price } = req.body;
+        await db.execute('INSERT INTO courses (title, description, instructor, price) VALUES (?, ?, ?, ?)', [title, description, instructor, price]);
+        res.json({ success: true, message: 'Course published successfully' });
+    } catch (error) {
+        console.error("Error creating course:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.get('/courses', async (req, res) => {
+    try {
+        const [rows] = await db.execute('SELECT * FROM courses ORDER BY id DESC');
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching courses:", error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
