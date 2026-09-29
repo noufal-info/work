@@ -245,18 +245,22 @@
         .splash-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ffffff;
+            background-color: #f8fafc;
             overflow-y: auto;
             z-index: 9999;
             padding: 40px 20px;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         .splash-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             gap: 50px;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
         }
         .splash-header {
             text-align: center;
@@ -264,46 +268,90 @@
             flex-direction: column;
             align-items: center;
         }
-        .analogix-main-logo { height: 60px; margin-bottom: 16px; }
-        .sicc-title { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 8px; }
-        .initiative-text { font-size: 14px; color: #4b5563; margin-bottom: 24px; }
-        .semicon-main-logo { height: 120px; }
+        .analogix-main-logo { height: 70px; margin-bottom: 20px; }
+        .sicc-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .initiative-text { font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; }
+        .semicon-main-logo { height: 110px; }
         
         .splash-section h3 {
-            font-size: 18px; color: #111827; font-weight: 700; margin-bottom: 24px; text-align: left;
+            font-size: 14px; color: #94a3b8; font-weight: 700; margin-bottom: 24px; text-align: center; text-transform: uppercase; letter-spacing: 2px;
         }
         .partners-row {
-            display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: 30px;
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px;
         }
-        .partners-row img { height: 50px; object-fit: contain; }
+        .partners-row img { height: 45px; object-fit: contain; filter: grayscale(100%) opacity(70%); transition: 0.3s; }
+        .partners-row img:hover { filter: grayscale(0%) opacity(100%); transform: scale(1.05); }
+
+        .industry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .industry-card {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .industry-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+        .card-badge {
+            flex: 0 0 120px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .card-logo {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .card-logo img {
+            height: 40px;
+            object-fit: contain;
+        }
         
-        .industry-table {
-            display: flex; flex-direction: column;
-            border: 1px solid #111827; overflow: hidden;
+        .highlight-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+            border: 2px solid #bae6fd;
+            grid-column: 1 / -1;
         }
-        .industry-row {
-            display: flex; border-bottom: 1px solid #111827;
-        }
-        .industry-row:last-child { border-bottom: none; }
-        .industry-col-title {
-            flex: 1; padding: 20px; font-weight: 700; color: #111827; background: #ffffff;
-            border-right: 1px solid #111827; display: flex; align-items: center; font-size: 18px;
-        }
-        .industry-col-logo {
-            flex: 2; padding: 20px; display: flex; align-items: center; justify-content: flex-start; background: #ffffff;
-        }
-        .industry-col-logo img { height: 50px; object-fit: contain; }
+        .highlight-card .card-badge { color: #0284c7; }
+        .highlight-card .card-logo img { height: 60px; }
         
-        .highlight-row { background: #ffffff; }
-        .xtra-logo { height: 80px !important; }
-        
+        .btn-continue {
+            background: #4f5be8;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(79, 91, 232, 0.2);
+            transition: all 0.2s;
+            margin: 20px auto 0;
+            display: block;
+        }
+        .btn-continue:hover { background: #3f4ac8; transform: translateY(-2px); }
+
         @media (max-width: 600px) {
-            .industry-row { flex-direction: column; }
-            .industry-col-title { border-right: none; border-bottom: 1px solid #111827; text-align: center; justify-content: center; }
-            .industry-col-logo { justify-content: center; }
+            .splash-container { padding: 30px 20px; border-radius: 16px; gap: 30px; }
+            .industry-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .card-badge { flex: auto; background: #f1f5f9; padding: 4px 12px; border-radius: 20px; }
+            .card-logo { justify-content: center; width: 100%; }
+            .highlight-card { grid-column: auto; }
             .semicon-main-logo { height: 80px; }
-            .partners-row { justify-content: center; }
-            .splash-section h3 { text-align: center; }
         }
     </style>
 </head>
@@ -328,36 +376,36 @@
             </div>
 
             <div class="splash-section">
-                <h3>Proposed Industry Partners:</h3>
-                <div class="industry-table">
-                    <div class="industry-row">
-                        <div class="industry-col-title">EDA</div>
-                        <div class="industry-col-logo"><img src="/user/logo/synopsys.png" alt="Synopsys"></div>
+                <h3>Proposed Industry Partners</h3>
+                <div class="industry-grid">
+                    <div class="industry-card">
+                        <div class="card-badge">EDA</div>
+                        <div class="card-logo"><img src="/user/logo/synopsys.png" alt="Synopsys"></div>
                     </div>
-                    <div class="industry-row">
-                        <div class="industry-col-title">Analog</div>
-                        <div class="industry-col-logo"><img src="/user/logo/marvell.png" alt="Marvell"></div>
+                    <div class="industry-card">
+                        <div class="card-badge">Analog</div>
+                        <div class="card-logo"><img src="/user/logo/marvell.png" alt="Marvell"></div>
                     </div>
-                    <div class="industry-row">
-                        <div class="industry-col-title">Power</div>
-                        <div class="industry-col-logo"><img src="/user/logo/ivp.png" alt="IVP Semi"></div>
+                    <div class="industry-card">
+                        <div class="card-badge">Power</div>
+                        <div class="card-logo"><img src="/user/logo/ivp.png" alt="IVP Semi"></div>
                     </div>
-                    <div class="industry-row">
-                        <div class="industry-col-title">Neuromorphic</div>
-                        <div class="industry-col-logo"><img src="/user/logo/innatera.png" alt="Innatera"></div>
+                    <div class="industry-card">
+                        <div class="card-badge">Neuromorphic</div>
+                        <div class="card-logo"><img src="/user/logo/innatera.png" alt="Innatera"></div>
                     </div>
-                    <div class="industry-row">
-                        <div class="industry-col-title">Verification</div>
-                        <div class="industry-col-logo"><img src="/user/logo/axiomise.png" alt="Axiomise"></div>
+                    <div class="industry-card">
+                        <div class="card-badge">Verification</div>
+                        <div class="card-logo"><img src="/user/logo/axiomise.png" alt="Axiomise"></div>
                     </div>
-                    <div class="industry-row highlight-row">
-                        <div class="industry-col-title">Learning Platform</div>
-                        <div class="industry-col-logo"><img src="/user/logo/xtra g club.png" alt="X-tra G club" class="xtra-logo"></div>
+                    <div class="industry-card highlight-card">
+                        <div class="card-badge">Learning Platform</div>
+                        <div class="card-logo"><img src="/user/logo/xtra g club.png" alt="X-tra G club"></div>
                     </div>
                 </div>
             </div>
             
-            <button id="skipSplashBtn" class="btn-login" style="max-width: 250px; margin: 0 auto; background: #111827;">Continue to Login</button>
+            <button id="skipSplashBtn" class="btn-continue">Continue to Login</button>
         </div>
     </div>
 
