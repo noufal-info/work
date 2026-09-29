@@ -26,19 +26,19 @@ app.get('/', (req, res) => {
     res.redirect('/AnalogiX');
 });
 
-app.get('/admin/login', (req, res) => {
+app.get('/AnalogiX/admin/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'admin', 'login.html'));
 });
 
-app.get('/admin', (req, res) => {
+app.get('/AnalogiX/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'admin', 'index.html'));
 });
 
-app.get('/partner/login', (req, res) => {
+app.get('/AnalogiX/partner/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'partner', 'login.html'));
 });
 
-app.get('/partner', (req, res) => {
+app.get('/AnalogiX/partner', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'partner', 'index.html'));
 });
 
