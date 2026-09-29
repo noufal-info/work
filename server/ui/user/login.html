@@ -245,22 +245,20 @@
         .splash-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #f8fafc;
+            background-color: #ffffff;
             overflow-y: auto;
             z-index: 9999;
             padding: 40px 20px;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         .splash-container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 50px;
+            gap: 40px;
             background: #ffffff;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            padding: 20px;
         }
         .splash-header {
             text-align: center;
@@ -268,133 +266,84 @@
             flex-direction: column;
             align-items: center;
         }
-        .analogix-main-logo { height: 70px; margin-bottom: 20px; }
-        .sicc-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .analogix-main-logo { height: 90px; margin-bottom: 30px; }
+        .sicc-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.5px; }
         .initiative-text { font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; }
         .semicon-main-logo { height: 110px; }
         
         .splash-section h3 {
-            font-size: 14px; color: #94a3b8; font-weight: 700; margin-bottom: 24px; text-align: center; text-transform: uppercase; letter-spacing: 2px;
+            font-size: 28px; color: #0f172a; font-weight: 700; margin-bottom: 12px; text-align: center;
+        }
+        .title-underline {
+            width: 50px;
+            height: 3px;
+            background-color: #f97316;
+            margin: 0 auto 40px;
         }
         .partners-row {
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px;
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 50px;
         }
-        .partners-row img { height: 45px; object-fit: contain; filter: grayscale(100%) opacity(70%); transition: 0.3s; }
+        .partners-row img { height: 55px; object-fit: contain; filter: grayscale(100%) opacity(80%); transition: 0.3s; }
         .partners-row img:hover { filter: grayscale(0%) opacity(100%); transform: scale(1.05); }
 
-        .industry-grid {
+        .clean-logo-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px 40px;
+            align-items: center;
+            justify-items: center;
         }
-        .industry-card {
+        .clean-logo-item {
             display: flex;
             align-items: center;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
         }
-        .industry-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
-            border-color: #cbd5e1;
-        }
-        .card-badge {
-            flex: 0 0 120px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .card-logo {
-            flex: 1;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-        }
-        .card-logo img {
-            height: 40px;
+        .clean-logo-item img {
+            height: 50px;
             object-fit: contain;
+            max-width: 150px;
         }
-        
-        .highlight-card {
-            background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
-            border: 2px solid #bae6fd;
-            grid-column: 1 / -1;
+        .vertical-divider {
+            height: 40px;
+            width: 1px;
+            background-color: #cbd5e1;
         }
-        .highlight-card .card-badge { color: #0284c7; }
-        .highlight-card .card-logo img { height: 60px; }
+        .logo-role {
+            font-size: 15px;
+            color: #475569;
+            font-weight: 400;
+        }
         
         .btn-continue {
-            background: #4f5be8;
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
+            background: transparent;
+            color: #4f5be8;
+            border: 2px solid #4f5be8;
+            padding: 14px 40px;
+            border-radius: 30px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(79, 91, 232, 0.2);
             transition: all 0.2s;
-            margin: 20px auto 0;
+            margin: 40px auto 0;
             display: block;
         }
-        .btn-continue:hover { background: #3f4ac8; transform: translateY(-2px); }
+        .btn-continue:hover { background: #4f5be8; color: white; transform: translateY(-2px); }
+
+        @media (max-width: 900px) {
+            .clean-logo-grid { grid-template-columns: repeat(2, 1fr); }
+        }
 
         @media (max-width: 600px) {
-            .splash-screen { padding: 0; background-color: #ffffff; }
-            .splash-container { padding: 20px 15px; border-radius: 0; gap: 24px; box-shadow: none; background: transparent; max-width: 100%; }
-            
-            .analogix-main-logo { height: 45px; margin-bottom: 12px; }
-            .sicc-title { font-size: 15px; margin-bottom: 4px; }
-            .initiative-text { font-size: 11px; margin-bottom: 16px; }
-            .semicon-main-logo { height: 60px; }
-
-            .splash-section h3 { font-size: 11px; margin-bottom: 12px; letter-spacing: 1px; color: #64748b; }
-            
-            .partners-row { gap: 12px; }
-            .partners-row img { height: 20px; }
-
-            .industry-grid { 
-                grid-template-columns: 1fr 1fr;
-                gap: 12px; 
-            }
-            .industry-card { 
-                flex-direction: column; 
-                align-items: center; 
-                gap: 8px; 
-                padding: 12px; 
-                border-radius: 12px;
-                border: 1px solid #f1f5f9;
-                background: #f8fafc;
-                box-shadow: none;
-            }
-            .card-badge { 
-                flex: none; 
-                font-size: 9px; 
-                background: #e2e8f0; 
-                padding: 3px 8px; 
-                border-radius: 12px; 
-                color: #475569;
-            }
-            .card-logo { width: 100%; justify-content: center; }
-            .card-logo img { height: 24px; }
-            
-            .highlight-card { 
-                grid-column: 1 / -1; 
-                flex-direction: row; 
-                padding: 16px;
-                background: linear-gradient(to right, #f0f9ff, #e0f2fe);
-                border: 1px solid #bae6fd;
-            }
-            .highlight-card .card-badge { font-size: 11px; background: rgba(255,255,255,0.7); }
-            .highlight-card .card-logo img { height: 35px; }
-
-            .btn-continue { width: 100%; font-size: 14px; padding: 14px; margin-top: 10px; border-radius: 10px; }
+            .splash-screen { padding: 0; }
+            .splash-container { padding: 40px 20px; }
+            .analogix-main-logo { height: 60px; margin-bottom: 20px; }
+            .sicc-title { font-size: 18px; }
+            .splash-section h3 { font-size: 22px; }
+            .clean-logo-grid { grid-template-columns: 1fr; gap: 40px; }
+            .partners-row { gap: 30px; }
+            .partners-row img { height: 40px; }
         }
     </style>
 </head>
@@ -409,7 +358,8 @@
             </div>
 
             <div class="splash-section">
-                <h3>Partners</h3>
+                <h3>Our Partners</h3>
+                <div class="title-underline"></div>
                 <div class="partners-row">
                     <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam">
                     <img src="/user/logo/iby infopark.svg" alt="i by Infopark">
@@ -419,32 +369,39 @@
                 </div>
             </div>
 
-            <div class="splash-section">
+            <div class="splash-section" style="margin-top: 40px;">
                 <h3>Proposed Industry Partners</h3>
-                <div class="industry-grid">
-                    <div class="industry-card">
-                        <div class="card-badge">EDA</div>
-                        <div class="card-logo"><img src="/user/logo/synopsys.png" alt="Synopsys"></div>
+                <div class="title-underline"></div>
+                <div class="clean-logo-grid">
+                    <div class="clean-logo-item">
+                        <img src="/user/logo/synopsys.png" alt="Synopsys">
+                        <div class="vertical-divider"></div>
+                        <span class="logo-role">EDA</span>
                     </div>
-                    <div class="industry-card">
-                        <div class="card-badge">Analog</div>
-                        <div class="card-logo"><img src="/user/logo/marvell.png" alt="Marvell"></div>
+                    <div class="clean-logo-item">
+                        <img src="/user/logo/marvell.png" alt="Marvell">
+                        <div class="vertical-divider"></div>
+                        <span class="logo-role">Analog</span>
                     </div>
-                    <div class="industry-card">
-                        <div class="card-badge">Power</div>
-                        <div class="card-logo"><img src="/user/logo/ivp.png" alt="IVP Semi"></div>
+                    <div class="clean-logo-item">
+                        <img src="/user/logo/ivp.png" alt="IVP Semi">
+                        <div class="vertical-divider"></div>
+                        <span class="logo-role">Power</span>
                     </div>
-                    <div class="industry-card">
-                        <div class="card-badge">Neuromorphic</div>
-                        <div class="card-logo"><img src="/user/logo/innatera.png" alt="Innatera"></div>
+                    <div class="clean-logo-item">
+                        <img src="/user/logo/innatera.png" alt="Innatera">
+                        <div class="vertical-divider"></div>
+                        <span class="logo-role">Neuromorphic</span>
                     </div>
-                    <div class="industry-card">
-                        <div class="card-badge">Verification</div>
-                        <div class="card-logo"><img src="/user/logo/axiomise.png" alt="Axiomise"></div>
+                    <div class="clean-logo-item">
+                        <img src="/user/logo/axiomise.png" alt="Axiomise">
+                        <div class="vertical-divider"></div>
+                        <span class="logo-role">Verification</span>
                     </div>
-                    <div class="industry-card highlight-card">
-                        <div class="card-badge">Learning Platform</div>
-                        <div class="card-logo"><img src="/user/logo/xtra g club.png" alt="X-tra G club"></div>
+                    <div class="clean-logo-item">
+                        <img src="/user/logo/xtra g club.png" alt="X-tra G club" style="height: 65px;">
+                        <div class="vertical-divider"></div>
+                        <span class="logo-role">Learning Platform</span>
                     </div>
                 </div>
             </div>
