@@ -25,7 +25,7 @@
                 <div class="logo-icon">
                     <ion-icon name="school"></ion-icon>
                 </div>
-                <span>LMS Admin</span>
+                <span>Teacher Portal</span>
             </div>
             
             <nav class="sidebar-nav">
@@ -33,29 +33,25 @@
                     <ion-icon name="grid-outline"></ion-icon>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-subadmins" onclick="switchTab('subadmins')">
-                    <ion-icon name="shield-outline"></ion-icon>
-                    <span>Sub-Admins</span>
-                </a>
-                <a href="#" class="nav-item" id="nav-users" onclick="switchTab('users')">
+                <a href="#" class="nav-item" id="nav-students" onclick="switchTab('students')">
                     <ion-icon name="people-outline"></ion-icon>
-                    <span>Users</span>
+                    <span>Students</span>
                 </a>
                 <a href="#" class="nav-item" id="nav-courses" onclick="switchTab('courses')">
                     <ion-icon name="library-outline"></ion-icon>
                     <span>Courses</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-batches" onclick="switchTab('batches')">
-                    <ion-icon name="albums-outline"></ion-icon>
-                    <span>Batches</span>
+                <a href="#" class="nav-item" id="nav-calendar" onclick="switchTab('calendar')">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    <span>Calendar & Meets</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-messages" onclick="switchTab('messages')">
+                    <ion-icon name="chatbubbles-outline"></ion-icon>
+                    <span>Communications</span>
                 </a>
                 <a href="#" class="nav-item" id="nav-reports" onclick="switchTab('reports')">
                     <ion-icon name="bar-chart-outline"></ion-icon>
                     <span>Reports</span>
-                </a>
-                <a href="#" class="nav-item" id="nav-partners" onclick="switchTab('partners')">
-                    <ion-icon name="business-outline"></ion-icon>
-                    <span>Partners</span>
                 </a>
                 <a href="#" class="nav-item" id="nav-settings" onclick="switchTab('settings')">
                     <ion-icon name="settings-outline"></ion-icon>
@@ -88,8 +84,8 @@
                     <div class="admin-profile">
                         <img src="https://ui-avatars.com/api/?name=Admin+User&background=10b981&color=fff" alt="Admin Avatar">
                         <div class="profile-info">
-                            <span class="name">Admin User</span>
-                            <span class="role">Superadmin</span>
+                            <span class="name">Instructor User</span>
+                            <span class="role">Teacher</span>
                         </div>
                     </div>
                 </div>
@@ -100,11 +96,7 @@
                 <div class="page-header">
                     <h1>Dashboard Overview</h1>
                     <div style="display: flex; gap: 12px;">
-                        <button class="btn-secondary" onclick="openModal()">
-                            <ion-icon name="person-add-outline"></ion-icon>
-                            Create Sub-Admin
-                        </button>
-                        <button class="btn-primary">
+                        <button class="btn-primary" onclick="switchTab('courses')">
                             <ion-icon name="add-outline"></ion-icon>
                             Create Course
                         </button>
@@ -219,13 +211,13 @@
                 </div>
             </div>
 
-            <!-- Sub-Admins Content -->
-            <div id="section-subadmins" class="content-section dashboard-content" style="display: none;">
+            <!-- Students Content -->
+            <div id="section-students" class="content-section dashboard-content" style="display: none;">
                 <div class="page-header">
-                    <h1>Sub-Admins</h1>
-                    <button class="btn-primary" onclick="openModal()">
+                    <h1>Student Management</h1>
+                    <button class="btn-primary" onclick="alert('Add New Student form opened')">
                         <ion-icon name="add-outline"></ion-icon>
-                        Create Sub-Admin
+                        Add New Student
                     </button>
                 </div>
                 <div class="data-section">
@@ -233,41 +225,45 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
+                                    <th>Student</th>
+                                    <th>Score Sheet</th>
+                                    <th>Attendance</th>
+                                    <th>Certificate</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="subAdminsTableBody">
-                                <!-- Populated dynamically -->
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="avatar-small">AS</div>
+                                            <span>Alex Student<br><small style="color: #64748b; font-weight: normal;">alex@example.com</small></span>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge active" style="background:#e0e7ff; color:#4f5be8;">A Grade (92%)</span></td>
+                                    <td>95%</td>
+                                    <td>
+                                        <button class="btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="alert('File selector opened for certificate upload')">
+                                            <ion-icon name="cloud-upload-outline"></ion-icon> Upload
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Placeholder Content for other tabs -->
-            <div id="section-users" class="content-section dashboard-content" style="display: none;">
-                <h1>Users Management</h1><p>Placeholder for users list.</p>
-            </div>
+            <!-- Courses Content -->
             <div id="section-courses" class="content-section dashboard-content" style="display: none;">
-                <h1>Courses Management</h1><p>Placeholder for courses list.</p>
-            </div>
-            <div id="section-batches" class="content-section dashboard-content" style="display: none;">
-                <h1>Batches Management</h1><p>Placeholder for batches list.</p>
-            </div>
-            <div id="section-reports" class="content-section dashboard-content" style="display: none;">
-                <h1>Reports</h1><p>Placeholder for reports.</p>
-            </div>
-            
-            <!-- Partners Content -->
-            <div id="section-partners" class="content-section dashboard-content" style="display: none;">
                 <div class="page-header">
-                    <h1>Partner Management</h1>
-                    <button class="btn-primary" onclick="openPartnerModal()">
+                    <h1>Courses Management</h1>
+                    <button class="btn-primary" onclick="alert('Create New Course wizard opened')">
                         <ion-icon name="add-outline"></ion-icon>
-                        Create Partner
+                        Create New Course
                     </button>
                 </div>
                 <div class="data-section">
@@ -275,110 +271,84 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Partner Name</th>
-                                    <th>Domain</th>
-                                    <th>Admin Email</th>
+                                    <th>Course Name</th>
+                                    <th>Enrolled</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="partnersTableBody">
-                                <!-- Populated dynamically -->
+                            <tbody>
+                                <tr>
+                                    <td>Advanced Node.js</td>
+                                    <td>142 Students</td>
+                                    <td><span class="status-badge active">Published</span></td>
+                                    <td><button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
+            <!-- Calendar & Meets Content -->
+            <div id="section-calendar" class="content-section dashboard-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Event & Google Meet Calendar</h1>
+                    <button class="btn-primary" onclick="alert('Google Meet integration opened')">
+                        <ion-icon name="videocam-outline"></ion-icon>
+                        Schedule Google Meet
+                    </button>
+                </div>
+                <div class="data-section" style="padding: 40px; text-align: center; background: #f8fafc; border: 1px dashed #cbd5e1;">
+                    <ion-icon name="calendar" style="font-size: 64px; color: #94a3b8;"></ion-icon>
+                    <h2 style="margin-top: 16px; color: #334155;">No Upcoming Events</h2>
+                    <p style="color: #64748b; margin-top: 8px;">Schedule a Google Meet session or mark an event to notify students on their dashboard.</p>
+                </div>
+            </div>
+
+            <!-- Communications Content -->
+            <div id="section-messages" class="content-section dashboard-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Send Notifications & Emails</h1>
+                </div>
+                <div class="data-section" style="padding: 24px; max-width: 800px;">
+                    <form onsubmit="event.preventDefault(); alert('Message successfully sent to the database and queued for email delivery!');">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Recipient(s)</label>
+                            <select style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                                <option>All Students (Bulk Notification)</option>
+                                <option>Alex Student (alex@example.com)</option>
+                                <option>Sarah Jenkins (sarah@example.com)</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Subject</label>
+                            <input type="text" placeholder="e.g. Upcoming Google Meet Session" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+                        </div>
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Message</label>
+                            <textarea rows="6" placeholder="Type your message here... This will appear on the student UI." required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" style="padding: 12px 24px;">
+                            <ion-icon name="send-outline"></ion-icon> Send Email / Notification
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reports Content -->
+            <div id="section-reports" class="content-section dashboard-content" style="display: none;">
+                <h1>Reports</h1><p>Placeholder for student progress and revenue reports.</p>
+            </div>
+            
+            <!-- Settings Content -->
             <div id="section-settings" class="content-section dashboard-content" style="display: none;">
                 <h1>Settings</h1><p>Placeholder for system settings.</p>
             </div>
         </main>
     </div>
 
-    <!-- Modal for Create Sub Admin -->
-    <div id="subAdminModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 32px; border-radius: 12px; width: 400px; max-width: 90%;">
-            <h2 style="margin-bottom: 16px; color: var(--blue-dark);">Create Sub-Admin</h2>
-            <form id="createSubAdminForm">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Name</label>
-                    <input type="text" id="subAdminName" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Email</label>
-                    <input type="email" id="subAdminEmail" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                </div>
-                <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Create</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal for Create Partner -->
-    <div id="partnerModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 32px; border-radius: 12px; width: 500px; max-width: 90%;">
-            <h2 style="margin-bottom: 16px; color: var(--blue-dark);">Create New Partner LMS</h2>
-            <form id="createPartnerForm">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Partner Organization Name</label>
-                    <input type="text" id="partnerName" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Custom Domain / Subdomain</label>
-                    <input type="text" id="partnerDomain" placeholder="e.g. partner.yourapp.com" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Admin Email</label>
-                    <input type="email" id="partnerEmail" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;">Initial Admin Password</label>
-                    <input type="password" id="partnerPassword" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                </div>
-                <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                    <button type="button" class="btn-secondary" onclick="closePartnerModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Provision LMS</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
-        function openModal() {
-            document.getElementById('subAdminModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('subAdminModal').style.display = 'none';
-        }
-
-        document.getElementById('createSubAdminForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('subAdminName').value;
-            const email = document.getElementById('subAdminEmail').value;
-            
-            try {
-                const res = await fetch('/api/admin/subadmins', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    alert(data.message);
-                    closeModal();
-                    document.getElementById('createSubAdminForm').reset();
-                    if (currentTab === 'subadmins') loadSubAdmins();
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                alert('Error creating sub-admin');
-            }
-        });
-
         let currentTab = 'dashboard';
         function switchTab(tabId) {
             currentTab = tabId;
@@ -390,133 +360,9 @@
             document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
             // Show target section
             document.getElementById('section-' + tabId).style.display = 'block';
-
-            if (tabId === 'subadmins') {
-                loadSubAdmins();
-            } else if (tabId === 'partners') {
-                loadPartners();
-            }
         }
 
-        async function loadSubAdmins() {
-            try {
-                const res = await fetch('/api/admin/subadmins');
-                const subAdmins = await res.json();
-                
-                const tbody = document.getElementById('subAdminsTableBody');
-                if (subAdmins.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No sub-admins found.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = subAdmins.map(admin => `
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="avatar-small blue-bg">${admin.name.substring(0, 2).toUpperCase()}</div>
-                                <span>${admin.name}</span>
-                            </div>
-                        </td>
-                        <td>${admin.email}</td>
-                        <td><span class="status-badge active">${admin.role}</span></td>
-                        <td>
-                            <button class="icon-btn small"><ion-icon name="ellipsis-vertical"></ion-icon></button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                console.error("Error loading sub-admins", err);
-            }
-        }
-
-        // --- Partner Functions ---
-        function openPartnerModal() {
-            document.getElementById('partnerModal').style.display = 'flex';
-        }
-
-        function closePartnerModal() {
-            document.getElementById('partnerModal').style.display = 'none';
-        }
-
-        document.getElementById('createPartnerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('partnerName').value;
-            const domain = document.getElementById('partnerDomain').value;
-            const email = document.getElementById('partnerEmail').value;
-            const password = document.getElementById('partnerPassword').value;
-            
-            try {
-                const res = await fetch('/api/admin/partners', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, domain, email, password })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    alert('Partner LMS Provisioned Successfully! Admin features like courses, logins, and billing are ready on ' + domain);
-                    closePartnerModal();
-                    document.getElementById('createPartnerForm').reset();
-                    if (currentTab === 'partners') loadPartners();
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                alert('Error provisioning partner');
-            }
-        });
-
-        async function loadPartners() {
-            try {
-                const res = await fetch('/api/admin/partners');
-                const partners = await res.json();
-                
-                const tbody = document.getElementById('partnersTableBody');
-                if (partners.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No partners provisioned yet.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = partners.map(partner => `
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="avatar-small dark-bg">${partner.name.substring(0, 2).toUpperCase()}</div>
-                                <span>${partner.name}</span>
-                            </div>
-                        </td>
-                        <td>${partner.domain}</td>
-                        <td>${partner.adminEmail}</td>
-                        <td><span class="status-badge active">Active</span></td>
-                        <td>
-                            <button class="btn-secondary" onclick="impersonatePartner('${partner.domain}')" style="padding: 4px 12px; font-size: 12px;">Open Portal</button>
-                            <button class="icon-btn small"><ion-icon name="ellipsis-vertical"></ion-icon></button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                console.error("Error loading partners", err);
-            }
-        }
-
-        async function impersonatePartner(domain) {
-            try {
-                const res = await fetch('/api/admin/partners/impersonate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ domain })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    // Set token for partner portal and open in new tab
-                    localStorage.setItem('partnerDomain', data.domain);
-                    window.location.href = '/AnalogiX/partner';
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                alert('Error impersonating partner');
-            }
-        }
+        // Extra Javascript logic will be added here as needed
 
         // Logout functionality
         document.querySelector('.logout').addEventListener('click', (e) => {
