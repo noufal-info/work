@@ -246,50 +246,54 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #ffffff;
-            overflow-y: auto;
             z-index: 9999;
-            padding: 40px 20px;
+            padding: 2vh 20px;
             transition: opacity 0.5s ease, visibility 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
         }
         .splash-container {
+            width: 100%;
+            height: 100%;
             max-width: 1000px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            justify-content: center;
             background: #ffffff;
-            padding: 20px;
         }
         .splash-header {
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-bottom: 2vh;
         }
-        .analogix-main-logo { height: 90px; margin-bottom: 30px; }
-        .sicc-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .initiative-text { font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; }
-        .semicon-main-logo { height: 110px; }
+        .analogix-main-logo { height: clamp(60px, 10vh, 100px); margin-bottom: 1.5vh; }
+        .sicc-title { font-size: clamp(16px, 4vw, 24px); font-weight: 800; color: #0f172a; margin-bottom: 0.5vh; letter-spacing: -0.5px; }
+        .initiative-text { font-size: clamp(11px, 2.5vw, 15px); font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
         
+        .splash-section { margin-bottom: 3vh; }
         .splash-section h3 {
-            font-size: 28px; color: #0f172a; font-weight: 700; margin-bottom: 12px; text-align: center;
+            font-size: clamp(16px, 3.5vw, 28px); color: #0f172a; font-weight: 700; margin-bottom: 1vh; text-align: center;
         }
         .title-underline {
             width: 50px;
             height: 3px;
             background-color: #f97316;
-            margin: 0 auto 40px;
+            margin: 0 auto 2.5vh;
         }
         .partners-row {
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 50px;
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: clamp(15px, 3vw, 50px);
         }
-        .partners-row img { height: 55px; object-fit: contain; filter: grayscale(100%) opacity(80%); transition: 0.3s; }
-        .partners-row img:hover { filter: grayscale(0%) opacity(100%); transform: scale(1.05); }
+        .partners-row img { height: clamp(30px, 6vh, 55px); object-fit: contain; }
 
         .clean-logo-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 60px 40px;
+            gap: 2vh 2vw;
             align-items: center;
             justify-items: center;
         }
@@ -297,53 +301,48 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 16px;
+            gap: 1vw;
             width: 100%;
         }
         .clean-logo-item img {
-            height: 50px;
+            height: clamp(25px, 5vh, 50px);
             object-fit: contain;
-            max-width: 150px;
+            max-width: clamp(80px, 15vw, 150px);
         }
         .vertical-divider {
-            height: 40px;
+            height: clamp(20px, 4vh, 40px);
             width: 1px;
             background-color: #cbd5e1;
         }
         .logo-role {
-            font-size: 15px;
+            font-size: clamp(10px, 2.5vw, 15px);
             color: #475569;
-            font-weight: 400;
+            font-weight: 500;
         }
         
         .btn-continue {
             background: transparent;
             color: #4f5be8;
             border: 2px solid #4f5be8;
-            padding: 14px 40px;
+            padding: clamp(10px, 2vh, 14px) clamp(20px, 4vw, 40px);
             border-radius: 30px;
-            font-size: 16px;
+            font-size: clamp(14px, 3vw, 16px);
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin: 40px auto 0;
+            margin: 2vh auto 0;
             display: block;
         }
         .btn-continue:hover { background: #4f5be8; color: white; transform: translateY(-2px); }
 
         @media (max-width: 900px) {
-            .clean-logo-grid { grid-template-columns: repeat(2, 1fr); }
+            .clean-logo-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5vh 2vw; }
+            .clean-logo-item { gap: 8px; }
         }
-
         @media (max-width: 600px) {
-            .splash-screen { padding: 0; }
-            .splash-container { padding: 40px 20px; }
-            .analogix-main-logo { height: 60px; margin-bottom: 20px; }
-            .sicc-title { font-size: 18px; }
-            .splash-section h3 { font-size: 22px; }
-            .clean-logo-grid { grid-template-columns: 1fr; gap: 40px; }
-            .partners-row { gap: 30px; }
-            .partners-row img { height: 40px; }
+            .splash-screen { padding: 1vh 10px; }
+            .analogix-main-logo { height: 7vh; }
+            .clean-logo-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5vh 1vw; }
         }
     </style>
 </head>
@@ -354,7 +353,6 @@
                 <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" class="analogix-main-logo">
                 <h2 class="sicc-title">Semiconductor Industry Competence Centre (SICC)</h2>
                 <p class="initiative-text">A Flagship Initiative under Semicon Keralam</p>
-                <img src="/user/logo/semicon-keralam-logo (1).png" alt="Semicon Keralam" class="semicon-main-logo">
             </div>
 
             <div class="splash-section">
@@ -369,7 +367,7 @@
                 </div>
             </div>
 
-            <div class="splash-section" style="margin-top: 40px;">
+            <div class="splash-section">
                 <h3>Proposed Industry Partners</h3>
                 <div class="title-underline"></div>
                 <div class="clean-logo-grid">
