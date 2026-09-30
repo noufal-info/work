@@ -17,4 +17,17 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post('/courses/enroll', async (req, res) => {
+    try {
+        const { course_id, student_email } = req.body;
+        
+        // Student self-enrolls as 'Pending'
+        await db.execute('INSERT IGNORE INTO enrollments (course_id, student_email, status) VALUES (?, ?, ?)', [course_id, student_email, 'Pending']);
+        res.json({ success: true, message: 'Enrollment request sent to teacher' });
+    } catch (error) {
+        console.error("Error self-enrolling:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 module.exports = router;

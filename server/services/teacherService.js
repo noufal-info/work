@@ -51,17 +51,54 @@ router.post('/students/enroll', async (req, res) => {
     try {
         const { course_id, student_email } = req.body;
         
-        // Ensure student exists
+        // Ensure student exists, or create a dummy one
         const [studentRows] = await db.execute('SELECT * FROM students WHERE email = ?', [student_email]);
         if (studentRows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Student email not found in system' });
+            // Auto-create student with a default password so they can log in
+            await db.execute("INSERT INTO students (email, password, name) VALUES (?, 'password123', 'New Student')", [student_email]);
         }
 
-        // Enroll student
-        await db.execute('INSERT IGNORE INTO enrollments (course_id, student_email) VALUES (?, ?)', [course_id, student_email]);
+        // Enroll student directly as 'Active' since teacher is adding them
+        await db.execute('INSERT IGNORE INTO enrollments (course_id, student_email, status) VALUES (?, ?, ?)', [course_id, student_email, 'Active']);
         res.json({ success: true, message: 'Student enrolled successfully' });
     } catch (error) {
         console.error("Error enrolling student:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.get('/enrollments/pending', async (req, res) => {
+    try {
+        // In a real app, we'd filter by course_id belonging to this teacher
+        const [rows] = await db.execute(`
+            SELECT e.id as enrollment_id, e.student_email, c.title as course_title, e.enrolled_at 
+            FROM enrollments e 
+            JOIN courses c ON e.course_id = c.id 
+            WHERE e.status = 'Pending' 
+            ORDER BY e.enrolled_at DESC
+        `);
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching pending enrollments:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/enrollments/approve', async (req, res) => {
+    try {
+        const { enrollment_id, action } = req.body; // action = 'accept' or 'reject'
+        
+        if (action === 'accept') {
+            await db.execute("UPDATE enrollments SET status = 'Active' WHERE id = ?", [enrollment_id]);
+            res.json({ success: true, message: 'Student accepted successfully' });
+        } else if (action === 'reject') {
+            await db.execute("UPDATE enrollments SET status = 'Rejected' WHERE id = ?", [enrollment_id]);
+            res.json({ success: true, message: 'Student rejected successfully' });
+        } else {
+            res.status(400).json({ success: false, message: 'Invalid action' });
+        }
+    } catch (error) {
+        console.error("Error updating enrollment:", error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });

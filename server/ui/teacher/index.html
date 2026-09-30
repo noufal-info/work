@@ -85,7 +85,7 @@
                         Create New Course
                     </button>
                 </div>
-                <div class="data-section">
+                <div class="data-section" style="margin-top: 2rem;">
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
@@ -98,6 +98,27 @@
                             </thead>
                             <tbody id="coursesTableBody">
                                 <!-- Courses will be loaded here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="data-section" style="margin-top: 2rem;" id="pendingApprovalsSection">
+                    <div class="page-header" style="margin-bottom: 1rem;">
+                        <h2>Pending Approvals</h2>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student Email</th>
+                                    <th>Course Requested</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingTableBody">
+                                <!-- Pending requests will be loaded here dynamically -->
                             </tbody>
                         </table>
                     </div>
@@ -250,7 +271,63 @@
         }
 
         // Load courses when page loads
-        document.addEventListener('DOMContentLoaded', loadCourses);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCourses();
+            loadPendingApprovals();
+        });
+
+        async function loadPendingApprovals() {
+            const tbody = document.getElementById('pendingTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading requests...</td></tr>';
+            
+            try {
+                const response = await fetch('/api/teacher/enrollments/pending');
+                const pending = await response.json();
+                
+                if (pending.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No pending enrollment requests.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                pending.forEach(req => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${req.student_email}</td>
+                        <td><strong>${req.course_title}</strong></td>
+                        <td>${new Date(req.enrolled_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn-primary" style="padding: 4px 10px; font-size: 11px;" onclick="handleApproval(${req.enrollment_id}, 'accept')">Accept</button>
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="handleApproval(${req.enrollment_id}, 'reject')">Reject</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error loading pending requests.</td></tr>';
+            }
+        }
+
+        async function handleApproval(enrollment_id, action) {
+            try {
+                const res = await fetch('/api/teacher/enrollments/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enrollment_id, action })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    loadPendingApprovals();
+                    loadCourses(); // update enrolled count
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                alert("Failed to connect to the server.");
+            }
+        }
+
 
         function openEnrollModal(courseId) {
             document.getElementById('enrollCourseId').value = courseId;
