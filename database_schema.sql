@@ -62,3 +62,12 @@ CREATE TABLE IF NOT EXISTS otps (
   otp VARCHAR(10) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create Enrollments table (links students to courses)
+CREATE TABLE IF NOT EXISTS enrollments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  course_id INT NOT NULL,
+  student_email VARCHAR(255) NOT NULL,
+  enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_enrollment (course_id, student_email)
+);

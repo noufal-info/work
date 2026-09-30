@@ -35,10 +35,33 @@ router.post('/courses', async (req, res) => {
 
 router.get('/courses', async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT * FROM courses ORDER BY id DESC');
+        const [rows] = await db.execute(`
+            SELECT c.*, 
+            (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) as enrolled_count
+            FROM courses c ORDER BY c.id DESC
+        `);
         res.json(rows);
     } catch (error) {
         console.error("Error fetching courses:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/students/enroll', async (req, res) => {
+    try {
+        const { course_id, student_email } = req.body;
+        
+        // Ensure student exists
+        const [studentRows] = await db.execute('SELECT * FROM students WHERE email = ?', [student_email]);
+        if (studentRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Student email not found in system' });
+        }
+
+        // Enroll student
+        await db.execute('INSERT IGNORE INTO enrollments (course_id, student_email) VALUES (?, ?)', [course_id, student_email]);
+        res.json({ success: true, message: 'Student enrolled successfully' });
+    } catch (error) {
+        console.error("Error enrolling student:", error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });

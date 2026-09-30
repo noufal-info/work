@@ -25,7 +25,16 @@ const db = require('../db/database');
               status VARCHAR(50) DEFAULT 'Published'
             )
         `);
-        console.log("Teachers and Courses tables initialized.");
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS enrollments (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              course_id INT NOT NULL,
+              student_email VARCHAR(255) NOT NULL,
+              enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+              UNIQUE KEY unique_enrollment (course_id, student_email)
+            )
+        `);
+        console.log("Teachers, Courses, and Enrollments tables initialized.");
     } catch (err) {
         console.error("Failed to initialize tables:", err);
     }

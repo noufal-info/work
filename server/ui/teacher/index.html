@@ -141,6 +141,29 @@
                 </div>
             </div>
 
+            <!-- Enroll Student Modal -->
+            <div class="modal-overlay" id="enrollModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Enroll Student</h2>
+                        <button class="modal-close" onclick="closeModal('enrollModal')"><ion-icon name="close-outline"></ion-icon></button>
+                    </div>
+                    <form onsubmit="handleEnrollSubmit(event)">
+                        <div class="modal-body">
+                            <input type="hidden" id="enrollCourseId">
+                            <div class="form-group">
+                                <label>Student Email Address</label>
+                                <input type="email" id="enrollStudentEmail" placeholder="student@example.com" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-secondary" onclick="closeModal('enrollModal')">Cancel</button>
+                            <button type="submit" class="btn-primary">Add Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             </main>
     </div>
 
@@ -212,9 +235,12 @@
                             <strong>${course.title}</strong><br>
                             <small style="color:var(--text-muted)">Instructor: ${course.instructor}</small>
                         </td>
-                        <td>0 Students (₹${course.price})</td>
+                        <td>${course.enrolled_count || 0} Students (₹${course.price})</td>
                         <td><span class="status-badge ${course.status === 'Published' ? 'active' : ''}">${course.status || 'Published'}</span></td>
-                        <td><button class="icon-btn small"><ion-icon name="create-outline"></ion-icon></button></td>
+                        <td>
+                            <button class="icon-btn small" onclick="openEnrollModal(${course.id})" title="Add Student"><ion-icon name="person-add-outline"></ion-icon></button>
+                            <button class="icon-btn small" title="Edit Course"><ion-icon name="create-outline"></ion-icon></button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -225,6 +251,48 @@
 
         // Load courses when page loads
         document.addEventListener('DOMContentLoaded', loadCourses);
+
+        function openEnrollModal(courseId) {
+            document.getElementById('enrollCourseId').value = courseId;
+            openModal('enrollModal');
+        }
+
+        async function handleEnrollSubmit(e) {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Adding...';
+            btn.disabled = true;
+
+            const course_id = document.getElementById('enrollCourseId').value;
+            const student_email = document.getElementById('enrollStudentEmail').value;
+
+            try {
+                const response = await fetch('/api/teacher/students/enroll', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course_id, student_email })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert("Success! Student has been enrolled.");
+                    closeModal('enrollModal');
+                    e.target.reset();
+                    loadCourses(); // Refresh list to update count
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                alert("Failed to connect to the server.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
         // Extra Javascript logic will be added here as needed
 
         // Logout functionality
