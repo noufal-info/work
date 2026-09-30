@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const router = express.Router();
 const db = require('../db/database');
 
@@ -105,11 +107,19 @@ router.post('/enrollments/approve', async (req, res) => {
 
 router.post('/messages', async (req, res) => {
     try {
-        const { sender_email, receiver_email, course_id, subject, content } = req.body;
+        const { sender_email, receiver_email, course_id, subject, content, audio_base64 } = req.body;
         
+        let audio_url = null;
+        if (audio_base64) {
+            const base64Data = audio_base64.replace(/^data:audio\/\w+(?:;\w+=\w+(?:-\w+)?)?;base64,/, "");
+            const filename = `audio_${Date.now()}.webm`;
+            const filepath = path.join(__dirname, '..', 'uploads', 'audio', filename);
+            fs.writeFileSync(filepath, base64Data, 'base64');
+            audio_url = `/uploads/audio/${filename}`;
+        }
         await db.execute(
-            'INSERT INTO messages (sender_email, receiver_email, course_id, subject, content) VALUES (?, ?, ?, ?, ?)',
-            [sender_email, receiver_email || null, course_id || null, subject, content]
+            'INSERT INTO messages (sender_email, receiver_email, course_id, subject, content, audio_url) VALUES (?, ?, ?, ?, ?, ?)',
+            [sender_email, receiver_email || null, course_id || null, subject, content, audio_url]
         );
         res.json({ success: true, message: 'Message sent successfully' });
     } catch (error) {

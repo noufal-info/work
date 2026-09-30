@@ -43,9 +43,16 @@ const db = require('../db/database');
               course_id INT,
               subject VARCHAR(255) NOT NULL,
               content TEXT NOT NULL,
+              audio_url VARCHAR(255),
               sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        // Ensure audio_url exists for existing databases
+        try {
+            await db.execute("ALTER TABLE messages ADD COLUMN audio_url VARCHAR(255);");
+        } catch(e) {
+            // Ignore error if column already exists
+        }
         console.log("Teachers, Courses, Enrollments, and Messages tables initialized.");
     } catch (err) {
         console.error("Failed to initialize tables:", err);

@@ -258,6 +258,14 @@
                                 <label>Message</label>
                                 <textarea id="msgContent" rows="4" required></textarea>
                             </div>
+                            <div class="form-group">
+                                <label>Audio Message (Optional)</label>
+                                <div>
+                                    <button type="button" id="btnRecord" class="btn-primary" style="background:var(--danger); padding: 5px 10px; font-size:12px;" onclick="startRecording()">🎤 Record</button>
+                                    <button type="button" id="btnStopRecord" class="btn-secondary" style="display:none; padding: 5px 10px; font-size:12px;" onclick="stopRecording()">⏹ Stop</button>
+                                </div>
+                                <audio id="audioPreview" controls style="display:none; margin-top:10px; height: 30px;"></audio>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn-secondary" onclick="closeModal('messageModal')">Cancel</button>
@@ -424,7 +432,11 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${toText}</td>
-                        <td><strong>${msg.subject}</strong><br><small>${msg.content}</small></td>
+                        <td>
+                            <strong>${msg.subject}</strong><br>
+                            <small>${msg.content}</small>
+                            ${msg.audio_url ? `<br><audio controls src="${msg.audio_url}" style="height: 30px; margin-top: 5px;"></audio>` : ''}
+                        </td>
                         <td>${new Date(msg.sent_at).toLocaleDateString()}</td>
                     `;
                     tbody.appendChild(tr);
@@ -449,7 +461,7 @@
                 const response = await fetch('/api/teacher/messages', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sender_email: currentTeacherEmail, receiver_email, course_id, subject, content })
+                    body: JSON.stringify({ sender_email: currentTeacherEmail, receiver_email, course_id, subject, content, audio_base64: currentAudioBase64 })
                 });
 
                 const data = await response.json();
@@ -457,6 +469,11 @@
                     alert("Message sent via integrated messenger!");
                     closeModal('messageModal');
                     e.target.reset();
+                    // Reset audio
+                    currentAudioBase64 = null;
+                    document.getElementById('audioPreview').style.display = 'none';
+                    document.getElementById('audioPreview').src = '';
+                    
                     loadMessages();
                 } else {
                     alert("Error: " + data.message);
@@ -468,6 +485,55 @@
                 btn.disabled = false;
             }
         }
+
+        // Audio Recording Logic
+        let mediaRecorder;
+        let audioChunks = [];
+        let currentAudioBase64 = null;
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const preview = document.getElementById('audioPreview');
+                    preview.src = audioUrl;
+                    preview.style.display = 'block';
+
+                    // Convert to base64 for API
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob); 
+                    reader.onloadend = function() {
+                        currentAudioBase64 = reader.result;
+                    }
+                };
+
+                mediaRecorder.start();
+                document.getElementById('btnRecord').style.display = 'none';
+                document.getElementById('btnStopRecord').style.display = 'inline-block';
+            } catch (err) {
+                alert("Microphone access denied or unavailable.");
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Stop mic
+                document.getElementById('btnRecord').style.display = 'inline-block';
+                document.getElementById('btnRecord').innerHTML = '🎤 Re-record';
+                document.getElementById('btnStopRecord').style.display = 'none';
+            }
+        }
+
 
 
         async function loadPendingApprovals() {
