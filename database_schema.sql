@@ -72,3 +72,14 @@ CREATE TABLE IF NOT EXISTS enrollments (
   enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY unique_enrollment (course_id, student_email)
 );
+
+-- Create Messages table
+CREATE TABLE IF NOT EXISTS messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  sender_email VARCHAR(255) NOT NULL,
+  receiver_email VARCHAR(255),  -- NULL if bulk message to a course
+  course_id INT,                -- NULL if individual message
+  subject VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

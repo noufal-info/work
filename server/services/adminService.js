@@ -35,7 +35,18 @@ const db = require('../db/database');
               UNIQUE KEY unique_enrollment (course_id, student_email)
             )
         `);
-        console.log("Teachers, Courses, and Enrollments tables initialized.");
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS messages (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              sender_email VARCHAR(255) NOT NULL,
+              receiver_email VARCHAR(255),
+              course_id INT,
+              subject VARCHAR(255) NOT NULL,
+              content TEXT NOT NULL,
+              sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log("Teachers, Courses, Enrollments, and Messages tables initialized.");
     } catch (err) {
         console.error("Failed to initialize tables:", err);
     }

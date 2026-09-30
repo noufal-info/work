@@ -29,11 +29,11 @@
             
             
             <nav class="sidebar-nav">
-                <a href="/AnalogiX/teacher" class="nav-item active" id="nav-courses">
+                <a href="#" class="nav-item active" id="nav-courses" onclick="switchTab('courses', event)">
                     <ion-icon name="library-outline"></ion-icon>
                     <span>My Courses</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-messages">
+                <a href="#" class="nav-item" id="nav-messages" onclick="switchTab('messages', event)">
                     <ion-icon name="chatbubbles-outline"></ion-icon>
                     <span>Communications</span>
                 </a>
@@ -125,6 +125,42 @@
                 </div>
             </div>
 
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Content -->
+            <div id="section-messages" class="content-section dashboard-content" style="display: none;">
+                <div class="page-header">
+                    <h1>Communications</h1>
+                    <button class="btn-primary" onclick="openModal('messageModal')">
+                        <ion-icon name="paper-plane-outline"></ion-icon>
+                        Compose Message
+                    </button>
+                </div>
+                
+                <div class="data-section">
+                    <div class="section-header">
+                        <h2>Sent Messages</h2>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>To</th>
+                                    <th>Subject</th>
+                                    <th>Date Sent</th>
+                                </tr>
+                            </thead>
+                            <tbody id="messagesTableBody">
+                                <!-- Messages loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Course Modal -->
             <div class="modal-overlay" id="courseModal">
                 <div class="modal">
@@ -180,6 +216,52 @@
                         <div class="modal-footer">
                             <button type="button" class="btn-secondary" onclick="closeModal('enrollModal')">Cancel</button>
                             <button type="submit" class="btn-primary">Add Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Compose Message Modal -->
+            <div class="modal-overlay" id="messageModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Compose Message</h2>
+                        <button class="modal-close" onclick="closeModal('messageModal')"><ion-icon name="close-outline"></ion-icon></button>
+                    </div>
+                    <form onsubmit="handleMessageSubmit(event)">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Message Type</label>
+                                <select id="messageType" onchange="toggleMessageType()" required>
+                                    <option value="individual">Individual Student</option>
+                                    <option value="bulk">Bulk (Entire Course)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="groupIndividual">
+                                <label>Student Email</label>
+                                <input type="email" id="msgStudentEmail" placeholder="student@example.com">
+                            </div>
+                            
+                            <div class="form-group" id="groupBulk" style="display:none;">
+                                <label>Select Course</label>
+                                <select id="msgCourseId">
+                                    <!-- Courses loaded dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <input type="text" id="msgSubject" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea id="msgContent" rows="4" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-secondary" onclick="closeModal('messageModal')">Cancel</button>
+                            <button type="submit" class="btn-primary">Send Message</button>
                         </div>
                     </form>
                 </div>
@@ -270,11 +352,123 @@
             }
         }
 
+        // Tab Switching Logic
+        function switchTab(tabId, e) {
+            if(e) e.preventDefault();
+            
+            // Update Nav styling
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav-' + tabId).classList.add('active');
+            
+            // Update Sections
+            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+            document.getElementById('section-' + tabId).style.display = 'block';
+            
+            if (tabId === 'messages') {
+                loadMessages();
+                populateMessageCourses();
+            }
+        }
+
         // Load courses when page loads
         document.addEventListener('DOMContentLoaded', () => {
             loadCourses();
             loadPendingApprovals();
         });
+
+        // Toggle message type fields
+        function toggleMessageType() {
+            const type = document.getElementById('messageType').value;
+            if(type === 'individual') {
+                document.getElementById('groupIndividual').style.display = 'block';
+                document.getElementById('msgStudentEmail').required = true;
+                document.getElementById('groupBulk').style.display = 'none';
+                document.getElementById('msgCourseId').required = false;
+            } else {
+                document.getElementById('groupIndividual').style.display = 'none';
+                document.getElementById('msgStudentEmail').required = false;
+                document.getElementById('groupBulk').style.display = 'block';
+                document.getElementById('msgCourseId').required = true;
+            }
+        }
+
+        let currentTeacherEmail = 'teacher@example.com'; // In a real app, pull from localStorage auth token
+
+        async function populateMessageCourses() {
+            try {
+                const response = await fetch('/api/teacher/courses');
+                const courses = await response.json();
+                const select = document.getElementById('msgCourseId');
+                select.innerHTML = '';
+                courses.forEach(c => {
+                    select.innerHTML += `<option value="${c.id}">${c.title}</option>`;
+                });
+            } catch(e) {}
+        }
+
+        async function loadMessages() {
+            const tbody = document.getElementById('messagesTableBody');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading...</td></tr>';
+            try {
+                const response = await fetch('/api/teacher/messages?email=' + currentTeacherEmail);
+                const messages = await response.json();
+                
+                if (messages.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No messages sent yet.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                messages.forEach(msg => {
+                    const toText = msg.course_id ? `Bulk: ${msg.course_name}` : `Individual: ${msg.receiver_email}`;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${toText}</td>
+                        <td><strong>${msg.subject}</strong><br><small>${msg.content}</small></td>
+                        <td>${new Date(msg.sent_at).toLocaleDateString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {}
+        }
+
+        async function handleMessageSubmit(e) {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Sending...';
+            btn.disabled = true;
+
+            const type = document.getElementById('messageType').value;
+            const receiver_email = type === 'individual' ? document.getElementById('msgStudentEmail').value : null;
+            const course_id = type === 'bulk' ? document.getElementById('msgCourseId').value : null;
+            const subject = document.getElementById('msgSubject').value;
+            const content = document.getElementById('msgContent').value;
+
+            try {
+                const response = await fetch('/api/teacher/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sender_email: currentTeacherEmail, receiver_email, course_id, subject, content })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert("Message sent via integrated messenger!");
+                    closeModal('messageModal');
+                    e.target.reset();
+                    loadMessages();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                alert("Failed to connect to the server.");
+            } finally {
+                btn.innerHTML = 'Send Message';
+                btn.disabled = false;
+            }
+        }
+
 
         async function loadPendingApprovals() {
             const tbody = document.getElementById('pendingTableBody');

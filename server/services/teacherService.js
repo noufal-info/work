@@ -103,4 +103,37 @@ router.post('/enrollments/approve', async (req, res) => {
     }
 });
 
+router.post('/messages', async (req, res) => {
+    try {
+        const { sender_email, receiver_email, course_id, subject, content } = req.body;
+        
+        await db.execute(
+            'INSERT INTO messages (sender_email, receiver_email, course_id, subject, content) VALUES (?, ?, ?, ?, ?)',
+            [sender_email, receiver_email || null, course_id || null, subject, content]
+        );
+        res.json({ success: true, message: 'Message sent successfully' });
+    } catch (error) {
+        console.error("Error sending message:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.get('/messages', async (req, res) => {
+    try {
+        const { email } = req.query; // get teacher's email
+        // Get messages sent by this teacher
+        const [rows] = await db.execute(`
+            SELECT m.*, 
+                   CASE WHEN m.course_id IS NOT NULL THEN (SELECT title FROM courses WHERE id = m.course_id) ELSE NULL END as course_name
+            FROM messages m
+            WHERE m.sender_email = ? 
+            ORDER BY m.sent_at DESC
+        `, [email]);
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching messages:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 module.exports = router;
