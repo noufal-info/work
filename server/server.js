@@ -83,6 +83,10 @@ app.get('/AnalogiX/teacher', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'teacher', 'index.html'));
 });
 
+app.get('/AnalogiX/teacher/chat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'teacher', 'chat.html'));
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
     console.log(`Admin panel available at http://localhost:${PORT}/admin`);

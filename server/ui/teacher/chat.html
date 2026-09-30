@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Messenger - AnalogiX</title>
+    <link rel="stylesheet" href="/admin/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 80px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .chat-sidebar {
+            width: 300px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 700;
+            color: var(--blue-dark);
+            font-size: 18px;
+        }
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .contact-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .contact-item:hover, .contact-item.active {
+            background: #e2e8f0;
+        }
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--blue-dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .contact-info { flex: 1; }
+        .contact-name { font-weight: 600; color: #1e293b; font-size: 14px; }
+        .contact-type { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f1f5f9;
+        }
+        .chat-main-header {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 700;
+            color: var(--blue-dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .messages-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message-bubble {
+            max-width: 60%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+        .message-bubble.received {
+            background: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            color: #334155;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .message-bubble.sent {
+            background: var(--green-primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
+        }
+        .message-subject {
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+            display: block;
+        }
+        .chat-input-area {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-input-area input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+        .chat-input-area input[type="text"]:focus {
+            border-color: var(--green-primary);
+        }
+        .action-btn {
+            background: var(--green-primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        .action-btn.record { background: #ef4444; }
+        .action-btn.stop { background: #3b82f6; display: none; }
+        .action-btn:hover { transform: scale(1.05); }
+        .action-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        
+        .no-chat-selected {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+        }
+        .no-chat-selected ion-icon { font-size: 64px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/admin/images/AnalogiX.png" alt="AnalogiX Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="/AnalogiX/teacher"><ion-icon name="grid-outline"></ion-icon> Dashboard</a></li>
+            <li class="active"><a href="/AnalogiX/teacher/chat"><ion-icon name="chatbubbles-outline"></ion-icon> Messenger</a></li>
+        </ul>
+        <div class="logout">
+            <a href="#" onclick="logout()"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="search-bar">
+                <ion-icon name="search-outline"></ion-icon>
+                <input type="text" placeholder="Search contacts...">
+            </div>
+            <div class="user-info">
+                <ion-icon name="notifications-outline" class="bell-icon"></ion-icon>
+                <div class="profile">
+                    <div class="avatar" style="background-color: var(--green-primary);">T</div>
+                    <div class="details">
+                        <span class="name" id="displayTeacherName">Teacher</span>
+                        <span class="role">Instructor</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Messenger UI -->
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <div class="chat-sidebar">
+                <div class="chat-header">Contacts</div>
+                <div class="contacts-list" id="contactsList">
+                    <div style="padding:20px;text-align:center;color:#888;">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-main" id="chatMain" style="display: none;">
+                <div class="chat-main-header" id="chatHeaderTitle">
+                    Select a contact
+                </div>
+                <div class="messages-area" id="messagesArea">
+                    <!-- Messages go here -->
+                </div>
+                
+                <div style="padding: 10px 20px; background: white; border-top: 1px solid #e2e8f0; display: none;" id="audioPreviewContainer">
+                    <audio id="audioPreview" controls style="height:30px;"></audio>
+                    <button class="action-btn" style="background:#ef4444; width:30px; height:30px; font-size:14px; margin-left:10px;" onclick="cancelAudio()"><ion-icon name="close"></ion-icon></button>
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="msgSubject" placeholder="Subject (Optional)" style="max-width:150px;">
+                    <input type="text" id="msgContent" placeholder="Type your message here..." required>
+                    
+                    <button type="button" class="action-btn record" id="btnRecord" title="Record Audio"><ion-icon name="mic"></ion-icon></button>
+                    <button type="button" class="action-btn stop" id="btnStopRecord" title="Stop Recording"><ion-icon name="square"></ion-icon></button>
+                    
+                    <button type="button" class="action-btn" id="btnSend" onclick="sendMessage()"><ion-icon name="send"></ion-icon></button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="no-chat-selected" id="noChatSelected">
+                <ion-icon name="chatbubbles-outline"></ion-icon>
+                <h2>Your Messages</h2>
+                <p>Select a student or course to start chatting.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('teacherAuth')) {
+            window.location.href = '/AnalogiX/teacher/login';
+        }
+
+        const teacherEmail = localStorage.getItem('teacherEmail');
+        document.getElementById('displayTeacherName').innerText = teacherEmail.split('@')[0];
+
+        let currentActiveContact = null; // { type: 'course'|'student', id: string, name: string }
+
+        async function loadContacts() {
+            try {
+                const res = await fetch('/api/teacher/messages/contacts?email=' + encodeURIComponent(teacherEmail));
+                const data = await res.json();
+                
+                const list = document.getElementById('contactsList');
+                list.innerHTML = '';
+                
+                // Add Courses (Bulk messaging)
+                data.courses.forEach(c => {
+                    const el = document.createElement('div');
+                    el.className = 'contact-item';
+                    el.innerHTML = `
+                        <div class="contact-avatar"><ion-icon name="people"></ion-icon></div>
+                        <div class="contact-info">
+                            <div class="contact-name">${c.title}</div>
+                            <div class="contact-type">Course Announcement</div>
+                        </div>
+                    `;
+                    el.onclick = () => selectContact(el, { type: 'course', id: c.id, name: c.title });
+                    list.appendChild(el);
+                });
+
+                // Add Students
+                data.students.forEach(s => {
+                    const el = document.createElement('div');
+                    el.className = 'contact-item';
+                    el.innerHTML = `
+                        <div class="contact-avatar"><ion-icon name="person"></ion-icon></div>
+                        <div class="contact-info">
+                            <div class="contact-name">${s.name}</div>
+                            <div class="contact-type">${s.email}</div>
+                        </div>
+                    `;
+                    el.onclick = () => selectContact(el, { type: 'student', id: s.email, name: s.name });
+                    list.appendChild(el);
+                });
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('contactsList').innerHTML = '<div style="padding:20px;color:red;">Error loading contacts</div>';
+            }
+        }
+
+        function selectContact(el, contact) {
+            document.querySelectorAll('.contact-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            
+            currentActiveContact = contact;
+            document.getElementById('noChatSelected').style.display = 'none';
+            document.getElementById('chatMain').style.display = 'flex';
+            
+            const icon = contact.type === 'course' ? '<ion-icon name="people"></ion-icon>' : '<ion-icon name="person"></ion-icon>';
+            document.getElementById('chatHeaderTitle').innerHTML = `${icon} ${contact.name}`;
+            
+            loadChatHistory();
+        }
+
+        async function loadChatHistory() {
+            if (!currentActiveContact) return;
+            
+            const area = document.getElementById('messagesArea');
+            area.innerHTML = '<div style="text-align:center; color:#888;">Loading messages...</div>';
+            
+            let url = '/api/teacher/messages/history?email=' + encodeURIComponent(teacherEmail);
+            if (currentActiveContact.type === 'course') {
+                url += '&course_id=' + currentActiveContact.id;
+            } else {
+                url += '&receiver_email=' + encodeURIComponent(currentActiveContact.id);
+            }
+
+            try {
+                const res = await fetch(url);
+                const msgs = await res.json();
+                
+                area.innerHTML = '';
+                if (msgs.length === 0) {
+                    area.innerHTML = '<div style="text-align:center; color:#888; margin-top: 20px;">No messages yet. Send one below!</div>';
+                }
+                
+                msgs.forEach(m => {
+                    const isSent = m.sender_email === teacherEmail;
+                    const b = document.createElement('div');
+                    b.className = 'message-bubble ' + (isSent ? 'sent' : 'received');
+                    
+                    let subjectHtml = m.subject ? `<div class="message-subject">${m.subject}</div>` : '';
+                    let audioHtml = m.audio_url ? `<div style="margin-top:8px;"><audio controls src="${m.audio_url}" style="height:30px; width:100%;"></audio></div>` : '';
+                    
+                    b.innerHTML = `
+                        ${subjectHtml}
+                        ${m.content}
+                        ${audioHtml}
+                        <span class="message-time">${new Date(m.sent_at).toLocaleString()}</span>
+                    `;
+                    area.appendChild(b);
+                });
+                
+                area.scrollTop = area.scrollHeight;
+            } catch (err) {
+                area.innerHTML = '<div style="text-align:center; color:red;">Error loading history.</div>';
+            }
+        }
+
+        async function sendMessage() {
+            if (!currentActiveContact) return;
+            
+            const content = document.getElementById('msgContent').value.trim();
+            const subject = document.getElementById('msgSubject').value.trim();
+            
+            if (!content && !currentAudioBase64) {
+                alert("Please enter a message or record audio.");
+                return;
+            }
+            
+            const btn = document.getElementById('btnSend');
+            btn.disabled = true;
+            btn.innerHTML = '<ion-icon name="hourglass"></ion-icon>';
+
+            const payload = {
+                sender_email: teacherEmail,
+                receiver_email: currentActiveContact.type === 'student' ? currentActiveContact.id : null,
+                course_id: currentActiveContact.type === 'course' ? currentActiveContact.id : null,
+                subject: subject || 'No Subject',
+                content: content || 'Audio Message',
+                audio_base64: currentAudioBase64
+            };
+
+            try {
+                const res = await fetch('/api/teacher/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    document.getElementById('msgContent').value = '';
+                    document.getElementById('msgSubject').value = '';
+                    cancelAudio();
+                    loadChatHistory();
+                } else {
+                    alert("Error sending message.");
+                }
+            } catch (err) {
+                alert("Network error.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<ion-icon name="send"></ion-icon>';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('teacherAuth');
+            window.location.href = '/AnalogiX/teacher/login';
+        }
+
+        // --- Audio Recording Logic ---
+        let mediaRecorder;
+        let audioChunks = [];
+        let currentAudioBase64 = null;
+
+        document.getElementById('btnRecord').onclick = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    const preview = document.getElementById('audioPreview');
+                    preview.src = audioUrl;
+                    document.getElementById('audioPreviewContainer').style.display = 'flex';
+                    
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => { currentAudioBase64 = reader.result; };
+                };
+
+                mediaRecorder.start();
+                document.getElementById('btnRecord').style.display = 'none';
+                document.getElementById('btnStopRecord').style.display = 'flex';
+            } catch (err) {
+                alert("Microphone access denied.");
+            }
+        };
+
+        document.getElementById('btnStopRecord').onclick = () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(t => t.stop());
+                document.getElementById('btnRecord').style.display = 'flex';
+                document.getElementById('btnStopRecord').style.display = 'none';
+            }
+        };
+
+        function cancelAudio() {
+            currentAudioBase64 = null;
+            document.getElementById('audioPreview').src = '';
+            document.getElementById('audioPreviewContainer').style.display = 'none';
+        }
+
+        // Allow pressing Enter to send
+        document.getElementById('msgContent').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        loadContacts();
+    </script>
+</body>
+</html>

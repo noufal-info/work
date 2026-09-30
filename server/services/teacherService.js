@@ -128,22 +128,49 @@ router.post('/messages', async (req, res) => {
     }
 });
 
-router.get('/messages', async (req, res) => {
+
+router.get('/messages/contacts', async (req, res) => {
     try {
-        const { email } = req.query; // get teacher's email
-        // Get messages sent by this teacher
-        const [rows] = await db.execute(`
-            SELECT m.*, 
-                   CASE WHEN m.course_id IS NOT NULL THEN (SELECT title FROM courses WHERE id = m.course_id) ELSE NULL END as course_name
-            FROM messages m
-            WHERE m.sender_email = ? 
-            ORDER BY m.sent_at DESC
-        `, [email]);
+        const { email } = req.query; 
+        const [courses] = await db.execute("SELECT id, title FROM courses");
+        const [students] = await db.execute(`
+            SELECT DISTINCT s.email, s.name 
+            FROM students s
+            JOIN enrollments e ON s.email = e.student_email
+        `);
+        res.json({ courses, students });
+    } catch (error) {
+        console.error("Error fetching contacts:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.get('/messages/history', async (req, res) => {
+    try {
+        const { email, receiver_email, course_id } = req.query;
+        let query = "";
+        let params = [];
+        if (course_id) {
+            query = "SELECT * FROM messages WHERE course_id = ? ORDER BY sent_at ASC";
+            params = [course_id];
+        } else if (receiver_email) {
+            query = `
+                SELECT * FROM messages 
+                WHERE (sender_email = ? AND receiver_email = ?) 
+                   OR (sender_email = ? AND receiver_email = ?)
+                ORDER BY sent_at ASC
+            `;
+            params = [email, receiver_email, receiver_email, email];
+        } else {
+            return res.json([]);
+        }
+        const [rows] = await db.execute(query, params);
         res.json(rows);
     } catch (error) {
-        console.error("Error fetching messages:", error);
+        console.error("Error fetching history:", error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
 module.exports = router;
+
