@@ -453,8 +453,10 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert('Login successful!');
-                    window.location.href = '/';
+                    localStorage.setItem('studentAuth', 'true');
+                    localStorage.setItem('studentEmail', email);
+                    localStorage.setItem('studentName', data.user.name);
+                    window.location.href = '/AnalogiX/user';
                 } else {
                     alert(data.message);
                 }

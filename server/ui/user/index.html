@@ -8,9 +8,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <!-- Ionicons for mobile app icons -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .msg-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .msg-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .msg-sender { font-weight: bold; color: var(--blue-dark); font-size: 14px; }
+        .msg-date { font-size: 12px; color: var(--text-muted); }
+        .msg-subject { font-weight: 600; margin-bottom: 5px; font-size: 15px; }
+        .msg-body { font-size: 14px; color: #444; }
+        .enroll-btn { background: var(--green-primary); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .enroll-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .badge-status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; display: inline-block; margin-top: 10px; }
+        .status-Active { background: var(--green-primary); }
+        .status-Pending { background: #f59e0b; }
+        .status-Rejected { background: #ef4444; }
+        .logout-btn { background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 10px; width: 100%; margin-top: 20px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
     <header class="app-header">
@@ -20,107 +36,193 @@
             </div>
             <div class="greeting">
                 <p>Hello,</p>
-                <h1>Alex Student</h1>
+                <h1 id="studentGreetingName">Student</h1>
             </div>
         </div>
-        <button class="notification-btn">
-            <ion-icon name="notifications-outline"></ion-icon>
-            <span class="badge">2</span>
-        </button>
     </header>
 
     <main class="app-content">
-        <section class="metrics-section">
-            <h2 class="section-title">Your Progress</h2>
-            <div class="metrics-grid">
-                <div class="metric-card primary">
-                    <div class="metric-icon">
-                        <ion-icon name="book-outline"></ion-icon>
-                    </div>
-                    <div class="metric-info">
-                        <h3>Active Courses</h3>
-                        <p class="value">4</p>
-                    </div>
-                </div>
-                <div class="metric-card secondary">
-                    <div class="metric-icon">
-                        <ion-icon name="checkmark-circle-outline"></ion-icon>
-                    </div>
-                    <div class="metric-info">
-                        <h3>Completed</h3>
-                        <p class="value">12</p>
-                    </div>
-                </div>
-                <div class="metric-card accent-blue">
-                    <div class="metric-icon">
-                        <ion-icon name="time-outline"></ion-icon>
-                    </div>
-                    <div class="metric-info">
-                        <h3>Study Hours</h3>
-                        <p class="value">34h</p>
-                    </div>
-                </div>
-                <div class="metric-card accent-green">
-                    <div class="metric-icon">
-                        <ion-icon name="trophy-outline"></ion-icon>
-                    </div>
-                    <div class="metric-info">
-                        <h3>Certificates</h3>
-                        <p class="value">3</p>
-                    </div>
-                </div>
-            </div>
+        <!-- HOME TAB (Available Courses) -->
+        <section id="tab-home" class="tab-content active">
+            <h2 class="section-title">Trending / Available Courses</h2>
+            <div id="availableCoursesList">Loading...</div>
         </section>
 
-        <section class="recent-activity">
-            <h2 class="section-title">Continue Learning</h2>
-            <div class="course-card">
-                <div class="course-image">
-                    <ion-icon name="logo-nodejs"></ion-icon>
-                </div>
-                <div class="course-details">
-                    <h3>Advanced Node.js</h3>
-                    <p>Module 4: Express APIs</p>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 65%;"></div>
-                    </div>
-                    <span class="progress-text">65% Completed</span>
-                </div>
-            </div>
-            
-            <div class="course-card">
-                <div class="course-image" style="background: var(--dark-blue);">
-                    <ion-icon name="logo-react"></ion-icon>
-                </div>
-                <div class="course-details">
-                    <h3>React Native Basics</h3>
-                    <p>Module 1: Introduction</p>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 15%;"></div>
-                    </div>
-                    <span class="progress-text">15% Completed</span>
-                </div>
+        <!-- ENROLLED COURSES TAB -->
+        <section id="tab-courses" class="tab-content">
+            <h2 class="section-title">My Courses</h2>
+            <div id="enrolledCoursesList">Loading...</div>
+        </section>
+
+        <!-- CHAT TAB -->
+        <section id="tab-chat" class="tab-content">
+            <h2 class="section-title">Inbox</h2>
+            <div id="messagesList">Loading...</div>
+        </section>
+
+        <!-- PROFILE TAB -->
+        <section id="tab-profile" class="tab-content">
+            <h2 class="section-title">Profile</h2>
+            <div class="msg-card" style="text-align: center;">
+                <div style="font-size: 60px; color: var(--blue-dark);"><ion-icon name="person-circle"></ion-icon></div>
+                <h3 id="profileName">Student Name</h3>
+                <p id="profileEmail" style="color: var(--text-muted); margin-bottom: 20px;">student@example.com</p>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         </section>
     </main>
 
     <nav class="bottom-nav">
-        <a href="#" class="nav-item active">
+        <a href="#" class="nav-item active" onclick="switchTab('home', this)">
             <ion-icon name="home"></ion-icon>
             <span>Home</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" onclick="switchTab('courses', this)">
             <ion-icon name="play-circle-outline"></ion-icon>
             <span>Courses</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" onclick="switchTab('chat', this)">
             <ion-icon name="chatbubbles-outline"></ion-icon>
             <span>Chat</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" onclick="switchTab('profile', this)">
             <ion-icon name="person-outline"></ion-icon>
             <span>Profile</span>
         </a>
     </nav>
+
+    <script>
+        // Auth check
+        if (!localStorage.getItem('studentAuth')) {
+            window.location.href = '/AnalogiX';
+        }
+
+        const studentEmail = localStorage.getItem('studentEmail');
+        const studentName = localStorage.getItem('studentName') || 'Student';
+        document.getElementById('studentGreetingName').innerText = studentName;
+        document.getElementById('profileName').innerText = studentName;
+        document.getElementById('profileEmail').innerText = studentEmail;
+
+        function logout() {
+            localStorage.removeItem('studentAuth');
+            localStorage.removeItem('studentEmail');
+            localStorage.removeItem('studentName');
+            window.location.href = '/AnalogiX';
+        }
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(el) el.classList.add('active');
+
+            if (tabId === 'home') loadAvailableCourses();
+            if (tabId === 'courses') loadEnrolledCourses();
+            if (tabId === 'chat') loadMessages();
+        }
+
+        async function loadAvailableCourses() {
+            try {
+                const res = await fetch('/api/courses/available');
+                const courses = await res.json();
+                let html = '';
+                if(courses.length === 0) {
+                    html = '<p>No courses available right now.</p>';
+                } else {
+                    courses.forEach(c => {
+                        html += `
+                        <div class="course-card">
+                            <div class="course-image"><ion-icon name="book"></ion-icon></div>
+                            <div class="course-details">
+                                <h3>${c.title}</h3>
+                                <p>${c.description}</p>
+                                <button class="enroll-btn" onclick="enrollCourse(${c.id})">Enroll Now</button>
+                            </div>
+                        </div>`;
+                    });
+                }
+                document.getElementById('availableCoursesList').innerHTML = html;
+            } catch (err) {
+                document.getElementById('availableCoursesList').innerHTML = '<p>Error loading courses.</p>';
+            }
+        }
+
+        async function enrollCourse(courseId) {
+            try {
+                const res = await fetch('/api/courses/enroll', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course_id: courseId, student_email: studentEmail })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if(data.success) {
+                    // Switch to enrolled tab to see status
+                    document.querySelector('.nav-item:nth-child(2)').click();
+                }
+            } catch (err) {
+                alert("Failed to enroll.");
+            }
+        }
+
+        async function loadEnrolledCourses() {
+            try {
+                const res = await fetch('/api/courses/enrolled?email=' + encodeURIComponent(studentEmail));
+                const courses = await res.json();
+                let html = '';
+                if(courses.length === 0) {
+                    html = '<p>You are not enrolled in any courses yet.</p>';
+                } else {
+                    courses.forEach(c => {
+                        html += `
+                        <div class="course-card">
+                            <div class="course-image" style="background: var(--dark-blue);"><ion-icon name="play"></ion-icon></div>
+                            <div class="course-details">
+                                <h3>${c.title}</h3>
+                                <p>${c.description}</p>
+                                <span class="badge-status status-${c.enrollment_status}">${c.enrollment_status}</span>
+                            </div>
+                        </div>`;
+                    });
+                }
+                document.getElementById('enrolledCoursesList').innerHTML = html;
+            } catch (err) {
+                document.getElementById('enrolledCoursesList').innerHTML = '<p>Error loading your courses.</p>';
+            }
+        }
+
+        async function loadMessages() {
+            try {
+                const res = await fetch('/api/messages?email=' + encodeURIComponent(studentEmail));
+                const messages = await res.json();
+                let html = '';
+                if(messages.length === 0) {
+                    html = '<p>Your inbox is empty.</p>';
+                } else {
+                    messages.forEach(msg => {
+                        let context = msg.course_name ? `Announcement: ${msg.course_name}` : 'Direct Message';
+                        let audioHtml = msg.audio_url ? `<br><audio controls src="${msg.audio_url}" style="height:35px; margin-top:10px; width:100%;"></audio>` : '';
+                        html += `
+                        <div class="msg-card">
+                            <div class="msg-header">
+                                <span class="msg-sender">${msg.sender_email} <small style="color:#888;">(${context})</small></span>
+                                <span class="msg-date">${new Date(msg.sent_at).toLocaleDateString()}</span>
+                            </div>
+                            <div class="msg-subject">${msg.subject}</div>
+                            <div class="msg-body">${msg.content}</div>
+                            ${audioHtml}
+                        </div>`;
+                    });
+                }
+                document.getElementById('messagesList').innerHTML = html;
+            } catch (err) {
+                document.getElementById('messagesList').innerHTML = '<p>Error loading messages.</p>';
+            }
+        }
+
+        // Init
+        loadAvailableCourses();
+    </script>
 </body>
 </html>

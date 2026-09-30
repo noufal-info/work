@@ -26,6 +26,10 @@ app.get('/AnalogiX', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'user', 'login.html'));
 });
 
+app.get('/AnalogiX/user', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'user', 'index.html'));
+});
+
 app.get('/', (req, res) => {
     res.redirect('/AnalogiX');
 });

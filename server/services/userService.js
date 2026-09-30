@@ -30,4 +30,48 @@ router.post('/courses/enroll', async (req, res) => {
     }
 });
 
+router.get('/courses/available', async (req, res) => {
+    try {
+        const [rows] = await db.execute("SELECT * FROM courses WHERE status = 'Published' ORDER BY id DESC");
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching available courses:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.get('/courses/enrolled', async (req, res) => {
+    try {
+        const { email } = req.query;
+        const [rows] = await db.execute(`
+            SELECT c.*, e.status as enrollment_status 
+            FROM enrollments e 
+            JOIN courses c ON e.course_id = c.id 
+            WHERE e.student_email = ?
+        `, [email]);
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching enrolled courses:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.get('/messages', async (req, res) => {
+    try {
+        const { email } = req.query;
+        const [rows] = await db.execute(`
+            SELECT m.*, c.title as course_name 
+            FROM messages m
+            LEFT JOIN courses c ON m.course_id = c.id
+            WHERE m.receiver_email = ? 
+               OR m.course_id IN (SELECT course_id FROM enrollments WHERE student_email = ? AND status = 'Active')
+            ORDER BY m.sent_at DESC
+        `, [email, email]);
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching student messages:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 module.exports = router;
