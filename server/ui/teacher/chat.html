@@ -13,7 +13,7 @@
     <style>
         .chat-container {
             display: flex;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 120px);
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -62,8 +62,8 @@
             justify-content: center;
             font-weight: bold;
         }
-        .contact-info { flex: 1; }
-        .contact-name { font-weight: 600; color: #1e293b; font-size: 14px; }
+        .contact-info { flex: 1; overflow: hidden; }
+        .contact-name { font-weight: 600; color: #1e293b; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .contact-type { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; }
         
         .chat-main {
@@ -175,79 +175,106 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <img src="/admin/images/AnalogiX.png" alt="AnalogiX Logo">
-        </div>
-        <ul class="nav-links">
-            <li><a href="/AnalogiX/teacher"><ion-icon name="grid-outline"></ion-icon> Dashboard</a></li>
-            <li class="active"><a href="/AnalogiX/teacher/chat"><ion-icon name="chatbubbles-outline"></ion-icon> Messenger</a></li>
-        </ul>
-        <div class="logout">
-            <a href="#" onclick="logout()"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <header>
-            <div class="search-bar">
-                <ion-icon name="search-outline"></ion-icon>
-                <input type="text" placeholder="Search contacts...">
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo" style="margin-bottom: 24px; display: flex; justify-content: center; width: 100%;">
+                <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" style="height: 32px; max-width: 100%; object-fit: contain;">
             </div>
-            <div class="user-info">
-                <ion-icon name="notifications-outline" class="bell-icon"></ion-icon>
-                <div class="profile">
-                    <div class="avatar" style="background-color: var(--green-primary);">T</div>
-                    <div class="details">
-                        <span class="name" id="displayTeacherName">Teacher</span>
-                        <span class="role">Instructor</span>
+
+            <nav class="sidebar-nav">
+                <a href="/AnalogiX/teacher" class="nav-item">
+                    <ion-icon name="library-outline"></ion-icon>
+                    <span>Dashboard / Courses</span>
+                </a>
+                <a href="/AnalogiX/teacher/chat" class="nav-item active">
+                    <ion-icon name="chatbubbles-outline"></ion-icon>
+                    <span>Communications</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <ion-icon name="settings-outline"></ion-icon>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item logout" onclick="logout()">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="search-bar">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" placeholder="Search students, courses...">
+                </div>
+                <div class="user-profile">
+                    <button class="notification-btn">
+                        <ion-icon name="notifications-outline"></ion-icon>
+                        <span class="badge">5</span>
+                    </button>
+                    <div class="profile-info">
+                        <div class="avatar">
+                            <span>MA</span>
+                        </div>
+                        <div class="details">
+                            <span class="name" id="displayTeacherName">Teacher</span>
+                            <span class="role">Instructor</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Messenger UI -->
+                <div class="chat-container">
+                    <!-- Sidebar -->
+                    <div class="chat-sidebar">
+                        <div class="chat-header">Contacts</div>
+                        <div class="contacts-list" id="contactsList">
+                            <div style="padding:20px;text-align:center;color:#888;">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Area -->
+                    <div class="chat-main" id="chatMain" style="display: none;">
+                        <div class="chat-main-header" id="chatHeaderTitle">
+                            Select a contact
+                        </div>
+                        <div class="messages-area" id="messagesArea">
+                            <!-- Messages go here -->
+                        </div>
+                        
+                        <div style="padding: 10px 20px; background: white; border-top: 1px solid #e2e8f0; display: none;" id="audioPreviewContainer">
+                            <audio id="audioPreview" controls style="height:30px;"></audio>
+                            <button class="action-btn" style="background:#ef4444; width:30px; height:30px; font-size:14px; margin-left:10px;" onclick="cancelAudio()"><ion-icon name="close"></ion-icon></button>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <input type="text" id="msgSubject" placeholder="Subject (Optional)" style="max-width:150px;">
+                            <input type="text" id="msgContent" placeholder="Type your message here..." required>
+                            
+                            <button type="button" class="action-btn record" id="btnRecord" title="Record Audio"><ion-icon name="mic"></ion-icon></button>
+                            <button type="button" class="action-btn stop" id="btnStopRecord" title="Stop Recording"><ion-icon name="square"></ion-icon></button>
+                            
+                            <button type="button" class="action-btn" id="btnSend" onclick="sendMessage()"><ion-icon name="send"></ion-icon></button>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="no-chat-selected" id="noChatSelected">
+                        <ion-icon name="chatbubbles-outline"></ion-icon>
+                        <h2>Your Messages</h2>
+                        <p>Select a student or course to start chatting.</p>
                     </div>
                 </div>
             </div>
-        </header>
-
-        <!-- Messenger UI -->
-        <div class="chat-container">
-            <!-- Sidebar -->
-            <div class="chat-sidebar">
-                <div class="chat-header">Contacts</div>
-                <div class="contacts-list" id="contactsList">
-                    <div style="padding:20px;text-align:center;color:#888;">Loading...</div>
-                </div>
-            </div>
-
-            <!-- Chat Area -->
-            <div class="chat-main" id="chatMain" style="display: none;">
-                <div class="chat-main-header" id="chatHeaderTitle">
-                    Select a contact
-                </div>
-                <div class="messages-area" id="messagesArea">
-                    <!-- Messages go here -->
-                </div>
-                
-                <div style="padding: 10px 20px; background: white; border-top: 1px solid #e2e8f0; display: none;" id="audioPreviewContainer">
-                    <audio id="audioPreview" controls style="height:30px;"></audio>
-                    <button class="action-btn" style="background:#ef4444; width:30px; height:30px; font-size:14px; margin-left:10px;" onclick="cancelAudio()"><ion-icon name="close"></ion-icon></button>
-                </div>
-
-                <div class="chat-input-area">
-                    <input type="text" id="msgSubject" placeholder="Subject (Optional)" style="max-width:150px;">
-                    <input type="text" id="msgContent" placeholder="Type your message here..." required>
-                    
-                    <button type="button" class="action-btn record" id="btnRecord" title="Record Audio"><ion-icon name="mic"></ion-icon></button>
-                    <button type="button" class="action-btn stop" id="btnStopRecord" title="Stop Recording"><ion-icon name="square"></ion-icon></button>
-                    
-                    <button type="button" class="action-btn" id="btnSend" onclick="sendMessage()"><ion-icon name="send"></ion-icon></button>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div class="no-chat-selected" id="noChatSelected">
-                <ion-icon name="chatbubbles-outline"></ion-icon>
-                <h2>Your Messages</h2>
-                <p>Select a student or course to start chatting.</p>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
