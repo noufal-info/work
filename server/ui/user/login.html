@@ -404,7 +404,6 @@
                 </div>
             </div>
             
-            <button id="skipSplashBtn" class="btn-continue">Continue to Login</button>
         </div>
     </div>
 
@@ -432,13 +431,14 @@
 
 
     <script>
-        document.getElementById('skipSplashBtn').addEventListener('click', () => {
+        // Auto-hide splash screen after 4 seconds
+        setTimeout(() => {
             const splash = document.getElementById('splashScreen');
             if (splash) {
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.visibility = 'hidden', 500);
             }
-        });
+        }, 4000);
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
