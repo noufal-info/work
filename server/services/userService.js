@@ -20,10 +20,26 @@ router.post('/login', async (req, res) => {
 router.post('/courses/enroll', async (req, res) => {
     try {
         const { course_id, student_email } = req.body;
-        
-        // Student self-enrolls as 'Pending'
+        if (!course_id || !student_email) {
+            return res.status(400).json({ success: false, message: 'Course ID and Student Email are required.' });
+        }
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS enrollments (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              course_id INT NOT NULL,
+              student_email VARCHAR(255) NOT NULL,
+              status VARCHAR(50) DEFAULT 'Pending',
+              enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+              UNIQUE KEY unique_enrollment (course_id, student_email)
+            )
+        `);
         await db.execute('INSERT IGNORE INTO enrollments (course_id, student_email, status) VALUES (?, ?, ?)', [course_id, student_email, 'Pending']);
         res.json({ success: true, message: 'Enrollment request sent to teacher' });
+    } catch (error) {
+        console.error("Error self-enrolling:", error);
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+    }
+});
     } catch (error) {
         console.error("Error self-enrolling:", error);
         res.status(500).json({ success: false, message: 'Server error' });
