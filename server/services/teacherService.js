@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
         res.status(401).json({ success: false, message: 'Invalid email or password' });
     } catch (error) {
         console.error("Teacher login error:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -73,7 +73,7 @@ router.post('/courses', async (req, res) => {
         res.json({ success: true, message: 'Course published successfully' });
     } catch (error) {
         console.error("Error creating course:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -87,7 +87,7 @@ router.get('/courses', async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error("Error fetching courses:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -107,7 +107,7 @@ router.post('/students/enroll', async (req, res) => {
         res.json({ success: true, message: 'Student enrolled successfully' });
     } catch (error) {
         console.error("Error enrolling student:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -124,7 +124,7 @@ router.get('/enrollments/pending', async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error("Error fetching pending enrollments:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -143,7 +143,7 @@ router.post('/enrollments/approve', async (req, res) => {
         }
     } catch (error) {
         console.error("Error updating enrollment:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -166,7 +166,7 @@ router.post('/messages', async (req, res) => {
         res.json({ success: true, message: 'Message sent successfully' });
     } catch (error) {
         console.error("Error sending message:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -183,7 +183,7 @@ router.get('/messages/contacts', async (req, res) => {
         res.json({ courses, students });
     } catch (error) {
         console.error("Error fetching contacts:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
@@ -210,7 +210,7 @@ router.get('/messages/history', async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error("Error fetching history:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 });
 
