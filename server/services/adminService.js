@@ -77,10 +77,13 @@ const db = require('../db/database');
               id INT AUTO_INCREMENT PRIMARY KEY,
               section_id INT NOT NULL,
               title VARCHAR(255) NOT NULL,
+              description TEXT,
               video_url VARCHAR(255) NOT NULL,
               order_index INT DEFAULT 0
             )
         `);
+        
+        try { await db.execute("ALTER TABLE course_lessons ADD COLUMN description TEXT;"); } catch(e) {}
         
         // Sample Data
         await db.execute("INSERT IGNORE INTO teachers (id, name, email, course, password, status) VALUES (1, 'Prof. Smith', 'smith@example.com', 'Web Development', 'password123', 'Active')");
