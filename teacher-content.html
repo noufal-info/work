@@ -1,0 +1,129 @@
+<!-- Teacher Content Modal -->
+<div class="modal-overlay" id="contentModal">
+    <div class="modal" style="width: 800px; max-width: 95%;">
+        <div class="modal-header">
+            <h2>Manage Course Content</h2>
+            <button class="modal-close" onclick="closeModal('contentModal')"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="contentCourseId">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 id="contentCourseTitle">Course Sections</h3>
+                <button class="btn-primary" onclick="addSectionPrompt()">+ Add Section</button>
+            </div>
+            <div id="sectionsList" style="margin-bottom: 20px;">
+                <!-- Sections loaded here -->
+            </div>
+            <hr>
+            <h3>Upload Lesson Video</h3>
+            <form id="uploadLessonForm" onsubmit="handleLessonUpload(event)">
+                <div class="form-group">
+                    <label>Select Section</label>
+                    <select id="lessonSectionId" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Lesson Title</label>
+                    <input type="text" id="lessonTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Video File (.mp4, .webm)</label>
+                    <input type="file" id="lessonVideo" accept="video/mp4,video/webm" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%;">Upload Lesson</button>
+            </form>
+            <div id="uploadProgress" style="display:none; margin-top:10px; color:var(--primary); font-weight:bold;">Uploading... Please wait.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openContentModal(courseId, courseTitle) {
+        document.getElementById('contentCourseId').value = courseId;
+        document.getElementById('contentCourseTitle').innerText = courseTitle;
+        loadSections(courseId);
+        openModal('contentModal');
+    }
+
+    async function loadSections(courseId) {
+        const list = document.getElementById('sectionsList');
+        const select = document.getElementById('lessonSectionId');
+        list.innerHTML = 'Loading sections...';
+        
+        try {
+            const res = await fetch('/api/courses/' + courseId + '/structure');
+            const data = await res.json();
+            if(data.success && data.sections.length > 0) {
+                list.innerHTML = '';
+                select.innerHTML = '';
+                data.sections.forEach(sec => {
+                    select.innerHTML += \`<option value="\${sec.id}">\${sec.title}</option>\`;
+                    let lessonsHtml = sec.lessons.map(l => \`<div style="padding:5px 0; border-bottom:1px solid #eee; display:flex; align-items:center;"><ion-icon name="play-circle-outline" style="margin-right:10px;"></ion-icon> \${l.title}</div>\`).join('');
+                    list.innerHTML += \`
+                        <div style="background:#f8f9fa; border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:5px;">
+                            <h4 style="margin:0; color:var(--primary);">\${sec.title}</h4>
+                            <div style="margin-top:10px; padding-left:10px;">\${lessonsHtml || '<em>No lessons yet.</em>'}</div>
+                        </div>
+                    \`;
+                });
+            } else {
+                list.innerHTML = 'No sections found. Add a section first.';
+                select.innerHTML = '<option value="">-- Create a section first --</option>';
+            }
+        } catch(e) {
+            list.innerHTML = 'Error loading content.';
+        }
+    }
+
+    async function addSectionPrompt() {
+        const courseId = document.getElementById('contentCourseId').value;
+        const title = prompt("Enter new section title:");
+        if(title) {
+            try {
+                const res = await fetch('/api/teacher/courses/' + courseId + '/sections', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({title})
+                });
+                const data = await res.json();
+                if(data.success) {
+                    loadSections(courseId);
+                } else alert("Failed to add section");
+            } catch(e) { alert("Error adding section"); }
+        }
+    }
+
+    async function handleLessonUpload(e) {
+        e.preventDefault();
+        const sectionId = document.getElementById('lessonSectionId').value;
+        if(!sectionId) return alert("Please add a section first.");
+        
+        const title = document.getElementById('lessonTitle').value;
+        const file = document.getElementById('lessonVideo').files[0];
+        
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('video', file);
+        
+        document.getElementById('uploadProgress').style.display = 'block';
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/teacher/sections/' + sectionId + '/lessons', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("Lesson uploaded successfully!");
+                e.target.reset();
+                loadSections(document.getElementById('contentCourseId').value);
+            } else alert("Failed to upload lesson.");
+        } catch(e) {
+            alert("Error uploading lesson.");
+        } finally {
+            document.getElementById('uploadProgress').style.display = 'none';
+            btn.disabled = false;
+        }
+    }
+</script>

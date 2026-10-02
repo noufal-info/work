@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, '../../ui')));
 
 // Mock Database
 const db = {
-    students: [{ email: 'student@example.com', password: 'password123', name: 'Alex Student' }],
+    students: [{ email: 'student@example.com', password: 'password123', name: 'John Doe' }],
     admins: [{ email: 'master@example.com', role: 'Master Admin' }],
     subAdmins: [],
     partners: [],

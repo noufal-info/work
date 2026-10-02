@@ -4,6 +4,48 @@ const path = require('path');
 const router = express.Router();
 const db = require('../db/database');
 
+
+const multer = require('multer');
+const videoStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = path.join(__dirname, '..', 'uploads', 'videos');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const uploadVideo = multer({ storage: videoStorage });
+
+router.post('/courses/:id/sections', async (req, res) => {
+    try {
+        const { title, order_index } = req.body;
+        const [result] = await db.execute('INSERT INTO course_sections (course_id, title, order_index) VALUES (?, ?, ?)', [req.params.id, title, order_index || 0]);
+        res.json({ success: true, section_id: result.insertId });
+    } catch (error) { res.status(500).json({ success: false }); }
+});
+
+router.post('/sections/:id/lessons', uploadVideo.single('video'), async (req, res) => {
+    try {
+        const { title, order_index } = req.body;
+        const video_url = req.file ? '/uploads/videos/' + req.file.filename : '';
+        await db.execute('INSERT INTO course_lessons (section_id, title, video_url, order_index) VALUES (?, ?, ?, ?)', [req.params.id, title, video_url, order_index || 0]);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ success: false }); }
+});
+
+router.get('/courses/:id/structure', async (req, res) => {
+    try {
+        const [sections] = await db.execute('SELECT * FROM course_sections WHERE course_id = ? ORDER BY order_index', [req.params.id]);
+        for (let section of sections) {
+            const [lessons] = await db.execute('SELECT * FROM course_lessons WHERE section_id = ? ORDER BY order_index', [section.id]);
+            section.lessons = lessons;
+        }
+        res.json({ success: true, sections });
+    } catch (error) { res.status(500).json({ success: false }); }
+});
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;

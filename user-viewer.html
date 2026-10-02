@@ -1,0 +1,140 @@
+<!-- Udemy Style Course Viewer -->
+<style>
+    .udemy-viewer {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: #fff;
+        z-index: 9999;
+        flex-direction: column;
+    }
+    .uv-header {
+        background: #1c1d1f; color: white;
+        padding: 15px; display: flex; align-items: center;
+    }
+    .uv-header h2 { margin: 0; font-size: 18px; flex-grow: 1; margin-left: 15px; }
+    .uv-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+    .uv-body {
+        display: flex; flex-grow: 1; overflow: hidden;
+        flex-direction: column;
+    }
+    @media(min-width: 768px) {
+        .uv-body { flex-direction: row; }
+    }
+    .uv-video-area {
+        flex: 1; background: #000;
+        display: flex; flex-direction: column;
+    }
+    .uv-video-area video { width: 100%; max-height: 70vh; flex-grow: 1; background: #000; }
+    .uv-video-title { padding: 15px; color: white; background: #2d2f31; }
+    .uv-sidebar {
+        width: 100%; max-width: 400px;
+        background: #f7f9fa; border-left: 1px solid #d1d7dc;
+        overflow-y: auto;
+    }
+    @media(max-width: 767px) {
+        .uv-sidebar { max-width: 100%; border-left: none; border-top: 1px solid #d1d7dc; }
+    }
+    .uv-section { border-bottom: 1px solid #d1d7dc; }
+    .uv-section-header {
+        padding: 15px; background: #f7f9fa; cursor: pointer;
+        font-weight: bold; color: #1c1d1f; display: flex; justify-content: space-between;
+    }
+    .uv-lessons { display: none; background: #fff; }
+    .uv-section.open .uv-lessons { display: block; }
+    .uv-lesson-item {
+        padding: 15px; border-bottom: 1px solid #e1e1e1; cursor: pointer;
+        display: flex; align-items: flex-start; font-size: 14px;
+    }
+    .uv-lesson-item:hover { background: #f0f0f0; }
+    .uv-lesson-item.active { background: #d1d7dc; font-weight: bold; }
+    .uv-lesson-item ion-icon { margin-right: 10px; font-size: 18px; color: #5624d0; }
+</style>
+
+<div class="udemy-viewer" id="udemyViewer">
+    <div class="uv-header">
+        <button class="uv-close" onclick="closeCourseViewer()"><ion-icon name="arrow-back-outline"></ion-icon></button>
+        <h2 id="uvCourseTitle">Course Title</h2>
+    </div>
+    <div class="uv-body">
+        <div class="uv-video-area">
+            <video id="uvVideoPlayer" controls controlsList="nodownload"></video>
+            <div class="uv-video-title"><h3 id="uvLessonTitle" style="margin:0;">Select a lesson</h3></div>
+        </div>
+        <div class="uv-sidebar" id="uvSidebar">
+            <!-- Sections go here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCourseViewer(courseId, courseTitle) {
+        document.getElementById('uvCourseTitle').innerText = courseTitle;
+        document.getElementById('udemyViewer').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        loadCourseStructure(courseId);
+    }
+
+    function closeCourseViewer() {
+        document.getElementById('udemyViewer').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('uvVideoPlayer').pause();
+    }
+
+    async function loadCourseStructure(courseId) {
+        const sidebar = document.getElementById('uvSidebar');
+        sidebar.innerHTML = '<div style="padding:20px;">Loading course content...</div>';
+        
+        try {
+            const res = await fetch('/api/courses/' + courseId + '/structure');
+            const data = await res.json();
+            if(data.success && data.sections.length > 0) {
+                sidebar.innerHTML = '';
+                let firstLesson = null;
+
+                data.sections.forEach((sec, idx) => {
+                    let lessonsHtml = sec.lessons.map(l => {
+                        if(!firstLesson) firstLesson = l;
+                        return \`
+                        <div class="uv-lesson-item" onclick="playLesson('\${l.video_url}', '\${l.title}', this)">
+                            <ion-icon name="play-circle"></ion-icon>
+                            <span>\${l.title}</span>
+                        </div>\`;
+                    }).join('');
+
+                    sidebar.innerHTML += \`
+                        <div class="uv-section \${idx === 0 ? 'open' : ''}">
+                            <div class="uv-section-header" onclick="this.parentElement.classList.toggle('open')">
+                                <span>Section \${idx+1}: \${sec.title}</span>
+                                <ion-icon name="chevron-down-outline"></ion-icon>
+                            </div>
+                            <div class="uv-lessons">\${lessonsHtml}</div>
+                        </div>
+                    \`;
+                });
+
+                if(firstLesson) {
+                    playLesson(firstLesson.video_url, firstLesson.title);
+                }
+            } else {
+                sidebar.innerHTML = '<div style="padding:20px;">No content available for this course yet.</div>';
+            }
+        } catch(e) {
+            sidebar.innerHTML = '<div style="padding:20px;">Error loading content.</div>';
+        }
+    }
+
+    function playLesson(videoUrl, title, el) {
+        document.getElementById('uvVideoPlayer').src = videoUrl;
+        document.getElementById('uvVideoPlayer').play();
+        document.getElementById('uvLessonTitle').innerText = title;
+        
+        if(el) {
+            document.querySelectorAll('.uv-lesson-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        } else {
+            const firstItem = document.querySelector('.uv-lesson-item');
+            if(firstItem) firstItem.classList.add('active');
+        }
+    }
+</script>

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS students (
 );
 
 -- Insert dummy student
-INSERT IGNORE INTO students (email, password, name) VALUES ('student@example.com', 'password123', 'Alex Student');
+INSERT IGNORE INTO students (email, password, name) VALUES ('student@example.com', 'password123', 'John Doe');
 
 -- Create Admins table
 CREATE TABLE IF NOT EXISTS admins (
@@ -82,4 +82,21 @@ CREATE TABLE IF NOT EXISTS messages (
   subject VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create Course Sections table
+CREATE TABLE IF NOT EXISTS course_sections (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  course_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  order_index INT DEFAULT 0
+);
+
+-- Create Course Lessons table
+CREATE TABLE IF NOT EXISTS course_lessons (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  section_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  video_url VARCHAR(255) NOT NULL,
+  order_index INT DEFAULT 0
 );

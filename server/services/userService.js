@@ -85,4 +85,16 @@ router.get('/messages', async (req, res) => {
     }
 });
 
+
+router.get('/courses/:id/structure', async (req, res) => {
+    try {
+        const [sections] = await db.execute('SELECT * FROM course_sections WHERE course_id = ? ORDER BY order_index', [req.params.id]);
+        for (let section of sections) {
+            const [lessons] = await db.execute('SELECT * FROM course_lessons WHERE section_id = ? ORDER BY order_index', [section.id]);
+            section.lessons = lessons;
+        }
+        res.json({ success: true, sections });
+    } catch (error) { res.status(500).json({ success: false }); }
+});
+
 module.exports = router;

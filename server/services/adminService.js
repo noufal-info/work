@@ -53,6 +53,32 @@ const db = require('../db/database');
         } catch(e) {
             // Ignore error if column already exists
         }
+        
+        try { await db.execute("ALTER TABLE courses ADD COLUMN icon VARCHAR(255) DEFAULT 'book-outline';"); } catch(e) {}
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS course_sections (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              course_id INT NOT NULL,
+              title VARCHAR(255) NOT NULL,
+              order_index INT DEFAULT 0
+            )
+        `);
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS course_lessons (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              section_id INT NOT NULL,
+              title VARCHAR(255) NOT NULL,
+              video_url VARCHAR(255) NOT NULL,
+              order_index INT DEFAULT 0
+            )
+        `);
+        
+        // Sample Data
+        await db.execute("INSERT IGNORE INTO teachers (id, name, email, course, password, status) VALUES (1, 'Prof. Smith', 'smith@example.com', 'Web Development', 'password123', 'Active')");
+        await db.execute("INSERT IGNORE INTO courses (id, title, description, instructor, price, status, icon) VALUES (1, 'Complete Web Development Bootcamp', 'Learn HTML, CSS, JavaScript and Node.js', 'smith@example.com', 99.99, 'Published', 'globe-outline')");
+        await db.execute("INSERT IGNORE INTO course_sections (id, course_id, title, order_index) VALUES (1, 1, 'Introduction to Web Development', 1), (2, 1, 'HTML5 Fundamentals', 2)");
+        await db.execute("INSERT IGNORE INTO course_lessons (id, section_id, title, video_url, order_index) VALUES (1, 1, 'What is the web?', 'https://www.w3schools.com/html/mov_bbb.mp4', 1), (2, 1, 'How the internet works', 'https://www.w3schools.com/html/mov_bbb.mp4', 2), (3, 2, 'HTML Basics', 'https://www.w3schools.com/html/mov_bbb.mp4', 1)");
+
         console.log("Teachers, Courses, Enrollments, and Messages tables initialized.");
     } catch (err) {
         console.error("Failed to initialize tables:", err);
