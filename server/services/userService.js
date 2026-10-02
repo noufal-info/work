@@ -40,11 +40,6 @@ router.post('/courses/enroll', async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error: ' + error.message });
     }
 });
-    } catch (error) {
-        console.error("Error self-enrolling:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
 
 router.get('/courses/available', async (req, res) => {
     try {
