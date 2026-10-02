@@ -83,6 +83,10 @@ app.get('/AnalogiX/teacher', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'teacher', 'index.html'));
 });
 
+app.get('/AnalogiX/teacher/builder', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ui', 'teacher', 'builder.html'));
+});
+
 app.get('/AnalogiX/teacher/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'teacher', 'chat.html'));
 });

@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS course_lessons (
   id INT AUTO_INCREMENT PRIMARY KEY,
   section_id INT NOT NULL,
   title VARCHAR(255) NOT NULL,
+  description TEXT,
   video_url VARCHAR(255) NOT NULL,
   order_index INT DEFAULT 0
 );

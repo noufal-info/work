@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Curriculum Builder</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f7f9fa; color: #1c1d1f; margin: 0; }
+        .builder-header {
+            background: #fff; padding: 15px 30px; border-bottom: 1px solid #d1d7dc;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .builder-header h1 { margin: 0; font-size: 20px; font-weight: 600; }
+        .back-btn { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #1c1d1f; font-weight: 500; }
+        .back-btn:hover { color: #5624d0; }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .curriculum-header { margin-bottom: 20px; }
+        .curriculum-header h2 { margin: 0; font-size: 24px; }
+        .curriculum-header p { color: #6a6f73; margin-top: 5px; }
+        
+        .section-card {
+            background: #fff; border: 1px solid #d1d7dc; border-radius: 8px;
+            margin-bottom: 20px; overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .section-header {
+            background: #f7f9fa; padding: 15px 20px; border-bottom: 1px solid #d1d7dc;
+            display: flex; align-items: center; gap: 15px; font-weight: 600; font-size: 16px;
+        }
+        .section-header .drag-handle { cursor: grab; color: #1c1d1f; font-size: 20px; }
+        .lesson-list { padding: 10px 20px; }
+        .lesson-item {
+            background: #fff; border: 1px solid #d1d7dc; border-radius: 4px;
+            padding: 12px 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px;
+            transition: all 0.2s;
+        }
+        .lesson-item:hover { border-color: #5624d0; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .lesson-item .type-icon { font-size: 20px; color: #5624d0; }
+        .lesson-info { flex: 1; }
+        .lesson-title { font-weight: 500; font-size: 15px; }
+        .lesson-desc { font-size: 13px; color: #6a6f73; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 500px; }
+        
+        .add-btn {
+            background: none; border: 1px dashed #5624d0; color: #5624d0;
+            padding: 10px 15px; border-radius: 4px; font-weight: 600; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+            transition: all 0.2s; margin-top: 10px;
+        }
+        .add-btn:hover { background: rgba(86,36,208,0.05); }
+        .add-section-btn { border-style: solid; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal { background: #fff; border-radius: 12px; width: 500px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6a6f73; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #d1d7dc; border-radius: 4px; font-family: inherit; }
+        .form-group textarea { height: 80px; resize: vertical; }
+        .form-group input[type="file"] { padding: 8px; }
+        .btn-primary { background: #5624d0; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn-primary:hover { background: #401b9c; }
+        .btn-primary:disabled { background: #a48de2; cursor: not-allowed; }
+        
+        .loading-state { text-align: center; padding: 40px; color: #6a6f73; }
+        .empty-state { text-align: center; padding: 40px 20px; background: #fff; border-radius: 8px; border: 1px dashed #d1d7dc; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <header class="builder-header">
+        <a href="/AnalogiX/teacher" class="back-btn"><ion-icon name="arrow-back-outline"></ion-icon> Back to Dashboard</a>
+        <h1 id="headerCourseTitle">Loading Course...</h1>
+        <div style="width:100px;"></div>
+    </header>
+
+    <div class="container">
+        <div class="curriculum-header">
+            <h2>Curriculum</h2>
+            <p>Start putting together your course by creating sections, and then add lessons (videos) to those sections.</p>
+        </div>
+
+        <div id="curriculumContainer" class="loading-state">
+            <ion-icon name="sync-outline" class="spin" style="font-size: 30px;"></ion-icon>
+            <p>Loading curriculum...</p>
+        </div>
+
+        <button class="add-btn add-section-btn" onclick="openSectionModal()">
+            <ion-icon name="add-circle-outline"></ion-icon> New Section
+        </button>
+    </div>
+
+    <!-- Section Modal -->
+    <div class="modal-overlay" id="sectionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>New Section</h3>
+                <button class="modal-close" onclick="closeModal('sectionModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Section Title</label>
+                    <input type="text" id="sectionTitle" placeholder="e.g. Introduction">
+                </div>
+                <button class="btn-primary" onclick="createSection()">Add Section</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Modal -->
+    <div class="modal-overlay" id="lessonModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Lesson (Video)</h3>
+                <button class="modal-close" onclick="closeModal('lessonModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <form id="lessonForm" onsubmit="createLesson(event)">
+                    <input type="hidden" id="lessonSectionId">
+                    <div class="form-group">
+                        <label>Lesson Title</label>
+                        <input type="text" id="lessonTitle" required placeholder="e.g. Welcome to the course">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="lessonDesc" placeholder="Briefly describe what students will learn in this lesson"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Video File (.mp4, .webm)</label>
+                        <input type="file" id="lessonVideo" accept="video/mp4,video/webm" required>
+                    </div>
+                    <button type="submit" class="btn-primary" id="uploadBtn">Upload Lesson</button>
+                    <div id="uploadStatus" style="margin-top:10px; text-align:center; font-weight:500; color:#5624d0; display:none;">Uploading... Please wait</div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseId');
+        
+        if (!courseId) {
+            alert("No course selected.");
+            window.location.href = '/AnalogiX/teacher';
+        }
+
+        async function loadCurriculum() {
+            const container = document.getElementById('curriculumContainer');
+            try {
+                // To display course title, we could fetch course details, but for now we fetch structure
+                const res = await fetch('/api/courses/' + courseId + '/structure');
+                const data = await res.json();
+                
+                if (data.success) {
+                    // Update header title (you could do a dedicated fetch for course title)
+                    document.getElementById('headerCourseTitle').innerText = "Course Editor";
+                    
+                    if (data.sections.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <ion-icon name="document-text-outline" style="font-size: 40px; color: #d1d7dc;"></ion-icon>
+                                <h3 style="margin: 10px 0 5px;">Your curriculum is empty</h3>
+                                <p style="margin:0; color: #6a6f73; font-size:14px;">Get started by creating your first section.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = '';
+                    data.sections.forEach((sec, idx) => {
+                        let lessonsHtml = sec.lessons.map((l, lidx) => `
+                            <div class="lesson-item">
+                                <ion-icon name="play-circle" class="type-icon"></ion-icon>
+                                <div class="lesson-info">
+                                    <div class="lesson-title">Lesson ${lidx + 1}: ${l.title}</div>
+                                    ${l.description ? `<div class="lesson-desc">${l.description}</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+
+                        container.innerHTML += `
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <ion-icon name="menu-outline" class="drag-handle"></ion-icon>
+                                    <span>Section ${idx + 1}: ${sec.title}</span>
+                                </div>
+                                <div class="lesson-list">
+                                    ${lessonsHtml}
+                                    <button class="add-btn" onclick="openLessonModal(${sec.id})">
+                                        <ion-icon name="add-outline"></ion-icon> Add Lesson
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) {
+                container.innerHTML = '<div style="color:red; padding:20px;">Error loading curriculum.</div>';
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function openSectionModal() {
+            document.getElementById('sectionTitle').value = '';
+            openModal('sectionModal');
+        }
+
+        function openLessonModal(sectionId) {
+            document.getElementById('lessonForm').reset();
+            document.getElementById('lessonSectionId').value = sectionId;
+            openModal('lessonModal');
+        }
+
+        async function createSection() {
+            const title = document.getElementById('sectionTitle').value;
+            if(!title) return;
+            try {
+                const res = await fetch('/api/teacher/courses/' + courseId + '/sections', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ title, order_index: document.querySelectorAll('.section-card').length + 1 })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    closeModal('sectionModal');
+                    loadCurriculum();
+                }
+            } catch(e) { alert('Error creating section'); }
+        }
+
+        async function createLesson(e) {
+            e.preventDefault();
+            const sectionId = document.getElementById('lessonSectionId').value;
+            const title = document.getElementById('lessonTitle').value;
+            const desc = document.getElementById('lessonDesc').value;
+            const file = document.getElementById('lessonVideo').files[0];
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', desc);
+            formData.append('video', file);
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const statusText = document.getElementById('uploadStatus');
+            uploadBtn.disabled = true;
+            statusText.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/teacher/sections/' + sectionId + '/lessons', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if(data.success) {
+                    closeModal('lessonModal');
+                    loadCurriculum();
+                } else alert('Upload failed');
+            } catch(e) {
+                alert('Error uploading video');
+            } finally {
+                uploadBtn.disabled = false;
+                statusText.style.display = 'none';
+            }
+        }
+
+        // Initialize
+        loadCurriculum();
+    </script>
+</body>
+</html>

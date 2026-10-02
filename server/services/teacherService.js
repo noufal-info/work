@@ -28,9 +28,9 @@ router.post('/courses/:id/sections', async (req, res) => {
 
 router.post('/sections/:id/lessons', uploadVideo.single('video'), async (req, res) => {
     try {
-        const { title, order_index } = req.body;
+        const { title, description, order_index } = req.body;
         const video_url = req.file ? '/uploads/videos/' + req.file.filename : '';
-        await db.execute('INSERT INTO course_lessons (section_id, title, video_url, order_index) VALUES (?, ?, ?, ?)', [req.params.id, title, video_url, order_index || 0]);
+        await db.execute('INSERT INTO course_lessons (section_id, title, description, video_url, order_index) VALUES (?, ?, ?, ?, ?)', [req.params.id, title, description || '', video_url, order_index || 0]);
         res.json({ success: true });
     } catch (error) { res.status(500).json({ success: false }); }
 });

@@ -351,7 +351,7 @@
                         <td>
                             <button class="icon-btn small" onclick="openEnrollModal(${course.id})" title="Add Student"><ion-icon name="person-add-outline"></ion-icon></button>
                             <button class="icon-btn small" title="Edit Course"><ion-icon name="create-outline"></ion-icon></button>
-<button class="icon-btn small" title="Manage Content" onclick="openContentModal(${course.id}, \`${course.title}\`)"><ion-icon name="cloud-upload-outline"></ion-icon></button>
+<button class="icon-btn small" title="Manage Content" onclick="window.location.href='/AnalogiX/teacher/builder?courseId=${course.id}'"><ion-icon name="cloud-upload-outline"></ion-icon></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
