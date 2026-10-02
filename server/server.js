@@ -30,6 +30,10 @@ app.get('/AnalogiX/user', (req, res) => {
     res.sendFile(path.join(__dirname, 'ui', 'user', 'index.html'));
 });
 
+app.get('/AnalogiX/student', (req, res) => {
+    res.redirect('/AnalogiX/user');
+});
+
 app.get('/', (req, res) => {
     res.redirect('/AnalogiX');
 });

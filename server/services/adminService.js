@@ -65,6 +65,14 @@ const db = require('../db/database');
             )
         `);
         await db.execute(`
+            CREATE TABLE IF NOT EXISTS students (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              email VARCHAR(255) UNIQUE NOT NULL,
+              password VARCHAR(255) NOT NULL,
+              name VARCHAR(255) NOT NULL
+            )
+        `);
+        await db.execute(`
             CREATE TABLE IF NOT EXISTS course_lessons (
               id INT AUTO_INCREMENT PRIMARY KEY,
               section_id INT NOT NULL,
