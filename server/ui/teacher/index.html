@@ -545,6 +545,7 @@
                 const response = await fetch('/api/teacher/enrollments/pending');
                 const pending = await response.json();
                 
+                if (pending.success === false) { throw new Error(pending.message); }
                 if (pending.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No pending enrollment requests.</td></tr>';
                     return;
