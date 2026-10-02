@@ -12,7 +12,8 @@
   "description": "",
   "dependencies": {
     "dotenv": "^18.0.4",
-    "express": "^5.2.1",
+    "express": "^4.22.3",
+    "multer": "^2.4.0",
     "mysql2": "^3.24.4"
   }
 }
