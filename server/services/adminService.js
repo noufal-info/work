@@ -56,6 +56,7 @@ const db = require('../db/database');
         
         try { await db.execute("ALTER TABLE courses ADD COLUMN icon VARCHAR(255) DEFAULT 'book-outline';"); } catch(e) {}
         try { await db.execute("ALTER TABLE course_lessons ADD COLUMN description TEXT;"); } catch(e) {}
+        try { await db.execute("ALTER TABLE enrollments ADD COLUMN status VARCHAR(50) DEFAULT 'Pending';"); } catch(e) {}
         await db.execute(`
             CREATE TABLE IF NOT EXISTS course_sections (
               id INT AUTO_INCREMENT PRIMARY KEY,
