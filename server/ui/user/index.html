@@ -103,6 +103,16 @@
         document.getElementById('profileName').innerText = studentName;
         document.getElementById('profileEmail').innerText = studentEmail;
 
+        // Verify session
+        fetch('/api/me?email=' + encodeURIComponent(studentEmail))
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    logout();
+                }
+            })
+            .catch(() => {});
+
         function logout() {
             localStorage.removeItem('studentAuth');
             localStorage.removeItem('studentEmail');
@@ -171,7 +181,9 @@
                 const res = await fetch('/api/courses/enrolled?email=' + encodeURIComponent(studentEmail));
                 const courses = await res.json();
                 let html = '';
-                if(courses.length === 0) {
+                if(courses.success === false) {
+                    html = '<p>Error loading your courses: ' + (courses.message || 'Server error') + '</p>';
+                } else if(!courses.length || courses.length === 0) {
                     html = '<p>You are not enrolled in any courses yet.</p>';
                 } else {
                     courses.forEach(c => {

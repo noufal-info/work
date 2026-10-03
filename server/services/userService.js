@@ -63,7 +63,7 @@ router.get('/courses/enrolled', async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error("Error fetching enrolled courses:", error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message, stack: error.stack });
     }
 });
 
@@ -95,6 +95,21 @@ router.get('/courses/:id/structure', async (req, res) => {
         }
         res.json({ success: true, sections });
     } catch (error) { res.status(500).json({ success: false }); }
+});
+
+router.get('/me', async (req, res) => {
+    try {
+        const { email } = req.query;
+        if (!email) return res.json({ success: false });
+        const [rows] = await db.execute('SELECT id, name, email FROM students WHERE email = ?', [email]);
+        if (rows.length > 0) {
+            res.json({ success: true, user: rows[0] });
+        } else {
+            res.json({ success: false });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 });
 
 module.exports = router;
