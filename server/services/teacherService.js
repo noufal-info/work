@@ -183,6 +183,24 @@ router.post('/messages', async (req, res) => {
     }
 });
 
+router.get('/messages', async (req, res) => {
+    try {
+        const { email } = req.query;
+        let query = "SELECT m.*, c.title as course_title FROM messages m LEFT JOIN courses c ON m.course_id = c.id";
+        let params = [];
+        if (email) {
+            query += " WHERE m.sender_email = ? ORDER BY m.sent_at DESC";
+            params = [email];
+        } else {
+            query += " ORDER BY m.sent_at DESC LIMIT 50";
+        }
+        const [rows] = await db.execute(query, params);
+        res.json(rows);
+    } catch (error) {
+        console.error("Error fetching sent messages:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 
 router.get('/messages/contacts', async (req, res) => {
     try {
@@ -309,34 +327,75 @@ router.post('/profile', uploadImage.single('avatar'), async (req, res) => {
     }
 });
 
+router.post('/courses/edit', uploadImage.single('thumbnail'), async (req, res) => {
+    try {
+        const { id, title, description, price, status } = req.body;
+        let updateQuery = 'UPDATE courses SET title = ?, description = ?, price = ?, status = ?';
+        let params = [title, description, price, status || 'Published'];
+        
+        if (req.file) {
+            updateQuery += ', thumbnail_url = ?';
+            params.push('/uploads/images/' + req.file.filename);
+        }
+        
+        updateQuery += ' WHERE id = ?';
+        params.push(id);
+        
+        await db.execute(updateQuery, params);
+        res.json({ success: true, message: 'Course updated successfully' });
+    } catch (error) {
+        console.error("Error editing course:", error);
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
+    }
+});
+
 router.get('/dashboard-metrics', async (req, res) => {
     try {
-        let courses = [];
-        try {
-            const [rows] = await db.execute('SELECT id, price FROM courses');
-            courses = rows;
-        } catch(e) {
-            courses = [];
-        }
-
         let totalEarnings = 0;
         let totalStudents = 0;
+        let avgProgress = 0;
         
-        for (let c of courses) {
-            try {
-                const [enrolls] = await db.execute('SELECT COUNT(*) as count FROM enrollments WHERE course_id = ? AND status = "Active"', [c.id]);
-                const count = enrolls[0]?.count || 0;
-                totalStudents += count;
-                totalEarnings += (count * parseFloat(c.price || 0));
-            } catch(e) {}
-        }
+        try {
+            const [enrollRows] = await db.execute(`
+                SELECT COUNT(*) as total_active, AVG(progress_percentage) as avg_prog 
+                FROM enrollments WHERE status = 'Active'
+            `);
+            totalStudents = enrollRows[0]?.total_active || 0;
+            avgProgress = Math.round(enrollRows[0]?.avg_prog || 0);
+
+            const [earningsRow] = await db.execute(`
+                SELECT SUM(c.price) as earnings 
+                FROM enrollments e 
+                JOIN courses c ON e.course_id = c.id 
+                WHERE e.status = 'Active'
+            `);
+            totalEarnings = earningsRow[0]?.earnings || 0;
+        } catch(e) {}
+
+        let avgRating = '4.8';
+        try {
+            const [reviewStats] = await db.execute('SELECT AVG(rating) as avg_r FROM course_reviews');
+            if (reviewStats[0]?.avg_r) avgRating = parseFloat(reviewStats[0].avg_r).toFixed(1);
+        } catch(e) {}
+
+        const baseProg = Math.max(30, avgProgress || 70);
+        const performance = [
+            Math.max(20, baseProg - 22),
+            Math.max(25, baseProg - 15),
+            Math.max(30, baseProg - 8),
+            Math.max(35, baseProg - 3),
+            Math.min(95, baseProg + 6),
+            Math.min(100, baseProg + 12)
+        ];
 
         res.json({ 
             success: true, 
             metrics: {
                 totalEarnings: totalEarnings > 0 ? totalEarnings : 48500,
                 totalStudents: totalStudents > 0 ? totalStudents : 124,
-                performance: [55, 65, 72, 68, 84, 92],
+                avgRating: avgRating,
+                avgProgress: avgProgress || 78,
+                performance: performance,
                 activity: [4.5, 6.0, 5.5, 8.0, 6.5, 3.0, 1.5]
             }
         });
@@ -346,6 +405,8 @@ router.get('/dashboard-metrics', async (req, res) => {
             metrics: {
                 totalEarnings: 48500,
                 totalStudents: 124,
+                avgRating: '4.8',
+                avgProgress: 78,
                 performance: [55, 65, 72, 68, 84, 92],
                 activity: [4.5, 6.0, 5.5, 8.0, 6.5, 3.0, 1.5]
             }
@@ -357,39 +418,105 @@ router.get('/schedule', async (req, res) => {
     try {
         let events = [];
         try {
-            const [rows] = await db.execute('SELECT * FROM calendar_events ORDER BY start_time ASC LIMIT 10');
+            const [rows] = await db.execute(`
+                SELECT e.*, c.title as course_title 
+                FROM calendar_events e
+                LEFT JOIN courses c ON e.course_id = c.id
+                ORDER BY e.start_time ASC LIMIT 20
+            `);
             events = rows;
         } catch(e) {}
 
         if (!events || events.length === 0) {
             events = [
-                { id: 1, title: 'Live Full Stack Masterclass', start_time: '09:00 AM - 10:30 AM', event_type: 'Live Session', color_code: '#4f5be8' },
-                { id: 2, title: 'Code Review & Doubt Clearing', start_time: '11:30 AM - 01:00 PM', event_type: 'Mentorship', color_code: '#10b981' },
-                { id: 3, title: 'Assignment Grading & Evaluation', start_time: '03:00 PM - 04:30 PM', event_type: 'Review', color_code: '#0f172a' },
-                { id: 4, title: 'Curriculum & Project Meeting', start_time: '05:00 PM - 06:00 PM', event_type: 'Sync', color_code: '#6366f1' }
+                { id: 1, title: 'Live Full Stack Masterclass', start_time: '2026-10-04 09:00:00', end_time: '2026-10-04 10:30:00', event_type: 'Live Class', color_code: '#4f5be8', meeting_link: 'https://meet.google.com/abc-defg-hij', course_title: 'Full Stack Web Development' },
+                { id: 2, title: 'Code Review & Doubt Clearing', start_time: '2026-10-04 11:30:00', end_time: '2026-10-04 13:00:00', event_type: 'Mentorship', color_code: '#10b981', meeting_link: 'https://meet.google.com/xyz-uvwx-rst', course_title: 'Python & Django Bootcamp' },
+                { id: 3, title: 'Assignment Grading & Evaluation', start_time: '2026-10-05 15:00:00', end_time: '2026-10-05 16:30:00', event_type: 'Review', color_code: '#0f172a', meeting_link: 'https://meet.google.com/mno-pqrs-tuv', course_title: 'Database Architecture' }
             ];
         }
         res.json({ success: true, events });
     } catch (error) { 
-        res.json({ 
-            success: true, 
-            events: [
-                { id: 1, title: 'Live Full Stack Masterclass', start_time: '09:00 AM - 10:30 AM', event_type: 'Live Session', color_code: '#4f5be8' },
-                { id: 2, title: 'Code Review & Doubt Clearing', start_time: '11:30 AM - 01:00 PM', event_type: 'Mentorship', color_code: '#10b981' },
-                { id: 3, title: 'Assignment Grading & Evaluation', start_time: '03:00 PM - 04:30 PM', event_type: 'Review', color_code: '#0f172a' }
-            ]
-        }); 
+        res.json({ success: true, events: [] }); 
     }
 });
 
 router.post('/schedule', async (req, res) => {
     try {
-        const { teacher_email, title, start_time, end_time, event_type, color_code } = req.body;
+        const { teacher_email, title, course_id, start_time, end_time, event_type, color_code, meeting_link } = req.body;
         await db.execute(
-            'INSERT INTO calendar_events (teacher_email, title, start_time, end_time, event_type, color_code) VALUES (?, ?, ?, ?, ?, ?)',
-            [teacher_email || 'teacher@analogix.com', title, start_time || new Date(), end_time || new Date(), event_type || 'General', color_code || '#4f5be8']
+            'INSERT INTO calendar_events (teacher_email, course_id, title, start_time, end_time, event_type, color_code, meeting_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [teacher_email || 'teacher@analogix.com', course_id || null, title, start_time || new Date(), end_time || new Date(), event_type || 'Live Class', color_code || '#4f5be8', meeting_link || null]
         );
-        res.json({ success: true, message: 'Event added' });
+        res.json({ success: true, message: 'Online live session scheduled successfully' });
+    } catch(e) {
+        console.error("Error creating session:", e);
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.delete('/schedule/:id', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM calendar_events WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Event deleted successfully' });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/schedule/delete', async (req, res) => {
+    try {
+        const { id } = req.body;
+        await db.execute('DELETE FROM calendar_events WHERE id = ?', [id]);
+        res.json({ success: true, message: 'Event deleted successfully' });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/students/progress', async (req, res) => {
+    try {
+        const [rows] = await db.execute(`
+            SELECT e.id as enrollment_id, e.student_email, e.status, e.progress_percentage, e.enrolled_at,
+                   c.id as course_id, c.title as course_title,
+                   COALESCE(s.name, e.student_email) as student_name
+            FROM enrollments e
+            JOIN courses c ON e.course_id = c.id
+            LEFT JOIN students s ON e.student_email = s.email
+            ORDER BY e.enrolled_at DESC
+        `);
+        res.json({ success: true, students: rows });
+    } catch(e) {
+        console.error("Error fetching students progress:", e);
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/students/progress', async (req, res) => {
+    try {
+        const { enrollment_id, progress_percentage } = req.body;
+        const pct = Math.min(100, Math.max(0, parseInt(progress_percentage) || 0));
+        await db.execute('UPDATE enrollments SET progress_percentage = ? WHERE id = ?', [pct, enrollment_id]);
+        res.json({ success: true, message: 'Progress updated to ' + pct + '%' });
+    } catch(e) {
+        console.error("Error updating progress:", e);
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.delete('/messages/:id', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM messages WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Message deleted successfully' });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/messages/delete', async (req, res) => {
+    try {
+        const { id } = req.body;
+        await db.execute('DELETE FROM messages WHERE id = ?', [id]);
+        res.json({ success: true, message: 'Message deleted successfully' });
     } catch(e) {
         res.status(500).json({ success: false, message: e.message });
     }
@@ -404,7 +531,7 @@ router.get('/feedback', async (req, res) => {
                 FROM course_reviews r
                 LEFT JOIN courses c ON r.course_id = c.id
                 LEFT JOIN students s ON r.student_email = s.email
-                ORDER BY r.created_at DESC LIMIT 10
+                ORDER BY r.created_at DESC LIMIT 15
             `);
             reviews = rows;
         } catch(e) {}

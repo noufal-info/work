@@ -58,6 +58,12 @@ const db = require('../db/database');
         try { await db.execute("ALTER TABLE courses ADD COLUMN thumbnail_url VARCHAR(255) DEFAULT '/uploads/images/default_course.jpg';"); } catch(e) {}
         try { await db.execute("ALTER TABLE course_lessons ADD COLUMN description TEXT;"); } catch(e) {}
         try { await db.execute("ALTER TABLE enrollments ADD COLUMN status VARCHAR(50) DEFAULT 'Pending';"); } catch(e) {}
+        try { await db.execute("ALTER TABLE enrollments ADD COLUMN progress_percentage INT DEFAULT 0;"); } catch(e) {}
+        try { await db.execute("ALTER TABLE enrollments ADD COLUMN completed_lessons TEXT;"); } catch(e) {}
+        try { await db.execute("ALTER TABLE messages ADD COLUMN is_read BOOLEAN DEFAULT FALSE;"); } catch(e) {}
+        try { await db.execute("ALTER TABLE messages ADD COLUMN status VARCHAR(20) DEFAULT 'delivered';"); } catch(e) {}
+        try { await db.execute("ALTER TABLE calendar_events ADD COLUMN meeting_link VARCHAR(500);"); } catch(e) {}
+        try { await db.execute("ALTER TABLE calendar_events ADD COLUMN course_id INT;"); } catch(e) {}
 
         // Teacher UI Schema Updates
         try { await db.execute("ALTER TABLE teachers ADD COLUMN phone_number VARCHAR(50);"); } catch(e) {}

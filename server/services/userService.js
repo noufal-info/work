@@ -43,7 +43,20 @@ router.post('/courses/enroll', async (req, res) => {
 
 router.get('/courses/available', async (req, res) => {
     try {
-        const [rows] = await db.execute("SELECT * FROM courses WHERE status = 'Published' ORDER BY id DESC");
+        const { email } = req.query;
+        let query = "SELECT * FROM courses WHERE status = 'Published' ORDER BY id DESC";
+        let params = [];
+        if (email) {
+            query = `
+                SELECT c.*, e.status as enrollment_status 
+                FROM courses c 
+                LEFT JOIN enrollments e ON e.course_id = c.id AND e.student_email = ?
+                WHERE c.status = 'Published' 
+                ORDER BY c.id DESC
+            `;
+            params = [email];
+        }
+        const [rows] = await db.execute(query, params);
         res.json(rows);
     } catch (error) {
         console.error("Error fetching available courses:", error);
@@ -55,7 +68,7 @@ router.get('/courses/enrolled', async (req, res) => {
     try {
         const { email } = req.query;
         const [rows] = await db.execute(`
-            SELECT c.*, e.status as enrollment_status 
+            SELECT c.*, e.status as enrollment_status, COALESCE(e.progress_percentage, 0) as progress_percentage 
             FROM enrollments e 
             JOIN courses c ON e.course_id = c.id 
             WHERE e.student_email = ?
@@ -75,13 +88,37 @@ router.get('/messages', async (req, res) => {
             FROM messages m
             LEFT JOIN courses c ON m.course_id = c.id
             WHERE m.receiver_email = ? 
-               OR m.course_id IN (SELECT course_id FROM enrollments WHERE student_email = ? AND status = 'Active')
+               OR m.sender_email = ?
+               OR (m.course_id IS NOT NULL AND m.course_id IN (SELECT course_id FROM enrollments WHERE student_email = ? AND status = 'Active'))
             ORDER BY m.sent_at DESC
-        `, [email, email]);
+        `, [email, email, email]);
         res.json(rows);
     } catch (error) {
         console.error("Error fetching student messages:", error);
         res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.delete('/messages/:id', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM messages WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Message deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+router.post('/messages/delete', async (req, res) => {
+    try {
+        const { id, email } = req.body;
+        if (id) {
+            await db.execute('DELETE FROM messages WHERE id = ?', [id]);
+        } else if (email) {
+            await db.execute('DELETE FROM messages WHERE sender_email = ? OR receiver_email = ?', [email, email]);
+        }
+        res.json({ success: true, message: 'Chat deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
@@ -158,16 +195,20 @@ router.get('/events', async (req, res) => {
         const { email } = req.query;
         let events = [];
         try {
-            // First try to fetch events belonging to teachers of enrolled courses
             const [rows] = await db.execute(`
-                SELECT e.*, c.title as course_title, COALESCE(t.name, 'Course Instructor') as teacher_name 
+                SELECT e.id, e.teacher_email, e.course_id, e.title, e.start_time, e.end_time, e.event_type, e.color_code, e.meeting_link,
+                       COALESCE(c.title, 'General Live Class') as course_title,
+                       COALESCE(t.name, e.teacher_email, 'Instructor') as teacher_name
                 FROM calendar_events e
                 LEFT JOIN teachers t ON e.teacher_email = t.email
-                LEFT JOIN courses c ON (c.instructor = t.email OR c.instructor = t.name)
-                ORDER BY e.start_time ASC LIMIT 6
+                LEFT JOIN courses c ON e.course_id = c.id
+                ORDER BY e.start_time ASC
+                LIMIT 20
             `);
             events = rows;
-        } catch (e) {}
+        } catch (e) {
+            console.error("Error fetching calendar events:", e);
+        }
 
         if (!events || events.length === 0) {
             events = [
@@ -178,6 +219,7 @@ router.get('/events', async (req, res) => {
                     end_time: '2026-10-04 10:30:00',
                     event_type: 'Live Session',
                     color_code: '#4f5be8',
+                    meeting_link: 'https://meet.google.com/abc-defg-hij',
                     course_title: 'Full Stack Web Development',
                     teacher_name: 'Instructor'
                 },
@@ -188,6 +230,7 @@ router.get('/events', async (req, res) => {
                     end_time: '2026-10-04 13:00:00',
                     event_type: 'Mentorship',
                     color_code: '#10b981',
+                    meeting_link: 'https://meet.google.com/xyz-uvwx-rst',
                     course_title: 'Python & Django Bootcamp',
                     teacher_name: 'Instructor'
                 },
@@ -198,6 +241,7 @@ router.get('/events', async (req, res) => {
                     end_time: '2026-10-05 16:30:00',
                     event_type: 'Live Class',
                     color_code: '#6366f1',
+                    meeting_link: 'https://meet.google.com/mno-pqrs-tuv',
                     course_title: 'Database Architecture',
                     teacher_name: 'Instructor'
                 }

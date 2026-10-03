@@ -117,10 +117,15 @@
                         </div>
 
                         <div class="dash-card calendar-card">
-                            <h3>
-                                <span id="currentMonthYear">October 2026</span> 
-                                <ion-icon name="calendar-clear-outline" style="color: #4f5be8;"></ion-icon>
-                            </h3>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <h3 style="margin:0;">
+                                    <span id="currentMonthYear">October 2026</span> 
+                                    <ion-icon name="calendar-clear-outline" style="color: #4f5be8;"></ion-icon>
+                                </h3>
+                                <button class="btn-filter" style="font-size:12px; padding:5px 10px; background:#4f5be8; color:white; border-radius:6px; cursor:pointer;" onclick="openCreateSessionModal()">
+                                    <ion-icon name="videocam-outline"></ion-icon> + Live Session
+                                </button>
+                            </div>
                             <div class="calendar-days" id="calendarDaysContainer">
                                 <!-- Populated dynamically -->
                             </div>
@@ -269,13 +274,92 @@
                         <table class="dash-table">
                             <thead>
                                 <tr>
-                                    <th>To</th>
+                                    <th>To / Recipient</th>
                                     <th>Subject & Content</th>
+                                    <th>Status</th>
                                     <th>Date Sent</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="messagesTableBody">
                                 <!-- Messages loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar & Online Live Sessions Section -->
+            <div id="section-calendar" class="content-section dashboard-content" style="display: none;">
+                <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h1 style="font-size: 22px; color: var(--blue-dark); font-weight: 700;">Online Live Classes & Calendar</h1>
+                        <p style="color: var(--text-muted); font-size: 13px;">Create new live online sessions with video meeting links, automatically placed on student calendars.</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCreateSessionModal()" style="padding: 10px 18px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                        <ion-icon name="videocam-outline"></ion-icon>
+                        Schedule Live Class
+                    </button>
+                </div>
+
+                <div class="data-section dash-card">
+                    <div class="card-header-flex">
+                        <h3>Scheduled Live Classes & Events</h3>
+                        <button class="btn-view-all" onclick="loadTeacherCalendar()">
+                            <ion-icon name="refresh-outline"></ion-icon> Refresh
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>Session Title</th>
+                                    <th>Course</th>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Meeting Link</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendarTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students & Course Progress Section -->
+            <div id="section-students" class="content-section dashboard-content" style="display: none;">
+                <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h1 style="font-size: 22px; color: var(--blue-dark); font-weight: 700;">Students & Course Progress</h1>
+                        <p style="color: var(--text-muted); font-size: 13px;">Track learning progress and update completion ratings for every enrolled student.</p>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <select id="studentCourseFilter" onchange="filterStudentsProgress()" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none;">
+                            <option value="">All Courses</option>
+                        </select>
+                        <button class="btn-filter" onclick="loadStudentsProgress()">
+                            <ion-icon name="refresh-outline"></ion-icon> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="data-section dash-card">
+                    <div class="table-container">
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Course Enrolled</th>
+                                    <th>Completion Progress</th>
+                                    <th>Enrollment Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsProgressTableBody">
+                                <!-- Populated dynamically -->
                             </tbody>
                         </table>
                     </div>
@@ -469,7 +553,166 @@
         </div>
     </div>
 
-    <!-- Logic Script -->
+    <!-- Create / Schedule Live Session Modal -->
+    <div class="modal-overlay" id="createSessionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Schedule Online Live Session</h2>
+                <button class="modal-close" onclick="closeModal('createSessionModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleCreateSessionSubmit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Session / Class Title</label>
+                        <input type="text" id="sessionTitle" required placeholder="e.g. Live Full Stack Masterclass & Doubt Solving">
+                    </div>
+                    <div class="form-group">
+                        <label>Target Course</label>
+                        <select id="sessionCourseId">
+                            <option value="">-- General (All Students) --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Session Type</label>
+                        <select id="sessionEventType">
+                            <option value="Live Class">Online Live Class</option>
+                            <option value="Mentorship">1-on-1 Mentorship</option>
+                            <option value="Doubt Clearance">Doubt Clearance</option>
+                            <option value="Review / Evaluation">Review / Evaluation</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Start Date & Time</label>
+                            <input type="datetime-local" id="sessionStartTime" required>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>End Date & Time</label>
+                            <input type="datetime-local" id="sessionEndTime" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex; align-items:center; gap:6px;">
+                            <ion-icon name="videocam" style="color:#10b981;"></ion-icon> 
+                            <span>Paste Video Class Meeting Link</span>
+                        </label>
+                        <input type="url" id="sessionMeetingLink" required placeholder="https://meet.google.com/abc-defg-hij or Zoom URL">
+                        <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;">Paste Google Meet, Zoom, MS Teams, or YouTube Live stream URL.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Color Theme</label>
+                        <select id="sessionColorCode">
+                            <option value="#4f5be8">Royal Blue (Primary)</option>
+                            <option value="#10b981">Emerald Green (Live)</option>
+                            <option value="#6366f1">Indigo (Mentorship)</option>
+                            <option value="#0f172a">Dark Slate (Evaluation)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createSessionModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#10b981; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">
+                        <ion-icon name="calendar-outline"></ion-icon> Schedule Live Class
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div class="modal-overlay" id="editCourseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit Course Details</h2>
+                <button class="modal-close" onclick="closeModal('editCourseModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleEditCourseSubmit(event)">
+                <input type="hidden" id="editCourseId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Course Title</label>
+                        <input type="text" id="editCourseTitle" required placeholder="e.g. Python Full Stack Bootcamp">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="editCourseDescription" rows="3" required placeholder="Course overview..."></textarea>
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Price (₹)</label>
+                            <input type="number" id="editCoursePrice" required min="0">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Status</label>
+                            <select id="editCourseStatus">
+                                <option value="Published">Published (Active)</option>
+                                <option value="Draft">Draft (Hidden)</option>
+                                <option value="Archived">Archived</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Replace Course Thumbnail (Optional)</label>
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                            <img id="editThumbPreview" src="/uploads/images/default_course.jpg" style="width:60px; height:45px; border-radius:6px; object-fit:cover; border:1px solid #cbd5e1;" alt="">
+                            <input type="file" id="editCourseThumbnail" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('editCourseModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#4f5be8; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Student Course Progress Modal -->
+    <div class="modal-overlay" id="updateProgressModal">
+        <div class="modal" style="max-width:480px;">
+            <div class="modal-header">
+                <h2>Update Student Progress Rating</h2>
+                <button class="modal-close" onclick="closeModal('updateProgressModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleUpdateProgressSubmit(event)">
+                <input type="hidden" id="progEnrollmentId">
+                <div class="modal-body">
+                    <div style="background:#f8fafc; padding:14px; border-radius:10px; margin-bottom:16px; border:1px solid #e2e8f0;">
+                        <div style="font-size:12px; color:#64748b; margin-bottom:2px;">Student</div>
+                        <strong id="progStudentName" style="color:#0f172a; font-size:15px;">Student Name</strong>
+                        <div style="font-size:12px; color:#64748b; margin-top:8px; margin-bottom:2px;">Course</div>
+                        <strong id="progCourseTitle" style="color:#4f5be8; font-size:14px;">Course Title</strong>
+                    </div>
+
+                    <div class="form-group">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <label style="margin:0;">Course Completion Percentage</label>
+                            <span id="progPctDisplay" style="font-size:18px; font-weight:800; color:#4f5be8;">0%</span>
+                        </div>
+                        <input type="range" id="progPctRange" min="0" max="100" value="0" style="width:100%; accent-color:#4f5be8; cursor:pointer;" oninput="syncProgressInput(this.value)">
+                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:4px;">
+                            <span>0% (Just Started)</span>
+                            <span>50% (Halfway)</span>
+                            <span>100% (Completed)</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:12px;">
+                        <label>Or Enter Exact Value (%)</label>
+                        <input type="number" id="progPctInput" min="0" max="100" value="0" oninput="syncProgressInput(this.value)" style="width:120px;" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('updateProgressModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#4f5be8; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">
+                        Update Progress Rating
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script>
         let currentTeacherEmail = localStorage.getItem('teacherEmail') || '';
         let currentTeacherName = localStorage.getItem('teacherName') || 'Instructor';
@@ -490,18 +733,6 @@
         function switchTab(tabId, event) {
             if(event) event.preventDefault();
             
-            if(tabId === 'calendar') {
-                switchTab('dashboard');
-                const cal = document.querySelector('.calendar-card');
-                if(cal) cal.scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            if(tabId === 'students') {
-                switchTab('courses');
-                return;
-            }
-
             document.querySelectorAll('.content-section').forEach(el => {
                 el.classList.remove('active');
                 el.style.display = 'none';
@@ -521,6 +752,10 @@
             } else if (tabId === 'courses') {
                 loadCourses();
                 loadPendingApprovals();
+            } else if (tabId === 'calendar') {
+                loadTeacherCalendar();
+            } else if (tabId === 'students') {
+                loadStudentsProgress();
             } else if (tabId === 'messages') {
                 loadMessages();
                 populateMessageCourses();
@@ -583,6 +818,7 @@
                         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--text-muted);">No courses published yet.</td></tr>';
                         return;
                     }
+                    teacherCoursesCache = courses;
                     courses.slice(0, 5).forEach(c => {
                         const price = parseFloat(c.price) || 0;
                         const enrolled = parseInt(c.enrolled_count) || 0;
@@ -592,7 +828,7 @@
                         tr.innerHTML = `
                             <td>
                                 <div class="dash-course-info">
-                                    <img src="${thumb}" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&auto=format&fit=crop&q=60'" alt="">
+                                    <img src="${thumb}" onerror="this.src='/uploads/images/default_course.jpg'" alt="">
                                     <div>
                                         <strong>${c.title}</strong>
                                         <small>${enrolled} Enrolled</small>
@@ -604,7 +840,12 @@
                                 <div class="progress-bar"><div class="fill" style="width: 82%"></div></div>
                             </td>
                             <td><strong>₹${earnings}</strong></td>
-                            <td><span class="status-badge active">${c.status || 'Active'}</span></td>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <span class="status-badge active">${c.status || 'Active'}</span>
+                                    <button class="btn-filter" style="padding:4px 8px; font-size:11px;" onclick="openEditCourseModal(${c.id})" title="Edit Course Details"><ion-icon name="create-outline"></ion-icon> Edit</button>
+                                </div>
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -665,12 +906,28 @@
                 list.innerHTML = '';
                 if(data.success && data.events && data.events.length > 0) {
                     data.events.forEach(ev => {
+                        const sTime = new Date(ev.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                        const sDate = new Date(ev.start_time).toLocaleDateString([], {month:'short', day:'numeric'});
+                        
+                        let meetingLinkHtml = '';
+                        if (ev.meeting_link) {
+                            meetingLinkHtml = `<a href="${ev.meeting_link}" target="_blank" rel="noopener noreferrer" style="color:#10b981; font-weight:700; font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;"><ion-icon name="videocam"></ion-icon> Join Link</a>`;
+                        }
+
                         const div = document.createElement('div');
                         div.className = 'schedule-item';
                         if(ev.color_code) div.style.borderLeftColor = ev.color_code;
                         div.innerHTML = `
-                            <strong>${ev.title}</strong>
-                            <small><ion-icon name="time-outline" style="vertical-align:middle;"></ion-icon> ${ev.start_time} • ${ev.event_type || 'Event'}</small>
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div style="flex:1;">
+                                    <strong>${ev.title}</strong><br>
+                                    <small><ion-icon name="time-outline" style="vertical-align:middle;"></ion-icon> ${sDate} • ${sTime} • ${ev.event_type || 'Event'}</small>
+                                    <div>${meetingLinkHtml}</div>
+                                </div>
+                                <button onclick="deleteScheduledSession(${ev.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:15px; padding:2px 4px;" title="Cancel session">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </button>
+                            </div>
                         `;
                         list.appendChild(div);
                     });
@@ -678,16 +935,52 @@
                     list.innerHTML = '<div style="color:var(--text-muted); font-size:12px; text-align:center; padding:12px;">No schedule events today.</div>';
                 }
             } catch(e) {
-                list.innerHTML = `
-                    <div class="schedule-item type-live">
-                        <strong>Live React & Node Session</strong>
-                        <small>09:00 AM - 10:30 AM (Live Class)</small>
-                    </div>
-                    <div class="schedule-item type-mentor">
-                        <strong>Code Review & Doubt Clearance</strong>
-                        <small>11:30 AM - 01:00 PM (Mentorship)</small>
-                    </div>
-                `;
+                list.innerHTML = '<div style="color:var(--text-muted); font-size:12px; text-align:center; padding:12px;">No schedule events today.</div>';
+            }
+        }
+
+        async function loadTeacherCalendar() {
+            const tbody = document.getElementById('calendarTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Loading live sessions...</td></tr>';
+            
+            try {
+                const res = await fetch('/api/teacher/schedule?email=' + encodeURIComponent(currentTeacherEmail || ''));
+                const data = await res.json();
+                if(data.success && Array.isArray(data.events) && data.events.length > 0) {
+                    tbody.innerHTML = '';
+                    data.events.forEach(ev => {
+                        const sDate = new Date(ev.start_time).toLocaleDateString([], {month:'short', day:'numeric', year:'numeric'});
+                        const sTime = new Date(ev.start_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                        const eTime = ev.end_time ? new Date(ev.end_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+                        
+                        let linkHtml = '';
+                        if(ev.meeting_link) {
+                            linkHtml = `<a href="${ev.meeting_link}" target="_blank" rel="noopener noreferrer" style="color:#10b981; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:12px; background:#ecfdf5; padding:4px 8px; border-radius:6px; border:1px solid #a7f3d0;"><ion-icon name="videocam"></ion-icon> Open Meeting</a>`;
+                        } else {
+                            linkHtml = '<span style="color:#94a3b8; font-size:12px;">No link added</span>';
+                        }
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong style="color:#0f172a;">${ev.title}</strong></td>
+                            <td>${ev.course_title || 'General (All Students)'}</td>
+                            <td><strong>${sDate}</strong><br><small style="color:#64748b;">${sTime} - ${eTime}</small></td>
+                            <td><span class="status-badge" style="background:${ev.color_code || '#4f5be8'}; color:white;">${ev.event_type || 'Live Class'}</span></td>
+                            <td>${linkHtml}</td>
+                            <td>
+                                <button class="btn-filter" style="color:#ef4444; padding:4px 8px;" onclick="deleteScheduledSession(${ev.id})" title="Delete Session">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">No live sessions scheduled yet. Click "+ Schedule Live Class" above to create one.</td></tr>';
+                }
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red; padding:20px;">Error loading schedule.</td></tr>';
             }
         }
 
@@ -858,6 +1151,10 @@
         }
 
         // Courses Management functions
+        let teacherCoursesCache = [];
+        let allStudentsProgressCache = [];
+
+        // Courses Management functions
         async function loadCourses() {
             const tbody = document.getElementById('coursesTableBody');
             if(!tbody) return;
@@ -872,6 +1169,7 @@
                     return;
                 }
 
+                teacherCoursesCache = courses;
                 tbody.innerHTML = '';
                 courses.forEach(course => {
                     const tr = document.createElement('tr');
@@ -883,14 +1181,307 @@
                         <td>${course.enrolled_count || 0} Students</td>
                         <td><span class="status-badge ${course.status === 'Published' || course.status === 'Active' ? 'active' : ''}">${course.status || 'Published'}</span></td>
                         <td>
-                            <button class="btn-filter" style="padding: 4px 8px; font-size: 12px;" onclick="openEnrollModal(${course.id})" title="Enroll Student"><ion-icon name="person-add-outline"></ion-icon></button>
-                            <button class="btn-filter" style="padding: 4px 8px; font-size: 12px;" onclick="openContentModal(${course.id}, '${escape(course.title)}')" title="Manage Content"><ion-icon name="cloud-upload-outline"></ion-icon></button>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn-filter" style="padding: 5px 9px; font-size: 12px; color:#4f5be8;" onclick="openEditCourseModal(${course.id})" title="Edit Course Details"><ion-icon name="create-outline"></ion-icon> Edit</button>
+                                <button class="btn-filter" style="padding: 5px 9px; font-size: 12px;" onclick="openEnrollModal(${course.id})" title="Enroll Student"><ion-icon name="person-add-outline"></ion-icon> Enroll</button>
+                                <button class="btn-filter" style="padding: 5px 9px; font-size: 12px;" onclick="openContentModal(${course.id}, decodeURIComponent('${encodeURIComponent(course.title)}'))" title="Manage Lessons & Video"><ion-icon name="cloud-upload-outline"></ion-icon> Lessons</button>
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (error) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error loading courses.</td></tr>';
+            }
+        }
+
+        // Edit Course Logic
+        function openEditCourseModal(courseId) {
+            const course = teacherCoursesCache.find(c => c.id == courseId);
+            if (!course) {
+                fetch('/api/teacher/courses')
+                    .then(r => r.json())
+                    .then(courses => {
+                        teacherCoursesCache = courses;
+                        const found = courses.find(c => c.id == courseId);
+                        if (found) populateEditModal(found);
+                    });
+            } else {
+                populateEditModal(course);
+            }
+        }
+
+        function populateEditModal(c) {
+            document.getElementById('editCourseId').value = c.id;
+            document.getElementById('editCourseTitle').value = c.title;
+            document.getElementById('editCourseDescription').value = c.description;
+            document.getElementById('editCoursePrice').value = c.price;
+            document.getElementById('editCourseStatus').value = c.status || 'Published';
+            document.getElementById('editThumbPreview').src = c.thumbnail_url || '/uploads/images/default_course.jpg';
+            openModal('editCourseModal');
+        }
+
+        async function handleEditCourseSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const id = document.getElementById('editCourseId').value;
+            const title = document.getElementById('editCourseTitle').value;
+            const description = document.getElementById('editCourseDescription').value;
+            const price = document.getElementById('editCoursePrice').value;
+            const status = document.getElementById('editCourseStatus').value;
+            const file = document.getElementById('editCourseThumbnail').files[0];
+
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('price', price);
+            formData.append('status', status);
+            if (file) formData.append('thumbnail', file);
+
+            try {
+                const res = await fetch('/api/teacher/courses/edit', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Course updated successfully!');
+                    closeModal('editCourseModal');
+                    loadCourses();
+                    loadDashboardData();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Connection error.');
+            } finally {
+                btn.innerHTML = 'Save Changes';
+                btn.disabled = false;
+            }
+        }
+
+        // Live Session Scheduling Logic
+        async function openCreateSessionModal() {
+            const sel = document.getElementById('sessionCourseId');
+            sel.innerHTML = '<option value="">-- General (All Students) --</option>';
+            try {
+                const res = await fetch('/api/teacher/courses');
+                const courses = await res.json();
+                if(Array.isArray(courses)) {
+                    courses.forEach(c => {
+                        sel.innerHTML += `<option value="${c.id}">${c.title}</option>`;
+                    });
+                }
+            } catch(e) {}
+            
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('sessionStartTime').value = now.toISOString().slice(0, 16);
+            
+            const oneHourLater = new Date(Date.now() + 3600000);
+            oneHourLater.setMinutes(oneHourLater.getMinutes() - oneHourLater.getTimezoneOffset());
+            document.getElementById('sessionEndTime').value = oneHourLater.toISOString().slice(0, 16);
+
+            openModal('createSessionModal');
+        }
+
+        async function handleCreateSessionSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Scheduling...';
+            btn.disabled = true;
+
+            const title = document.getElementById('sessionTitle').value;
+            const course_id = document.getElementById('sessionCourseId').value || null;
+            const event_type = document.getElementById('sessionEventType').value;
+            const start_time = document.getElementById('sessionStartTime').value;
+            const end_time = document.getElementById('sessionEndTime').value;
+            const meeting_link = document.getElementById('sessionMeetingLink').value.trim();
+            const color_code = document.getElementById('sessionColorCode').value;
+
+            try {
+                const res = await fetch('/api/teacher/schedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        teacher_email: currentTeacherEmail,
+                        title,
+                        course_id,
+                        event_type,
+                        start_time,
+                        end_time,
+                        meeting_link,
+                        color_code
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Live online session scheduled successfully! Students will see this with the join button on their calendar.');
+                    closeModal('createSessionModal');
+                    e.target.reset();
+                    loadSchedule(currentTeacherEmail);
+                    loadTeacherCalendar();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(err) {
+                alert('Server connection error.');
+            } finally {
+                btn.innerHTML = '<ion-icon name="calendar-outline"></ion-icon> Schedule Live Class';
+                btn.disabled = false;
+            }
+        }
+
+        async function deleteScheduledSession(eventId) {
+            if(!confirm('Are you sure you want to cancel and remove this scheduled session?')) return;
+            try {
+                const res = await fetch('/api/teacher/schedule/' + eventId, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.success) {
+                    loadSchedule(currentTeacherEmail);
+                    loadTeacherCalendar();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(e) {
+                alert('Server connection error.');
+            }
+        }
+
+        // Students & Progress Logic
+        async function loadStudentsProgress() {
+            const tbody = document.getElementById('studentsProgressTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Loading student progress data...</td></tr>';
+
+            try {
+                const res = await fetch('/api/teacher/students/progress');
+                const data = await res.json();
+                if(data.success && Array.isArray(data.students) && data.students.length > 0) {
+                    allStudentsProgressCache = data.students;
+                    renderStudentsProgressTable(data.students);
+                    populateCourseFilterOptions(data.students);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">No enrolled students found. Enroll students into your courses to track progress.</td></tr>';
+                }
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Error loading student progress.</td></tr>';
+            }
+        }
+
+        function renderStudentsProgressTable(students) {
+            const tbody = document.getElementById('studentsProgressTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            students.forEach(st => {
+                const pct = Math.min(100, Math.max(0, parseInt(st.progress_percentage) || 0));
+                const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(st.student_name || 'Student')}&background=eef2ff&color=4f5be8`;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${avatar}" style="width:36px; height:36px; border-radius:50%; object-fit:cover;" alt="">
+                            <div>
+                                <strong>${st.student_name}</strong><br>
+                                <small style="color:var(--text-muted);">${st.student_email}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><strong>${st.course_title}</strong></td>
+                    <td>
+                        <div style="width:160px;">
+                            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:4px;">
+                                <span style="color:#1e293b;">Progress</span>
+                                <span style="color:${pct >= 100 ? '#10b981' : '#4f5be8'};">${pct}%</span>
+                            </div>
+                            <div style="background:#e2e8f0; height:8px; border-radius:999px; overflow:hidden;">
+                                <div style="width:${pct}%; height:100%; background: linear-gradient(90deg, #4f5be8, #10b981); border-radius:999px;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="status-badge ${st.status === 'Active' ? 'active' : 'pending'}">${st.status}</span></td>
+                    <td>
+                        <button class="btn-filter" style="padding:6px 14px; font-size:12px; background:#4f5be8; color:white; border-radius:6px; cursor:pointer;" onclick="openUpdateProgressModal(${st.enrollment_id}, decodeURIComponent('${encodeURIComponent(st.student_name)}'), decodeURIComponent('${encodeURIComponent(st.course_title)}'), ${pct})">
+                            <ion-icon name="create-outline"></ion-icon> Update %
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateCourseFilterOptions(students) {
+            const sel = document.getElementById('studentCourseFilter');
+            if(!sel) return;
+            const courses = [...new Set(students.map(s => s.course_title))];
+            sel.innerHTML = '<option value="">All Courses</option>';
+            courses.forEach(c => {
+                sel.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+        }
+
+        function filterStudentsProgress() {
+            const course = document.getElementById('studentCourseFilter').value;
+            if(!course) {
+                renderStudentsProgressTable(allStudentsProgressCache);
+            } else {
+                const filtered = allStudentsProgressCache.filter(s => s.course_title === course);
+                renderStudentsProgressTable(filtered);
+            }
+        }
+
+        function openUpdateProgressModal(enrollmentId, studentName, courseTitle, currentPct) {
+            document.getElementById('progEnrollmentId').value = enrollmentId;
+            document.getElementById('progStudentName').innerText = studentName;
+            document.getElementById('progCourseTitle').innerText = courseTitle;
+            document.getElementById('progPctInput').value = currentPct;
+            document.getElementById('progPctRange').value = currentPct;
+            document.getElementById('progPctDisplay').innerText = currentPct + '%';
+            openModal('updateProgressModal');
+        }
+
+        function syncProgressInput(val) {
+            val = Math.min(100, Math.max(0, parseInt(val) || 0));
+            document.getElementById('progPctInput').value = val;
+            document.getElementById('progPctRange').value = val;
+            document.getElementById('progPctDisplay').innerText = val + '%';
+        }
+
+        async function handleUpdateProgressSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const enrollment_id = document.getElementById('progEnrollmentId').value;
+            const progress_percentage = document.getElementById('progPctInput').value;
+
+            try {
+                const res = await fetch('/api/teacher/students/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enrollment_id, progress_percentage })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert(data.message);
+                    closeModal('updateProgressModal');
+                    loadStudentsProgress();
+                    loadDashboardData();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(err) {
+                alert('Server error.');
+            } finally {
+                btn.innerHTML = 'Update Progress Rating';
+                btn.disabled = false;
             }
         }
 
@@ -1051,17 +1642,27 @@
         async function loadMessages() {
             const tbody = document.getElementById('messagesTableBody');
             if(!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Loading messages...</td></tr>';
             try {
                 const res = await fetch('/api/teacher/messages?email=' + encodeURIComponent(currentTeacherEmail || ''));
                 const msgs = await res.json();
                 if(!Array.isArray(msgs) || msgs.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">No messages sent yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--text-muted);">No messages sent yet.</td></tr>';
                     return;
                 }
                 tbody.innerHTML = '';
                 msgs.forEach(m => {
-                    const to = m.course_id ? `Bulk (Course #${m.course_id})` : (m.receiver_email || 'Student');
+                    const to = m.course_id ? `Bulk (${m.course_title || 'Course #' + m.course_id})` : (m.receiver_email || 'Student');
+                    
+                    let tickHtml = '';
+                    if (m.is_read) {
+                        tickHtml = '<span style="color:#2563eb; display:inline-flex; align-items:center; gap:4px; font-weight:600;"><ion-icon name="checkmark-done" style="font-size:16px;"></ion-icon> Read</span>';
+                    } else if (m.status === 'delivered') {
+                        tickHtml = '<span style="color:#64748b; display:inline-flex; align-items:center; gap:4px;"><ion-icon name="checkmark-done" style="font-size:16px;"></ion-icon> Delivered</span>';
+                    } else {
+                        tickHtml = '<span style="color:#94a3b8; display:inline-flex; align-items:center; gap:4px;"><ion-icon name="checkmark" style="font-size:16px;"></ion-icon> Sent</span>';
+                    }
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td><strong>${to}</strong></td>
@@ -1070,11 +1671,34 @@
                             <span style="color:var(--text-muted); font-size:12px;">${m.content}</span>
                             ${m.audio_url ? `<br><audio controls src="${m.audio_url}" style="height:28px; margin-top:4px;"></audio>` : ''}
                         </td>
+                        <td>${tickHtml}</td>
                         <td>${new Date(m.sent_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn-filter" style="color:#ef4444; padding:4px 8px;" onclick="deleteTeacherSentMessage(${m.id})" title="Delete message">
+                                <ion-icon name="trash-outline"></ion-icon>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch(e) {}
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">Error loading messages.</td></tr>';
+            }
+        }
+
+        async function deleteTeacherSentMessage(id) {
+            if(!confirm('Are you sure you want to delete this message?')) return;
+            try {
+                const res = await fetch('/api/teacher/messages/' + id, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.success) {
+                    loadMessages();
+                } else {
+                    alert('Error deleting message: ' + (data.message || ''));
+                }
+            } catch(e) {
+                alert('Connection error.');
+            }
         }
 
         let mediaRecorder;

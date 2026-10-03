@@ -69,6 +69,8 @@ CREATE TABLE IF NOT EXISTS enrollments (
   course_id INT NOT NULL,
   student_email VARCHAR(255) NOT NULL,
   status VARCHAR(50) DEFAULT 'Pending',
+  progress_percentage INT DEFAULT 0,
+  completed_lessons TEXT,
   enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY unique_enrollment (course_id, student_email)
 );
@@ -81,6 +83,9 @@ CREATE TABLE IF NOT EXISTS messages (
   course_id INT,                -- NULL if individual message
   subject VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
+  audio_url VARCHAR(255),
+  is_read BOOLEAN DEFAULT FALSE,
+  status VARCHAR(20) DEFAULT 'delivered',
   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -107,11 +112,13 @@ CREATE TABLE IF NOT EXISTS course_lessons (
 CREATE TABLE IF NOT EXISTS calendar_events (
   id INT AUTO_INCREMENT PRIMARY KEY,
   teacher_email VARCHAR(255) NOT NULL,
+  course_id INT,
   title VARCHAR(255) NOT NULL,
   start_time DATETIME NOT NULL,
   end_time DATETIME NOT NULL,
   event_type VARCHAR(100),
-  color_code VARCHAR(20) DEFAULT '#FFB74D'
+  color_code VARCHAR(20) DEFAULT '#4f5be8',
+  meeting_link VARCHAR(500)
 );
 
 -- Create Course Reviews table

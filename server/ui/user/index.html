@@ -13,12 +13,12 @@
     <style>
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .msg-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .msg-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .msg-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .msg-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
         .msg-sender { font-weight: bold; color: var(--blue-dark); font-size: 14px; }
-        .msg-date { font-size: 12px; color: var(--text-muted); }
-        .msg-subject { font-weight: 600; margin-bottom: 5px; font-size: 15px; }
-        .msg-body { font-size: 14px; color: #444; }
+        .msg-date { font-size: 12px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; }
+        .msg-subject { font-weight: 600; margin-bottom: 5px; font-size: 15px; color: #1e293b; }
+        .msg-body { font-size: 14px; color: #475569; line-height: 1.5; }
         .enroll-btn { background: var(--green-primary); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-top: 10px; cursor: pointer; }
         .enroll-btn:disabled { background: #ccc; cursor: not-allowed; }
         .badge-status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; display: inline-block; margin-top: 10px; }
@@ -26,6 +26,84 @@
         .status-Pending { background: #f59e0b; }
         .status-Rejected { background: #ef4444; }
         .logout-btn { background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 10px; width: 100%; margin-top: 20px; font-weight: bold; cursor: pointer; }
+        
+        /* Event card styling */
+        .live-event-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border: 1px solid #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .live-badge {
+            background: #ef4444;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            width: fit-content;
+        }
+        .btn-join-live {
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-join-live:hover { background: #059669; }
+
+        /* Progress Card */
+        .student-progress-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-top: 12px;
+            width: 100%;
+        }
+        .progress-bar-track {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 999px;
+            width: 100%;
+            overflow: hidden;
+            margin: 6px 0;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4f5be8, #10b981);
+            border-radius: 999px;
+            transition: width 0.5s ease;
+        }
+        .delete-msg-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .delete-msg-btn:hover { background: #fee2e2; }
     </style>
 </head>
 <body>
@@ -44,40 +122,74 @@
     <main class="app-content">
         <!-- HOME TAB (Available Courses) -->
         <section id="tab-home" class="tab-content active">
-            
             <div id="upcomingEventsContainer" style="display:none; margin-bottom: 24px;">
-                <h2 class="section-title">Upcoming Live Events</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h2 class="section-title" style="margin:0;">Upcoming Live Events</h2>
+                    <span style="font-size:12px; color:#4f5be8; font-weight:700; cursor:pointer;" onclick="switchTab('calendar', document.querySelectorAll('.nav-item')[2])">View Calendar →</span>
+                </div>
                 <div id="upcomingEventsList" style="display:flex; flex-direction:column; gap:12px;"></div>
             </div>
-            <h2 class="section-title">Trending / Available Courses</h2>
 
-            <div id="availableCoursesList">Loading...</div>
+            <h2 class="section-title">Trending / Available Courses</h2>
+            <div id="availableCoursesList">Loading courses...</div>
         </section>
 
         <!-- ENROLLED COURSES TAB -->
         <section id="tab-courses" class="tab-content">
-            <h2 class="section-title">My Courses</h2>
-            <div id="enrolledCoursesList">Loading...</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h2 class="section-title" style="margin:0;">My Courses</h2>
+                <button onclick="loadEnrolledCourses()" style="background:#eef2ff; color:#4f5be8; border:1px solid #c7d2fe; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                    <ion-icon name="refresh-outline"></ion-icon> Refresh
+                </button>
+            </div>
+            <div id="enrolledCoursesList">Loading your courses...</div>
+        </section>
+
+        <!-- CALENDAR & LIVE SESSIONS TAB -->
+        <section id="tab-calendar" class="tab-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h2 class="section-title" style="margin:0;">Live Online Classes</h2>
+                <button onclick="loadUpcomingEvents()" style="background:#eef2ff; color:#4f5be8; border:1px solid #c7d2fe; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                    <ion-icon name="refresh-outline"></ion-icon> Refresh
+                </button>
+            </div>
+            <p style="font-size:13px; color:#64748b; margin-top:-8px; margin-bottom:16px;">Direct links to join live video lectures and mentoring sessions placed by your instructors.</p>
+            <div id="fullCalendarEventsList" style="display:flex; flex-direction:column; gap:14px;">Loading calendar...</div>
         </section>
 
         <!-- CHAT TAB -->
         <section id="tab-chat" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h2 class="section-title" style="margin: 0;">Inbox & Announcements</h2>
-                <button onclick="openDoubtModal()" style="background: #4f5be8; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                    <ion-icon name="help-circle-outline" style="font-size: 16px;"></ion-icon> Ask Doubt
-                </button>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="clearStudentChat()" style="background:#fee2e2; color:#ef4444; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                        <ion-icon name="trash-outline"></ion-icon> Clear
+                    </button>
+                    <button onclick="openDoubtModal()" style="background: #4f5be8; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <ion-icon name="help-circle-outline" style="font-size: 16px;"></ion-icon> Ask Doubt
+                    </button>
+                </div>
             </div>
-            <div id="messagesList">Loading...</div>
+            <div id="messagesList">Loading messages...</div>
         </section>
 
         <!-- PROFILE TAB -->
         <section id="tab-profile" class="tab-content">
             <h2 class="section-title">Profile</h2>
-            <div class="msg-card" style="text-align: center;">
+            <div class="msg-card" style="text-align: center; padding: 30px 20px;">
                 <div style="font-size: 60px; color: var(--blue-dark);"><ion-icon name="person-circle"></ion-icon></div>
-                <h3 id="profileName">Student Name</h3>
+                <h3 id="profileName" style="margin: 10px 0 4px 0;">Student Name</h3>
                 <p id="profileEmail" style="color: var(--text-muted); margin-bottom: 20px;">student@example.com</p>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin-bottom:20px; text-align:left;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
+                        <span style="color:#64748b;">Account Status:</span>
+                        <span style="color:#10b981; font-weight:bold;">Active Student</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <span style="color:#64748b;">Portal:</span>
+                        <span style="color:#1e293b; font-weight:600;">AnalogiX LMS Learning Hub</span>
+                    </div>
+                </div>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         </section>
@@ -91,6 +203,10 @@
         <a href="#" class="nav-item" onclick="switchTab('courses', this)">
             <ion-icon name="play-circle-outline"></ion-icon>
             <span>Courses</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchTab('calendar', this)">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Calendar</span>
         </a>
         <a href="#" class="nav-item" onclick="switchTab('chat', this)">
             <ion-icon name="chatbubbles-outline"></ion-icon>
@@ -133,63 +249,139 @@
 
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
+            const targetSection = document.getElementById('tab-' + tabId);
+            if (targetSection) targetSection.classList.add('active');
             
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             if(el) el.classList.add('active');
 
             if (tabId === 'home') { loadAvailableCourses(); loadUpcomingEvents(); }
             if (tabId === 'courses') loadEnrolledCourses();
+            if (tabId === 'calendar') loadUpcomingEvents();
             if (tabId === 'chat') loadMessages();
         }
 
-        
         async function loadUpcomingEvents() {
             try {
                 const res = await fetch('/api/events?email=' + encodeURIComponent(studentEmail));
                 const data = await res.json();
-                if (data.success && data.events.length > 0) {
-                    document.getElementById('upcomingEventsContainer').style.display = 'block';
-                    let html = '';
-                    data.events.forEach(e => {
-                        const sTime = new Date(e.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                        const sDate = new Date(e.start_time).toLocaleDateString();
-                        html += `
-                            <div style="background: white; border-radius: 12px; padding: 12px; display:flex; align-items:center; gap: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 4px solid ${e.color_code}">
-                                <div style="background: ${e.color_code}22; color: ${e.color_code}; padding: 10px; border-radius: 8px;">
-                                    <ion-icon name="calendar" style="font-size: 24px;"></ion-icon>
+                
+                const homeContainer = document.getElementById('upcomingEventsContainer');
+                const homeList = document.getElementById('upcomingEventsList');
+                const fullList = document.getElementById('fullCalendarEventsList');
+
+                if (data.success && data.events && data.events.length > 0) {
+                    if (homeContainer) homeContainer.style.display = 'block';
+                    
+                    let homeHtml = '';
+                    let fullHtml = '';
+
+                    data.events.forEach((e, idx) => {
+                        const sDate = new Date(e.start_time).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+                        const sTime = new Date(e.start_time).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+                        const eTime = e.end_time ? new Date(e.end_time).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' }) : '';
+                        const color = e.color_code || '#4f5be8';
+
+                        let joinBtnHtml = '';
+                        if (e.meeting_link && e.meeting_link.trim() !== '') {
+                            joinBtnHtml = `
+                                <a href="${e.meeting_link}" target="_blank" rel="noopener noreferrer" class="btn-join-live">
+                                    <ion-icon name="videocam"></ion-icon> Join Live Class
+                                </a>
+                            `;
+                        } else {
+                            joinBtnHtml = `<span style="font-size:12px; color:#64748b;">Link will be shared before start</span>`;
+                        }
+
+                        // Compact view for home preview (top 2 events)
+                        if (idx < 2) {
+                            homeHtml += `
+                                <div class="live-event-card" style="border-left: 4px solid ${color};">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span class="live-badge"><ion-icon name="radio-outline"></ion-icon> ${e.event_type || 'Live Class'}</span>
+                                        <span style="font-size:12px; font-weight:700; color:#475569;">${sDate} • ${sTime}</span>
+                                    </div>
+                                    <div>
+                                        <h4 style="margin:0 0 4px 0; font-size:15px; color:#1e293b;">${e.title}</h4>
+                                        <p style="margin:0; font-size:12px; color:#64748b;">${e.course_title} • Instructor: ${e.teacher_name}</p>
+                                    </div>
+                                    <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+                                        ${joinBtnHtml}
+                                    </div>
                                 </div>
-                                <div style="flex:1;">
-                                    <h4 style="margin:0 0 4px 0; color:#1e293b;">${e.title}</h4>
-                                    <p style="margin:0; font-size:12px; color:#64748b;">${e.course_title} • ${e.teacher_name}</p>
+                            `;
+                        }
+
+                        // Full calendar view
+                        fullHtml += `
+                            <div class="live-event-card" style="border-left: 5px solid ${color};">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span class="live-badge" style="background:${color};"><ion-icon name="videocam"></ion-icon> ${e.event_type || 'Online Session'}</span>
+                                    <span style="font-size:12px; font-weight:700; color:#475569;">${sDate} (${sTime} - ${eTime})</span>
                                 </div>
-                                <div style="text-align:right; font-size:12px; color:#475569; font-weight:bold;">
-                                    ${sDate}<br>${sTime}
+                                <div>
+                                    <h3 style="margin:4px 0; font-size:16px; color:#0f172a;">${e.title}</h3>
+                                    <p style="margin:0; font-size:13px; color:#64748b;"><strong>Course:</strong> ${e.course_title} &nbsp;|&nbsp; <strong>Teacher:</strong> ${e.teacher_name}</p>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid #f1f5f9;">
+                                    <span style="font-size:12px; color:#475569;">Interactive Video Session</span>
+                                    ${joinBtnHtml}
                                 </div>
                             </div>
                         `;
                     });
-                    document.getElementById('upcomingEventsList').innerHTML = html;
+
+                    if (homeList) homeList.innerHTML = homeHtml;
+                    if (fullList) fullList.innerHTML = fullHtml;
                 } else {
-                    document.getElementById('upcomingEventsContainer').style.display = 'none';
+                    if (homeContainer) homeContainer.style.display = 'none';
+                    if (fullList) fullList.innerHTML = '<div style="background:white; padding:24px; border-radius:12px; text-align:center; color:#64748b;">No live classes scheduled currently. When your teachers schedule an online session, it will automatically appear here with a direct join link.</div>';
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.error("Error loading events:", err);
+            }
         }
 
         async function loadAvailableCourses() {
             try {
-                const res = await fetch('/api/courses/available');
+                const res = await fetch('/api/courses/available?email=' + encodeURIComponent(studentEmail));
                 const courses = await res.json();
                 let html = '';
-                if(courses.length === 0) {
-                    html = '<p>No courses available right now.</p>';
+                if(!Array.isArray(courses) || courses.length === 0) {
+                    html = '<p style="padding:20px; text-align:center; color:#64748b;">No courses available right now.</p>';
                 } else {
                     courses.forEach(c => {
+                        let badgeHtml = '';
+                        let buttonHtml = '';
+
+                        if (c.enrollment_status === 'Active') {
+                            badgeHtml = `<div class="premium-badge" style="background:#10b981; color:white;"><ion-icon name="checkmark-circle"></ion-icon> Enrolled</div>`;
+                            buttonHtml = `
+                                <button class="premium-enroll-btn" style="background:#10b981; color:white; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:6px;" onclick="goToEnrolledCourses()">
+                                    <ion-icon name="checkmark-circle"></ion-icon> Already Enrolled • Go to Course
+                                </button>
+                            `;
+                        } else if (c.enrollment_status === 'Pending') {
+                            badgeHtml = `<div class="premium-badge" style="background:#f59e0b; color:white;"><ion-icon name="time"></ion-icon> Pending Approval</div>`;
+                            buttonHtml = `
+                                <button class="premium-enroll-btn" style="background:#94a3b8; cursor:not-allowed; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:6px;" disabled>
+                                    <ion-icon name="hourglass-outline"></ion-icon> Approval Pending
+                                </button>
+                            `;
+                        } else {
+                            badgeHtml = `<div class="premium-badge"><ion-icon name="star"></ion-icon> 4.8</div>`;
+                            buttonHtml = `
+                                <button class="premium-enroll-btn" onclick="enrollCourse(${c.id})">
+                                    <ion-icon name="sparkles"></ion-icon> Enroll Now
+                                </button>
+                            `;
+                        }
+
                         html += `
                         <div class="premium-course-card">
                             <div class="premium-thumbnail">
                                 <img src="${c.thumbnail_url || '/uploads/images/default_course.jpg'}" alt="Course Thumbnail" onerror="this.src='/uploads/images/default_course.jpg'">
-                                <div class="premium-badge"><ion-icon name="star"></ion-icon> 4.8</div>
+                                ${badgeHtml}
                             </div>
                             <div class="premium-details">
                                 <h3 class="premium-title">${c.title}</h3>
@@ -197,17 +389,17 @@
                                 
                                 <div class="premium-instructor">
                                     <div class="instructor-avatar"><ion-icon name="person"></ion-icon></div>
-                                    <span class="instructor-name">${c.instructor.split('@')[0]}</span>
+                                    <span class="instructor-name">${c.instructor ? c.instructor.split('@')[0] : 'Instructor'}</span>
                                 </div>
                                 
                                 <div class="premium-meta">
                                     <div class="premium-meta-item"><ion-icon name="time-outline"></ion-icon> 12h 30m</div>
-                                    <div class="premium-meta-item"><ion-icon name="play-circle-outline"></ion-icon> ${Math.floor(Math.random()*20)+5} Lessons</div>
+                                    <div class="premium-meta-item"><ion-icon name="play-circle-outline"></ion-icon> Multi-Lesson</div>
                                     <div class="premium-meta-item"><ion-icon name="cash-outline"></ion-icon> ₹${c.price}</div>
                                 </div>
 
-                                <div class="premium-actions">
-                                    <button class="premium-enroll-btn" onclick="enrollCourse(${c.id})">Enroll Now</button>
+                                <div class="premium-actions" style="margin-top:10px;">
+                                    ${buttonHtml}
                                 </div>
                             </div>
                         </div>`;
@@ -217,6 +409,11 @@
             } catch (err) {
                 document.getElementById('availableCoursesList').innerHTML = '<p>Error loading courses.</p>';
             }
+        }
+
+        function goToEnrolledCourses() {
+            const courseTabBtn = document.querySelectorAll('.nav-item')[1];
+            switchTab('courses', courseTabBtn);
         }
 
         async function enrollCourse(courseId) {
@@ -229,8 +426,7 @@
                 const data = await res.json();
                 alert(data.message);
                 if(data.success) {
-                    // Switch to enrolled tab to see status
-                    document.querySelector('.nav-item:nth-child(2)').click();
+                    goToEnrolledCourses();
                 }
             } catch (err) {
                 alert("Failed to enroll.");
@@ -244,22 +440,53 @@
                 let html = '';
                 if(courses.success === false) {
                     html = '<p>Error loading your courses: ' + (courses.message || 'Server error') + '</p>';
-                } else if(!courses.length || courses.length === 0) {
-                    html = '<p>You are not enrolled in any courses yet.</p>';
+                } else if(!Array.isArray(courses) || courses.length === 0) {
+                    html = `
+                        <div style="background:white; border-radius:12px; padding:30px 20px; text-align:center; color:#64748b;">
+                            <ion-icon name="book-outline" style="font-size:48px; color:#94a3b8; margin-bottom:10px;"></ion-icon>
+                            <p style="margin:0 0 14px 0;">You are not enrolled in any courses yet.</p>
+                            <button class="premium-enroll-btn" onclick="switchTab('home', document.querySelectorAll('.nav-item')[0])">Browse Trending Courses</button>
+                        </div>
+                    `;
                 } else {
                     courses.forEach(c => {
-                        const statusClass = (c.enrollment_status || 'pending').toLowerCase();
+                        const isApproved = c.enrollment_status === 'Active';
+                        const progressPct = Math.min(100, Math.max(0, parseInt(c.progress_percentage) || 0));
+
                         let statusBadgeHtml = '';
                         let actionsHtml = '';
+                        let progressCardHtml = '';
 
-                        if (c.enrollment_status === 'Active') {
+                        if (isApproved) {
                             statusBadgeHtml = `<span class="premium-status active"><ion-icon name="checkmark-circle"></ion-icon> Enrolled & Active</span>`;
+                            
+                            // Course Progress Card for Student
+                            progressCardHtml = `
+                                <div class="student-progress-box">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                        <span style="font-size:12px; font-weight:700; color:#1e293b; display:inline-flex; align-items:center; gap:6px;">
+                                            <ion-icon name="trending-up-outline" style="color:#4f5be8; font-size:16px;"></ion-icon> Course Progress
+                                        </span>
+                                        <span style="font-size:13px; font-weight:800; color:${progressPct >= 100 ? '#10b981' : '#4f5be8'};">${progressPct}% Completed</span>
+                                    </div>
+                                    <div class="progress-bar-track">
+                                        <div class="progress-bar-fill" style="width: ${progressPct}%;"></div>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:11px; color:#64748b;">
+                                        <span>Status: ${progressPct >= 100 ? 'Course Completed 🎉' : 'In Progress'}</span>
+                                        <span>Evaluated by Teacher</span>
+                                    </div>
+                                </div>
+                            `;
+
+                            // Action buttons with clean string passing
+                            const safeTitle = encodeURIComponent(c.title || 'Course');
                             actionsHtml = `
                                 <div style="display:flex; gap:10px; width:100%; margin-top:14px; flex-wrap:wrap;">
-                                    <button class="btn-secondary" style="flex:1; border: 1px solid #4f5be8; color:#4f5be8; padding: 10px 14px; border-radius: 12px; background: #eef2ff; cursor: pointer; font-weight:600; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:140px;" onclick="openFeedbackModal(${c.id}, '${escape(c.title)}')">
+                                    <button class="btn-secondary" style="flex:1; border: 1px solid #4f5be8; color:#4f5be8; padding: 10px 14px; border-radius: 12px; background: #eef2ff; cursor: pointer; font-weight:600; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:140px;" onclick="handleOpenFeedback(${c.id}, decodeURIComponent('${safeTitle}'))">
                                         <ion-icon name="star-outline"></ion-icon> Leave Feedback
                                     </button>
-                                    <button class="premium-enroll-btn" style="flex:1; padding: 10px 16px; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:140px;" onclick="openCourseViewer(${c.id}, '${escape(c.title)}')">
+                                    <button class="premium-enroll-btn" style="flex:1; padding: 10px 16px; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:140px;" onclick="handleOpenViewer(${c.id}, decodeURIComponent('${safeTitle}'))">
                                         <ion-icon name="play-circle-outline"></ion-icon> Watch Course
                                     </button>
                                 </div>
@@ -268,7 +495,7 @@
                             statusBadgeHtml = `<span class="premium-status pending"><ion-icon name="time-outline"></ion-icon> Pending Instructor Approval</span>`;
                             actionsHtml = `
                                 <div style="background:#fffbeb; color:#92400e; border:1px solid #fde68a; padding:10px 14px; border-radius:10px; font-size:12px; margin-top:12px; line-height:1.5; width:100%;">
-                                    <strong>Request Sent to Instructor:</strong> Your enrollment is awaiting approval. Once the teacher accepts your request, all sections and video lessons will unlock here.
+                                    <strong>Request Sent to Instructor:</strong> Your enrollment is awaiting approval. Once the teacher accepts your request, all video lessons and progress tracking will unlock.
                                 </div>
                             `;
                         } else {
@@ -296,6 +523,7 @@
 
                                 <div class="premium-actions" style="flex-direction:column; align-items:flex-start; width:100%;">
                                     ${statusBadgeHtml}
+                                    ${progressCardHtml}
                                     ${actionsHtml}
                                 </div>
                             </div>
@@ -308,22 +536,56 @@
             }
         }
 
+        function handleOpenViewer(courseId, title) {
+            openCourseViewer(courseId, title);
+        }
+
+        function handleOpenFeedback(courseId, title) {
+            openFeedbackModal(courseId, title);
+        }
+
         async function loadMessages() {
             try {
                 const res = await fetch('/api/messages?email=' + encodeURIComponent(studentEmail));
                 const messages = await res.json();
                 let html = '';
-                if(messages.length === 0) {
-                    html = '<p>Your inbox is empty.</p>';
+                if(!Array.isArray(messages) || messages.length === 0) {
+                    html = '<div style="background:white; border-radius:12px; padding:30px; text-align:center; color:#64748b;">Your inbox is empty. Use "Ask Doubt" above to connect with your instructors.</div>';
                 } else {
                     messages.forEach(msg => {
-                        let context = msg.course_name ? `Announcement: ${msg.course_name}` : 'Direct Message';
+                        const isStudentSender = msg.sender_email === studentEmail;
+                        let context = msg.course_name ? `Course: ${msg.course_name}` : 'Direct Conversation';
                         let audioHtml = msg.audio_url ? `<br><audio controls src="${msg.audio_url}" style="height:35px; margin-top:10px; width:100%;"></audio>` : '';
+
+                        // Delivery tick logic
+                        let tickHtml = '';
+                        if (isStudentSender) {
+                            if (msg.is_read) {
+                                tickHtml = '<span title="Read by instructor" style="color:#2563eb; display:inline-flex; align-items:center; font-size:16px; margin-left:4px;"><ion-icon name="checkmark-done"></ion-icon></span>';
+                            } else if (msg.status === 'delivered') {
+                                tickHtml = '<span title="Delivered to instructor" style="color:#64748b; display:inline-flex; align-items:center; font-size:16px; margin-left:4px;"><ion-icon name="checkmark-done"></ion-icon></span>';
+                            } else {
+                                tickHtml = '<span title="Sent" style="color:#94a3b8; display:inline-flex; align-items:center; font-size:16px; margin-left:4px;"><ion-icon name="checkmark"></ion-icon></span>';
+                            }
+                        } else {
+                            tickHtml = '<span style="background:#e0e7ff; color:#4338ca; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700;">From Instructor</span>';
+                        }
+
                         html += `
                         <div class="msg-card">
                             <div class="msg-header">
-                                <span class="msg-sender">${msg.sender_email} <small style="color:#888;">(${context})</small></span>
-                                <span class="msg-date">${new Date(msg.sent_at).toLocaleDateString()}</span>
+                                <div>
+                                    <span class="msg-sender">${isStudentSender ? 'You (Student Doubt)' : msg.sender_email} <small style="color:#888;">(${context})</small></span>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="msg-date">
+                                        ${new Date(msg.sent_at).toLocaleDateString()}
+                                        ${tickHtml}
+                                    </span>
+                                    <button class="delete-msg-btn" onclick="deleteStudentMessage(${msg.id})" title="Delete this message">
+                                        <ion-icon name="trash-outline"></ion-icon>
+                                    </button>
+                                </div>
                             </div>
                             <div class="msg-subject">${msg.subject}</div>
                             <div class="msg-body">${msg.content}</div>
@@ -337,337 +599,380 @@
             }
         }
 
+        async function deleteStudentMessage(msgId) {
+            if(!confirm('Are you sure you want to delete this message?')) return;
+            try {
+                const res = await fetch('/api/messages/' + msgId, { method: 'DELETE' });
+                const data = await res.json();
+                if(data.success) {
+                    loadMessages();
+                } else {
+                    alert('Could not delete: ' + (data.message || ''));
+                }
+            } catch(e) {
+                alert('Connection error.');
+            }
+        }
+
+        async function clearStudentChat() {
+            if(!confirm('Are you sure you want to delete all messages in your chat inbox?')) return;
+            try {
+                const res = await fetch('/api/messages/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: studentEmail })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    loadMessages();
+                } else {
+                    alert('Error clearing chat.');
+                }
+            } catch(e) {
+                alert('Connection error.');
+            }
+        }
+
         // Init
         loadAvailableCourses();
+        loadUpcomingEvents();
     </script>
-<!-- Udemy Style Course Viewer -->
-<style>
-    .udemy-viewer {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: #fff;
-        z-index: 9999;
-        flex-direction: column;
-    }
-    .uv-header {
-        background: #1c1d1f; color: white;
-        padding: 15px; display: flex; align-items: center;
-    }
-    .uv-header h2 { margin: 0; font-size: 18px; flex-grow: 1; margin-left: 15px; }
-    .uv-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-    .uv-body {
-        display: flex; flex-grow: 1; overflow: hidden;
-        flex-direction: column;
-    }
-    @media(min-width: 768px) {
-        .uv-body { flex-direction: row; }
-    }
-    .uv-video-area {
-        flex: 1; background: #000;
-        display: flex; flex-direction: column;
-    }
-    .uv-video-area video { width: 100%; max-height: 70vh; flex-grow: 1; background: #000; }
-    .uv-video-title { padding: 15px; color: white; background: #2d2f31; }
-    .uv-sidebar {
-        width: 100%; max-width: 400px;
-        background: #f7f9fa; border-left: 1px solid #d1d7dc;
-        overflow-y: auto;
-    }
-    @media(max-width: 767px) {
-        .uv-sidebar { max-width: 100%; border-left: none; border-top: 1px solid #d1d7dc; }
-    }
-    .uv-section { border-bottom: 1px solid #d1d7dc; }
-    .uv-section-header {
-        padding: 15px; background: #f7f9fa; cursor: pointer;
-        font-weight: bold; color: #1c1d1f; display: flex; justify-content: space-between;
-    }
-    .uv-lessons { display: none; background: #fff; }
-    .uv-section.open .uv-lessons { display: block; }
-    .uv-lesson-item {
-        padding: 15px; border-bottom: 1px solid #e1e1e1; cursor: pointer;
-        display: flex; align-items: flex-start; font-size: 14px;
-    }
-    .uv-lesson-item:hover { background: #f0f0f0; }
-    .uv-lesson-item.active { background: #d1d7dc; font-weight: bold; }
-    .uv-lesson-item ion-icon { margin-right: 10px; font-size: 18px; color: #5624d0; }
-</style>
 
-<div class="udemy-viewer" id="udemyViewer">
-    <div class="uv-header">
-        <button class="uv-close" onclick="closeCourseViewer()"><ion-icon name="arrow-back-outline"></ion-icon></button>
-        <h2 id="uvCourseTitle">Course Title</h2>
+    <!-- Udemy Style Course Viewer -->
+    <style>
+        .udemy-viewer {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        .uv-header {
+            background: #1c1d1f; color: white;
+            padding: 15px; display: flex; align-items: center;
+        }
+        .uv-header h2 { margin: 0; font-size: 18px; flex-grow: 1; margin-left: 15px; }
+        .uv-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .uv-body {
+            display: flex; flex-grow: 1; overflow: hidden;
+            flex-direction: column;
+        }
+        @media(min-width: 768px) {
+            .uv-body { flex-direction: row; }
+        }
+        .uv-video-area {
+            flex: 1; background: #000;
+            display: flex; flex-direction: column;
+        }
+        .uv-video-area video { width: 100%; max-height: 70vh; flex-grow: 1; background: #000; }
+        .uv-video-title { padding: 15px; color: white; background: #2d2f31; }
+        .uv-sidebar {
+            width: 100%; max-width: 400px;
+            background: #f7f9fa; border-left: 1px solid #d1d7dc;
+            overflow-y: auto;
+        }
+        @media(max-width: 767px) {
+            .uv-sidebar { max-width: 100%; border-left: none; border-top: 1px solid #d1d7dc; }
+        }
+        .uv-section { border-bottom: 1px solid #d1d7dc; }
+        .uv-section-header {
+            padding: 15px; background: #f7f9fa; cursor: pointer;
+            font-weight: bold; color: #1c1d1f; display: flex; justify-content: space-between;
+        }
+        .uv-lessons { display: none; background: #fff; }
+        .uv-section.open .uv-lessons { display: block; }
+        .uv-lesson-item {
+            padding: 15px; border-bottom: 1px solid #e1e1e1; cursor: pointer;
+            display: flex; align-items: flex-start; font-size: 14px;
+        }
+        .uv-lesson-item:hover { background: #f0f0f0; }
+        .uv-lesson-item.active { background: #d1d7dc; font-weight: bold; }
+        .uv-lesson-item ion-icon { margin-right: 10px; font-size: 18px; color: #5624d0; }
+    </style>
+
+    <div class="udemy-viewer" id="udemyViewer">
+        <div class="uv-header">
+            <button class="uv-close" onclick="closeCourseViewer()"><ion-icon name="arrow-back-outline"></ion-icon></button>
+            <h2 id="uvCourseTitle">Course Title</h2>
+        </div>
+        <div class="uv-body">
+            <div class="uv-video-area">
+                <video id="uvVideoPlayer" controls controlsList="nodownload"></video>
+                <div class="uv-video-title"><h3 id="uvLessonTitle" style="margin:0;">Select a lesson</h3></div>
+            </div>
+            <div class="uv-sidebar" id="uvSidebar">
+                <!-- Sections populated dynamically -->
+            </div>
+        </div>
     </div>
-    <div class="uv-body">
-        <div class="uv-video-area">
-            <video id="uvVideoPlayer" controls controlsList="nodownload"></video>
-            <div class="uv-video-title"><h3 id="uvLessonTitle" style="margin:0;">Select a lesson</h3></div>
-        </div>
-        <div class="uv-sidebar" id="uvSidebar">
-            <!-- Sections go here -->
-        </div>
-    </div>
-</div>
 
-<script>
-    function openCourseViewer(courseId, courseTitle) {
-        document.getElementById('uvCourseTitle').innerText = courseTitle;
-        document.getElementById('udemyViewer').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        loadCourseStructure(courseId);
-    }
-
-    function closeCourseViewer() {
-        document.getElementById('udemyViewer').style.display = 'none';
-        document.body.style.overflow = 'auto';
-        document.getElementById('uvVideoPlayer').pause();
-    }
-
-    async function loadCourseStructure(courseId) {
-        const sidebar = document.getElementById('uvSidebar');
-        sidebar.innerHTML = '<div style="padding:20px;">Loading course content...</div>';
-        
-        try {
-            const res = await fetch('/api/courses/' + courseId + '/structure');
-            const data = await res.json();
-            if(data.success && data.sections.length > 0) {
-                sidebar.innerHTML = '';
-                let firstLesson = null;
-
-                data.sections.forEach((sec, idx) => {
-                    let lessonsHtml = sec.lessons.map(l => {
-                        if(!firstLesson) firstLesson = l;
-                        return \`
-                        <div class="uv-lesson-item" onclick="playLesson('\${l.video_url}', '\${l.title}', this)">
-                            <ion-icon name="play-circle"></ion-icon>
-                            <span>\${l.title}</span>
-                        </div>\`;
-                    }).join('');
-
-                    sidebar.innerHTML += \`
-                        <div class="uv-section \${idx === 0 ? 'open' : ''}">
-                            <div class="uv-section-header" onclick="this.parentElement.classList.toggle('open')">
-                                <span>Section \${idx+1}: \${sec.title}</span>
-                                <ion-icon name="chevron-down-outline"></ion-icon>
-                            </div>
-                            <div class="uv-lessons">\${lessonsHtml}</div>
-                        </div>
-                    \`;
-                });
-
-                if(firstLesson) {
-                    playLesson(firstLesson.video_url, firstLesson.title);
-                }
-            } else {
-                sidebar.innerHTML = '<div style="padding:20px;">No content available for this course yet.</div>';
-            }
-        } catch(e) {
-            sidebar.innerHTML = '<div style="padding:20px;">Error loading content.</div>';
+    <script>
+        function openCourseViewer(courseId, courseTitle) {
+            document.getElementById('uvCourseTitle').innerText = courseTitle;
+            document.getElementById('udemyViewer').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            loadCourseStructure(courseId);
         }
-    }
 
-    function playLesson(videoUrl, title, el) {
-        document.getElementById('uvVideoPlayer').src = videoUrl;
-        document.getElementById('uvVideoPlayer').play();
-        document.getElementById('uvLessonTitle').innerText = title;
-        
-        if(el) {
-            document.querySelectorAll('.uv-lesson-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-        } else {
-            const firstItem = document.querySelector('.uv-lesson-item');
-            if(firstItem) firstItem.classList.add('active');
+        function closeCourseViewer() {
+            document.getElementById('udemyViewer').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            const player = document.getElementById('uvVideoPlayer');
+            if (player) player.pause();
         }
-    }
 
-    // Feedback Modal Logic
-    let currentRating = 5.0;
-
-    function openFeedbackModal(courseId, courseTitle) {
-        document.getElementById('fbCourseId').value = courseId;
-        document.getElementById('fbCourseTitle').innerText = unescape(courseTitle);
-        setRating(5.0);
-        document.getElementById('fbReviewText').value = '';
-        document.getElementById('feedbackModal').classList.add('active');
-    }
-
-    function closeFeedbackModal() {
-        document.getElementById('feedbackModal').classList.remove('active');
-    }
-
-    function setRating(val) {
-        currentRating = val;
-        document.getElementById('ratingValText').innerText = val.toFixed(1);
-        const stars = document.querySelectorAll('#starPicker ion-icon');
-        stars.forEach(s => {
-            const sVal = parseInt(s.getAttribute('data-val'));
-            if (sVal <= val) {
-                s.classList.add('filled');
-            } else {
-                s.classList.remove('filled');
-            }
-        });
-    }
-
-    async function handleFeedbackSubmit(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btnSubmitFeedback');
-        btn.innerHTML = 'Submitting...';
-        btn.disabled = true;
-
-        const course_id = document.getElementById('fbCourseId').value;
-        const review_text = document.getElementById('fbReviewText').value;
-
-        try {
-            const res = await fetch('/api/courses/feedback', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    course_id,
-                    student_email: studentEmail,
-                    rating: currentRating,
-                    review_text
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert('Thank you! Your feedback has been sent directly to the instructor.');
-                closeFeedbackModal();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        } catch(err) {
-            alert('Server connection error.');
-        } finally {
-            btn.innerHTML = 'Submit Feedback';
-            btn.disabled = false;
-        }
-    }
-
-    // Ask Doubt Modal Logic
-    async function openDoubtModal() {
-        const sel = document.getElementById('doubtCourseSelect');
-        sel.innerHTML = '<option value="">Loading your courses...</option>';
-        document.getElementById('doubtModal').classList.add('active');
-
-        try {
-            const res = await fetch('/api/courses/enrolled?email=' + encodeURIComponent(studentEmail));
-            const courses = await res.json();
-            if (Array.isArray(courses) && courses.length > 0) {
-                sel.innerHTML = '<option value="">-- Choose Course --</option>';
-                courses.forEach(c => {
-                    sel.innerHTML += `<option value="${c.id}">${c.title}</option>`;
-                });
-            } else {
-                sel.innerHTML = '<option value="">No enrolled courses found</option>';
-            }
-        } catch(e) {
-            sel.innerHTML = '<option value="">Error loading courses</option>';
-        }
-    }
-
-    function closeDoubtModal() {
-        document.getElementById('doubtModal').classList.remove('active');
-    }
-
-    async function handleDoubtSubmit(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btnSubmitDoubt');
-        btn.innerHTML = 'Sending...';
-        btn.disabled = true;
-
-        const course_id = document.getElementById('doubtCourseSelect').value;
-        const subject = document.getElementById('doubtSubject').value;
-        const content = document.getElementById('doubtContent').value;
-
-        try {
-            const res = await fetch('/api/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sender_email: studentEmail,
-                    course_id: course_id || null,
-                    subject,
-                    content
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert('Your doubt has been submitted to your instructor!');
-                closeDoubtModal();
-                e.target.reset();
-                loadMessages();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        } catch(err) {
-            alert('Server connection error.');
-        } finally {
-            btn.innerHTML = 'Send to Instructor';
-            btn.disabled = false;
-        }
-    }
-</script>
-
-<!-- Feedback Modal Sheet -->
-<div class="modal-overlay" id="feedbackModal">
-    <div class="modal-sheet">
-        <div class="modal-sheet-header">
-            <h3>Rate & Review Course</h3>
-            <button class="close-sheet-btn" onclick="closeFeedbackModal()"><ion-icon name="close-outline"></ion-icon></button>
-        </div>
-        <form onsubmit="handleFeedbackSubmit(event)" style="padding: 20px;">
-            <input type="hidden" id="fbCourseId">
-            <h4 id="fbCourseTitle" style="color: var(--blue-dark); margin: 0 0 16px 0; font-size: 15px; font-weight:700;">Course Title</h4>
+        async function loadCourseStructure(courseId) {
+            const sidebar = document.getElementById('uvSidebar');
+            sidebar.innerHTML = '<div style="padding:20px; text-align:center;">Loading course lessons...</div>';
             
-            <div style="margin-bottom: 16px;">
-                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Your Rating for the Instructor</label>
-                <div class="star-rating-picker" id="starPicker">
-                    <ion-icon name="star" class="filled" data-val="1" onclick="setRating(1)"></ion-icon>
-                    <ion-icon name="star" class="filled" data-val="2" onclick="setRating(2)"></ion-icon>
-                    <ion-icon name="star" class="filled" data-val="3" onclick="setRating(3)"></ion-icon>
-                    <ion-icon name="star" class="filled" data-val="4" onclick="setRating(4)"></ion-icon>
-                    <ion-icon name="star" class="filled" data-val="5" onclick="setRating(5)"></ion-icon>
-                    <span id="ratingValText" style="font-weight: 700; margin-left: 8px; color: #f59e0b; font-size: 16px;">5.0</span>
+            try {
+                const res = await fetch('/api/courses/' + courseId + '/structure');
+                const data = await res.json();
+                if(data.success && Array.isArray(data.sections) && data.sections.length > 0) {
+                    sidebar.innerHTML = '';
+                    let firstLesson = null;
+
+                    data.sections.forEach((sec, idx) => {
+                        let lessonsHtml = '';
+                        if(Array.isArray(sec.lessons)) {
+                            sec.lessons.forEach(l => {
+                                if(!firstLesson) firstLesson = l;
+                                const safeLessonTitle = encodeURIComponent(l.title || 'Lesson');
+                                lessonsHtml += `
+                                    <div class="uv-lesson-item" onclick="playLesson('${l.video_url}', decodeURIComponent('${safeLessonTitle}'), this)">
+                                        <ion-icon name="play-circle"></ion-icon>
+                                        <span>${l.title}</span>
+                                    </div>
+                                `;
+                            });
+                        }
+
+                        sidebar.innerHTML += `
+                            <div class="uv-section ${idx === 0 ? 'open' : ''}">
+                                <div class="uv-section-header" onclick="this.parentElement.classList.toggle('open')">
+                                    <span>Section ${idx+1}: ${sec.title}</span>
+                                    <ion-icon name="chevron-down-outline"></ion-icon>
+                                </div>
+                                <div class="uv-lessons">${lessonsHtml || '<div style="padding:10px; font-size:12px; color:#888;">No lessons in this section</div>'}</div>
+                            </div>
+                        `;
+                    });
+
+                    if(firstLesson) {
+                        playLesson(firstLesson.video_url, firstLesson.title);
+                    }
+                } else {
+                    sidebar.innerHTML = '<div style="padding:20px; text-align:center; color:#64748b;">No content available for this course yet. The teacher is uploading lessons.</div>';
+                }
+            } catch(e) {
+                sidebar.innerHTML = '<div style="padding:20px; text-align:center; color:red;">Error loading course content.</div>';
+            }
+        }
+
+        function playLesson(videoUrl, title, el) {
+            const player = document.getElementById('uvVideoPlayer');
+            player.src = videoUrl;
+            player.play().catch(() => {});
+            document.getElementById('uvLessonTitle').innerText = title;
+            
+            if(el) {
+                document.querySelectorAll('.uv-lesson-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+            } else {
+                const firstItem = document.querySelector('.uv-lesson-item');
+                if(firstItem) firstItem.classList.add('active');
+            }
+        }
+
+        // Feedback Modal Logic
+        let currentRating = 5.0;
+
+        function openFeedbackModal(courseId, courseTitle) {
+            document.getElementById('fbCourseId').value = courseId;
+            document.getElementById('fbCourseTitle').innerText = courseTitle;
+            setRating(5.0);
+            document.getElementById('fbReviewText').value = '';
+            document.getElementById('feedbackModal').classList.add('active');
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').classList.remove('active');
+        }
+
+        function setRating(val) {
+            currentRating = val;
+            document.getElementById('ratingValText').innerText = val.toFixed(1);
+            const stars = document.querySelectorAll('#starPicker ion-icon');
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-val'));
+                if (sVal <= val) {
+                    s.classList.add('filled');
+                } else {
+                    s.classList.remove('filled');
+                }
+            });
+        }
+
+        async function handleFeedbackSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitFeedback');
+            btn.innerHTML = 'Submitting...';
+            btn.disabled = true;
+
+            const course_id = document.getElementById('fbCourseId').value;
+            const review_text = document.getElementById('fbReviewText').value;
+
+            try {
+                const res = await fetch('/api/courses/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course_id,
+                        student_email: studentEmail,
+                        rating: currentRating,
+                        review_text
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Thank you! Your feedback has been sent directly to the instructor.');
+                    closeFeedbackModal();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(err) {
+                alert('Server connection error.');
+            } finally {
+                btn.innerHTML = 'Submit Feedback';
+                btn.disabled = false;
+            }
+        }
+
+        // Ask Doubt Modal Logic
+        async function openDoubtModal() {
+            const sel = document.getElementById('doubtCourseSelect');
+            sel.innerHTML = '<option value="">Loading your courses...</option>';
+            document.getElementById('doubtModal').classList.add('active');
+
+            try {
+                const res = await fetch('/api/courses/enrolled?email=' + encodeURIComponent(studentEmail));
+                const courses = await res.json();
+                if (Array.isArray(courses) && courses.length > 0) {
+                    sel.innerHTML = '<option value="">-- Choose Course --</option>';
+                    courses.forEach(c => {
+                        sel.innerHTML += `<option value="${c.id}">${c.title}</option>`;
+                    });
+                } else {
+                    sel.innerHTML = '<option value="">No enrolled courses found</option>';
+                }
+            } catch(e) {
+                sel.innerHTML = '<option value="">Error loading courses</option>';
+            }
+        }
+
+        function closeDoubtModal() {
+            document.getElementById('doubtModal').classList.remove('active');
+        }
+
+        async function handleDoubtSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitDoubt');
+            btn.innerHTML = 'Sending...';
+            btn.disabled = true;
+
+            const course_id = document.getElementById('doubtCourseSelect').value;
+            const subject = document.getElementById('doubtSubject').value;
+            const content = document.getElementById('doubtContent').value;
+
+            try {
+                const res = await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender_email: studentEmail,
+                        course_id: course_id || null,
+                        subject,
+                        content
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Your doubt has been submitted to your instructor!');
+                    closeDoubtModal();
+                    e.target.reset();
+                    loadMessages();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(err) {
+                alert('Server connection error.');
+            } finally {
+                btn.innerHTML = 'Send to Instructor';
+                btn.disabled = false;
+            }
+        }
+    </script>
+
+    <!-- Feedback Modal Sheet -->
+    <div class="modal-overlay" id="feedbackModal">
+        <div class="modal-sheet">
+            <div class="modal-sheet-header">
+                <h3>Rate & Review Course</h3>
+                <button class="close-sheet-btn" onclick="closeFeedbackModal()"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleFeedbackSubmit(event)" style="padding: 20px;">
+                <input type="hidden" id="fbCourseId">
+                <h4 id="fbCourseTitle" style="color: var(--blue-dark); margin: 0 0 16px 0; font-size: 15px; font-weight:700;">Course Title</h4>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Your Rating for the Instructor</label>
+                    <div class="star-rating-picker" id="starPicker">
+                        <ion-icon name="star" class="filled" data-val="1" onclick="setRating(1)"></ion-icon>
+                        <ion-icon name="star" class="filled" data-val="2" onclick="setRating(2)"></ion-icon>
+                        <ion-icon name="star" class="filled" data-val="3" onclick="setRating(3)"></ion-icon>
+                        <ion-icon name="star" class="filled" data-val="4" onclick="setRating(4)"></ion-icon>
+                        <ion-icon name="star" class="filled" data-val="5" onclick="setRating(5)"></ion-icon>
+                        <span id="ratingValText" style="font-weight: 700; margin-left: 8px; color: #f59e0b; font-size: 16px;">5.0</span>
+                    </div>
                 </div>
-            </div>
 
-            <div style="margin-bottom: 20px;">
-                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Your Feedback / Review</label>
-                <textarea id="fbReviewText" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:12px; font-size:14px; outline:none; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Write a review about the course quality, instructor explanation, or doubts support..." required></textarea>
-            </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Your Feedback / Review</label>
+                    <textarea id="fbReviewText" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:12px; font-size:14px; outline:none; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Write a review about the course quality, instructor explanation, or doubts support..." required></textarea>
+                </div>
 
-            <button type="submit" id="btnSubmitFeedback" style="width:100%; background:#4f5be8; color:white; border:none; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s;">Submit Feedback</button>
-        </form>
-    </div>
-</div>
-
-<!-- Ask Doubt Modal Sheet -->
-<div class="modal-overlay" id="doubtModal">
-    <div class="modal-sheet">
-        <div class="modal-sheet-header">
-            <h3>Ask Instructor a Doubt</h3>
-            <button class="close-sheet-btn" onclick="closeDoubtModal()"><ion-icon name="close-outline"></ion-icon></button>
+                <button type="submit" id="btnSubmitFeedback" style="width:100%; background:#4f5be8; color:white; border:none; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s;">Submit Feedback</button>
+            </form>
         </div>
-        <form onsubmit="handleDoubtSubmit(event)" style="padding: 20px;">
-            <div style="margin-bottom: 14px;">
-                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Select Course</label>
-                <select id="doubtCourseSelect" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" required>
-                    <option value="">-- Choose Course --</option>
-                </select>
-            </div>
-            <div style="margin-bottom: 14px;">
-                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Subject / Topic</label>
-                <input type="text" id="doubtSubject" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="e.g. Query on Lesson 4" required>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Your Question</label>
-                <textarea id="doubtContent" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:12px; font-size:14px; outline:none; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Describe your doubt in detail..." required></textarea>
-            </div>
-            <button type="submit" id="btnSubmitDoubt" style="width:100%; background:#4f5be8; color:white; border:none; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s;">Send to Instructor</button>
-        </form>
     </div>
-</div>
+
+    <!-- Ask Doubt Modal Sheet -->
+    <div class="modal-overlay" id="doubtModal">
+        <div class="modal-sheet">
+            <div class="modal-sheet-header">
+                <h3>Ask Instructor a Doubt</h3>
+                <button class="close-sheet-btn" onclick="closeDoubtModal()"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleDoubtSubmit(event)" style="padding: 20px;">
+                <div style="margin-bottom: 14px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Select Course</label>
+                    <select id="doubtCourseSelect" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" required>
+                        <option value="">-- Choose Course --</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 14px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Subject / Topic</label>
+                    <input type="text" id="doubtSubject" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="e.g. Query on Lesson 4" required>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Your Question</label>
+                    <textarea id="doubtContent" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:12px; font-size:14px; outline:none; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Describe your doubt in detail..." required></textarea>
+                </div>
+                <button type="submit" id="btnSubmitDoubt" style="width:100%; background:#4f5be8; color:white; border:none; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s;">Send to Instructor</button>
+            </form>
+        </div>
+    </div>
 
 </body>
 </html>
