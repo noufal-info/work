@@ -142,12 +142,29 @@
                 } else {
                     courses.forEach(c => {
                         html += `
-                        <div class="course-card">
-                            <div class="course-image"><ion-icon name="${c.icon || 'book'}"></ion-icon></div>
-                            <div class="course-details">
-                                <h3>${c.title}</h3>
-                                <p>${c.description}</p>
-                                <button class="enroll-btn" onclick="enrollCourse(${c.id})">Enroll Now</button>
+                        <div class="premium-course-card">
+                            <div class="premium-thumbnail">
+                                <img src="${c.thumbnail_url || '/uploads/images/default_course.jpg'}" alt="Course Thumbnail" onerror="this.src='/uploads/images/default_course.jpg'">
+                                <div class="premium-badge"><ion-icon name="star"></ion-icon> 4.8</div>
+                            </div>
+                            <div class="premium-details">
+                                <h3 class="premium-title">${c.title}</h3>
+                                <p class="premium-desc">${c.description}</p>
+                                
+                                <div class="premium-instructor">
+                                    <div class="instructor-avatar"><ion-icon name="person"></ion-icon></div>
+                                    <span class="instructor-name">${c.instructor.split('@')[0]}</span>
+                                </div>
+                                
+                                <div class="premium-meta">
+                                    <div class="premium-meta-item"><ion-icon name="time-outline"></ion-icon> 12h 30m</div>
+                                    <div class="premium-meta-item"><ion-icon name="play-circle-outline"></ion-icon> ${Math.floor(Math.random()*20)+5} Lessons</div>
+                                    <div class="premium-meta-item"><ion-icon name="cash-outline"></ion-icon> ₹${c.price}</div>
+                                </div>
+
+                                <div class="premium-actions">
+                                    <button class="premium-enroll-btn" onclick="enrollCourse(${c.id})">Enroll Now</button>
+                                </div>
                             </div>
                         </div>`;
                     });
@@ -188,13 +205,28 @@
                 } else {
                     courses.forEach(c => {
                         html += `
-                        <div class="course-card">
-                            <div class="course-image" style="background: var(--dark-blue);"><ion-icon name="play"></ion-icon></div>
-                            <div class="course-details">
-                                <h3>${c.title}</h3>
-                                <p>${c.description}</p>
-                                <span class="badge-status status-${c.enrollment_status}">${c.enrollment_status}</span>
-         ${c.enrollment_status === 'Active' ? `<button class="enroll-btn" style="margin-left:10px; background:#5624d0;" onclick="openCourseViewer(${c.id}, '${c.title}')">Watch Course</button>` : ''}
+                        <div class="premium-course-card">
+                            <div class="premium-thumbnail">
+                                <img src="${c.thumbnail_url || '/uploads/images/default_course.jpg'}" alt="Course Thumbnail" onerror="this.src='/uploads/images/default_course.jpg'">
+                                <div class="premium-badge"><ion-icon name="bookmark"></ion-icon> Saved</div>
+                            </div>
+                            <div class="premium-details">
+                                <h3 class="premium-title">${c.title}</h3>
+                                <p class="premium-desc">${c.description}</p>
+                                
+                                <div class="premium-instructor">
+                                    <div class="instructor-avatar"><ion-icon name="person"></ion-icon></div>
+                                    <span class="instructor-name">${c.instructor ? c.instructor.split('@')[0] : 'Instructor'}</span>
+                                </div>
+                                
+                                <div class="premium-meta">
+                                    <div class="premium-meta-item"><ion-icon name="school-outline"></ion-icon> Enrolled</div>
+                                </div>
+
+                                <div class="premium-actions">
+                                    <span class="premium-status ${c.enrollment_status.toLowerCase()}">${c.enrollment_status}</span>
+                                    ${c.enrollment_status === 'Active' ? `<button class="premium-enroll-btn" onclick="openCourseViewer(${c.id}, '${c.title}')">Watch Course</button>` : ''}
+                                </div>
                             </div>
                         </div>`;
                     });

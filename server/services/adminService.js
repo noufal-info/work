@@ -55,6 +55,7 @@ const db = require('../db/database');
         }
         
         try { await db.execute("ALTER TABLE courses ADD COLUMN icon VARCHAR(255) DEFAULT 'book-outline';"); } catch(e) {}
+        try { await db.execute("ALTER TABLE courses ADD COLUMN thumbnail_url VARCHAR(255) DEFAULT '/uploads/images/default_course.jpg';"); } catch(e) {}
         try { await db.execute("ALTER TABLE course_lessons ADD COLUMN description TEXT;"); } catch(e) {}
         try { await db.execute("ALTER TABLE enrollments ADD COLUMN status VARCHAR(50) DEFAULT 'Pending';"); } catch(e) {}
         await db.execute(`
@@ -88,7 +89,7 @@ const db = require('../db/database');
         
         // Sample Data
         await db.execute("INSERT IGNORE INTO teachers (id, name, email, course, password, status) VALUES (1, 'Prof. Smith', 'smith@example.com', 'Web Development', 'password123', 'Active')");
-        await db.execute("INSERT IGNORE INTO courses (id, title, description, instructor, price, status, icon) VALUES (1, 'Complete Web Development Bootcamp', 'Learn HTML, CSS, JavaScript and Node.js', 'smith@example.com', 99.99, 'Published', 'globe-outline')");
+        await db.execute("INSERT IGNORE INTO courses (id, title, description, instructor, price, status, icon, thumbnail_url) VALUES (1, 'Complete Web Development Bootcamp', 'Learn HTML, CSS, JavaScript and Node.js', 'smith@example.com', 99.99, 'Published', 'globe-outline', '/uploads/images/default_course.jpg')");
         await db.execute("INSERT IGNORE INTO course_sections (id, course_id, title, order_index) VALUES (1, 1, 'Introduction to Web Development', 1), (2, 1, 'HTML5 Fundamentals', 2)");
         await db.execute("INSERT IGNORE INTO course_lessons (id, section_id, title, video_url, order_index) VALUES (1, 1, 'What is the web?', 'https://www.w3schools.com/html/mov_bbb.mp4', 1), (2, 1, 'How the internet works', 'https://www.w3schools.com/html/mov_bbb.mp4', 2), (3, 2, 'HTML Basics', 'https://www.w3schools.com/html/mov_bbb.mp4', 1)");
         // Remove 'Alex' from students if present

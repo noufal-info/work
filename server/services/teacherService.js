@@ -18,6 +18,18 @@ const videoStorage = multer.diskStorage({
 });
 const uploadVideo = multer({ storage: videoStorage });
 
+const imageStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = path.join(__dirname, '..', 'uploads', 'images');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const uploadImage = multer({ storage: imageStorage });
+
 router.post('/courses/:id/sections', async (req, res) => {
     try {
         const { title, order_index } = req.body;
@@ -65,11 +77,12 @@ router.post('/login', async (req, res) => {
 });
 
 // Teacher Courses Routes
-router.post('/courses', async (req, res) => {
+router.post('/courses', uploadImage.single('thumbnail'), async (req, res) => {
     try {
         const { title, description, instructor, price } = req.body;
+        const thumbnail_url = req.file ? '/uploads/images/' + req.file.filename : '/uploads/images/default_course.jpg';
         // In a real app, 'instructor' would be securely pulled from session/token
-        await db.execute('INSERT INTO courses (title, description, instructor, price) VALUES (?, ?, ?, ?)', [title, description, instructor, price]);
+        await db.execute('INSERT INTO courses (title, description, instructor, price, thumbnail_url) VALUES (?, ?, ?, ?, ?)', [title, description, instructor, price, thumbnail_url]);
         res.json({ success: true, message: 'Course published successfully' });
     } catch (error) {
         console.error("Error creating course:", error);
