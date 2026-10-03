@@ -227,5 +227,78 @@ router.get('/messages/history', async (req, res) => {
     }
 });
 
+
+// Teacher Dashboard API Routes
+router.get('/profile', async (req, res) => {
+    try {
+        const { email } = req.query;
+        const [rows] = await db.execute('SELECT id, name, email, course, status, phone_number, address, avatar_url, social_links FROM teachers WHERE email = ?', [email]);
+        if (rows.length === 0) return res.status(404).json({ success: false, message: 'Teacher not found' });
+        res.json({ success: true, profile: rows[0] });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
+router.post('/profile', uploadImage.single('avatar'), async (req, res) => {
+    try {
+        const { email, phone_number, address, social_links } = req.body;
+        const avatar_url = req.file ? '/uploads/images/' + req.file.filename : req.body.existing_avatar;
+        
+        await db.execute(
+            'UPDATE teachers SET phone_number = ?, address = ?, avatar_url = ?, social_links = ? WHERE email = ?',
+            [phone_number, address, avatar_url, social_links || null, email]
+        );
+        res.json({ success: true, message: 'Profile updated' });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
+router.get('/dashboard-metrics', async (req, res) => {
+    try {
+        const { email } = req.query;
+        // Mocking metrics based on courses and enrollments
+        const [courses] = await db.execute('SELECT id, price FROM courses WHERE instructor = ?', [email]);
+        let totalEarnings = 0;
+        let totalStudents = 0;
+        
+        for (let c of courses) {
+            const [enrolls] = await db.execute('SELECT COUNT(*) as count FROM enrollments WHERE course_id = ? AND status = "Active"', [c.id]);
+            totalStudents += enrolls[0].count;
+            totalEarnings += (enrolls[0].count * parseFloat(c.price));
+        }
+
+        res.json({ 
+            success: true, 
+            metrics: {
+                totalEarnings,
+                totalStudents,
+                performance: [45, 60, 50, 78, 70, 85], // Mock 6 months
+                activity: [4, 6, 5, 8, 3, 2, 0] // Mock Mon-Sun hours
+            }
+        });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
+router.get('/schedule', async (req, res) => {
+    try {
+        const { email } = req.query;
+        const [rows] = await db.execute('SELECT * FROM calendar_events WHERE teacher_email = ? ORDER BY start_time ASC', [email]);
+        res.json({ success: true, events: rows });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
+router.get('/feedback', async (req, res) => {
+    try {
+        const { email } = req.query;
+        const [rows] = await db.execute(`
+            SELECT r.*, c.title as course_title, s.name as student_name 
+            FROM course_reviews r
+            JOIN courses c ON r.course_id = c.id
+            JOIN students s ON r.student_email = s.email
+            WHERE c.instructor = ?
+            ORDER BY r.created_at DESC LIMIT 10
+        `, [email]);
+        res.json({ success: true, reviews: rows });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
 module.exports = router;
 

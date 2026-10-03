@@ -16,6 +16,7 @@
             window.location.href = '/AnalogiX/teacher/login';
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="admin-container">
@@ -28,20 +29,52 @@
 
             
             
+            
+            
+            
             <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" id="nav-courses" onclick="switchTab('courses', event)">
-                    <ion-icon name="library-outline"></ion-icon>
-                    <span>My Courses</span>
+                <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard', event)">
+                    <ion-icon name="grid-outline"></ion-icon>
+                    <span>Dashboard</span>
                 </a>
                 <a href="/AnalogiX/teacher/chat" class="nav-item" id="nav-messages">
                     <ion-icon name="chatbubbles-outline"></ion-icon>
-                    <span>Communications</span>
+                    <span>Messages</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-settings">
-                    <ion-icon name="settings-outline"></ion-icon>
-                    <span>Settings</span>
+                <a href="#" class="nav-item" id="nav-calendar">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    <span>Calendar</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-courses" onclick="switchTab('courses', event)">
+                    <ion-icon name="library-outline"></ion-icon>
+                    <span>My Courses</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-students">
+                    <ion-icon name="people-outline"></ion-icon>
+                    <span>Students</span>
                 </a>
             </nav>
+            <div class="pro-upgrade-card">
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/web-development-3454628-2918517.png" alt="Upgrade">
+                <h4>Upgrade to Pro</h4>
+                <p>Unlock premium features & enhance your LMS experience!</p>
+                <button>Upgrade Now</button>
+            </div>
+
+            <div class="pro-upgrade-card">
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/web-development-3454628-2918517.png" alt="Upgrade">
+                <h4>Upgrade to Pro</h4>
+                <p>Unlock premium features & enhance your LMS experience!</p>
+                <button>Upgrade Now</button>
+            </div>
+
+            <div class="pro-upgrade-card">
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/web-development-3454628-2918517.png" alt="Upgrade">
+                <h4>Upgrade to Pro</h4>
+                <p>Unlock premium features & enhance your LMS experience!</p>
+                <button>Upgrade Now</button>
+            </div>
+
 
             
             <div class="sidebar-footer">
@@ -77,7 +110,280 @@
             </header>
 
             <!-- Courses Content -->
-            <div id="section-courses" class="content-section dashboard-content" >
+            
+            <div id="section-dashboard" class="content-section dashboard-content active">
+                <div class="dashboard-grid">
+                    <!-- Left Column: Profile & Calendar -->
+                    <div class="dash-col-left">
+                        <div class="dash-card profile-card" id="teacherProfileCard">
+                            <div class="profile-header-bg"></div>
+                            <img src="https://ui-avatars.com/api/?name=Instructor" alt="Avatar" class="profile-avatar" id="t-avatar">
+                            <div class="profile-status"><span class="dot"></span> Active Contract</div>
+                            <h2 id="t-name">Loading...</h2>
+                            <p class="profile-role" id="t-role">Instructor</p>
+                            
+                            <div class="profile-contact">
+                                <div class="contact-item"><ion-icon name="mail-outline"></ion-icon> <span id="t-email">...</span></div>
+                                <div class="contact-item"><ion-icon name="call-outline"></ion-icon> <span id="t-phone">...</span></div>
+                                <div class="contact-item"><ion-icon name="location-outline"></ion-icon> <span id="t-address">...</span></div>
+                            </div>
+                            
+                            <div class="profile-socials">
+                                <ion-icon name="logo-linkedin"></ion-icon>
+                                <ion-icon name="logo-twitter"></ion-icon>
+                                <ion-icon name="logo-instagram"></ion-icon>
+                                <button class="btn-edit-profile">Edit</button>
+                            </div>
+                        </div>
+
+                        <div class="dash-card calendar-card">
+                            <h3><span id="currentMonthYear">Month Year</span> <ion-icon name="chevron-down-outline"></ion-icon></h3>
+                            <div class="calendar-days">
+                                <div class="cal-day"><span>Sun</span><strong>12</strong></div>
+                                <div class="cal-day"><span>Mon</span><strong>13</strong></div>
+                                <div class="cal-day"><span>Tue</span><strong>14</strong></div>
+                                <div class="cal-day active"><span>Wed</span><strong>15</strong></div>
+                                <div class="cal-day"><span>Thu</span><strong>16</strong></div>
+                                <div class="cal-day"><span>Fri</span><strong>17</strong></div>
+                                <div class="cal-day"><span>Sat</span><strong>18</strong></div>
+                            </div>
+                            <div class="schedule-list" id="scheduleList">
+                                <!-- Loaded dynamically -->
+                                <div style="text-align:center; padding: 20px;">Loading schedule...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Charts & Courses -->
+                    <div class="dash-col-right">
+                        <div class="charts-row">
+                            <div class="dash-card chart-card">
+                                <h3>Performance <span class="chart-filter">Last 6 Months</span></h3>
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                            <div class="dash-card chart-card">
+                                <h3>Activity <span class="chart-filter">This Week</span></h3>
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="dash-card courses-summary-card">
+                            <div class="card-header-flex">
+                                <h3>Courses</h3>
+                                <button class="btn-filter"><ion-icon name="filter-outline"></ion-icon> Filter</button>
+                            </div>
+                            <table class="dash-table">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Rating</th>
+                                        <th>Completion Rate</th>
+                                        <th>Earnings</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashCoursesTable">
+                                    <!-- Loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="dash-card feedback-card">
+                            <div class="card-header-flex">
+                                <h3>Feedback</h3>
+                                <button class="btn-view-all">View All</button>
+                            </div>
+                            <div class="feedback-scroll" id="feedbackList">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="section-dashboard" class="content-section dashboard-content active">
+                <div class="dashboard-grid">
+                    <!-- Left Column: Profile & Calendar -->
+                    <div class="dash-col-left">
+                        <div class="dash-card profile-card" id="teacherProfileCard">
+                            <div class="profile-header-bg"></div>
+                            <img src="https://ui-avatars.com/api/?name=Instructor" alt="Avatar" class="profile-avatar" id="t-avatar">
+                            <div class="profile-status"><span class="dot"></span> Active Contract</div>
+                            <h2 id="t-name">Loading...</h2>
+                            <p class="profile-role" id="t-role">Instructor</p>
+                            
+                            <div class="profile-contact">
+                                <div class="contact-item"><ion-icon name="mail-outline"></ion-icon> <span id="t-email">...</span></div>
+                                <div class="contact-item"><ion-icon name="call-outline"></ion-icon> <span id="t-phone">...</span></div>
+                                <div class="contact-item"><ion-icon name="location-outline"></ion-icon> <span id="t-address">...</span></div>
+                            </div>
+                            
+                            <div class="profile-socials">
+                                <ion-icon name="logo-linkedin"></ion-icon>
+                                <ion-icon name="logo-twitter"></ion-icon>
+                                <ion-icon name="logo-instagram"></ion-icon>
+                                <button class="btn-edit-profile">Edit</button>
+                            </div>
+                        </div>
+
+                        <div class="dash-card calendar-card">
+                            <h3><span id="currentMonthYear">Month Year</span> <ion-icon name="chevron-down-outline"></ion-icon></h3>
+                            <div class="calendar-days">
+                                <div class="cal-day"><span>Sun</span><strong>12</strong></div>
+                                <div class="cal-day"><span>Mon</span><strong>13</strong></div>
+                                <div class="cal-day"><span>Tue</span><strong>14</strong></div>
+                                <div class="cal-day active"><span>Wed</span><strong>15</strong></div>
+                                <div class="cal-day"><span>Thu</span><strong>16</strong></div>
+                                <div class="cal-day"><span>Fri</span><strong>17</strong></div>
+                                <div class="cal-day"><span>Sat</span><strong>18</strong></div>
+                            </div>
+                            <div class="schedule-list" id="scheduleList">
+                                <!-- Loaded dynamically -->
+                                <div style="text-align:center; padding: 20px;">Loading schedule...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Charts & Courses -->
+                    <div class="dash-col-right">
+                        <div class="charts-row">
+                            <div class="dash-card chart-card">
+                                <h3>Performance <span class="chart-filter">Last 6 Months</span></h3>
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                            <div class="dash-card chart-card">
+                                <h3>Activity <span class="chart-filter">This Week</span></h3>
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="dash-card courses-summary-card">
+                            <div class="card-header-flex">
+                                <h3>Courses</h3>
+                                <button class="btn-filter"><ion-icon name="filter-outline"></ion-icon> Filter</button>
+                            </div>
+                            <table class="dash-table">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Rating</th>
+                                        <th>Completion Rate</th>
+                                        <th>Earnings</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashCoursesTable">
+                                    <!-- Loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="dash-card feedback-card">
+                            <div class="card-header-flex">
+                                <h3>Feedback</h3>
+                                <button class="btn-view-all">View All</button>
+                            </div>
+                            <div class="feedback-scroll" id="feedbackList">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="section-dashboard" class="content-section dashboard-content active">
+                <div class="dashboard-grid">
+                    <!-- Left Column: Profile & Calendar -->
+                    <div class="dash-col-left">
+                        <div class="dash-card profile-card" id="teacherProfileCard">
+                            <div class="profile-header-bg"></div>
+                            <img src="https://ui-avatars.com/api/?name=Instructor" alt="Avatar" class="profile-avatar" id="t-avatar">
+                            <div class="profile-status"><span class="dot"></span> Active Contract</div>
+                            <h2 id="t-name">Loading...</h2>
+                            <p class="profile-role" id="t-role">Instructor</p>
+                            
+                            <div class="profile-contact">
+                                <div class="contact-item"><ion-icon name="mail-outline"></ion-icon> <span id="t-email">...</span></div>
+                                <div class="contact-item"><ion-icon name="call-outline"></ion-icon> <span id="t-phone">...</span></div>
+                                <div class="contact-item"><ion-icon name="location-outline"></ion-icon> <span id="t-address">...</span></div>
+                            </div>
+                            
+                            <div class="profile-socials">
+                                <ion-icon name="logo-linkedin"></ion-icon>
+                                <ion-icon name="logo-twitter"></ion-icon>
+                                <ion-icon name="logo-instagram"></ion-icon>
+                                <button class="btn-edit-profile">Edit</button>
+                            </div>
+                        </div>
+
+                        <div class="dash-card calendar-card">
+                            <h3><span id="currentMonthYear">Month Year</span> <ion-icon name="chevron-down-outline"></ion-icon></h3>
+                            <div class="calendar-days">
+                                <div class="cal-day"><span>Sun</span><strong>12</strong></div>
+                                <div class="cal-day"><span>Mon</span><strong>13</strong></div>
+                                <div class="cal-day"><span>Tue</span><strong>14</strong></div>
+                                <div class="cal-day active"><span>Wed</span><strong>15</strong></div>
+                                <div class="cal-day"><span>Thu</span><strong>16</strong></div>
+                                <div class="cal-day"><span>Fri</span><strong>17</strong></div>
+                                <div class="cal-day"><span>Sat</span><strong>18</strong></div>
+                            </div>
+                            <div class="schedule-list" id="scheduleList">
+                                <!-- Loaded dynamically -->
+                                <div style="text-align:center; padding: 20px;">Loading schedule...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Charts & Courses -->
+                    <div class="dash-col-right">
+                        <div class="charts-row">
+                            <div class="dash-card chart-card">
+                                <h3>Performance <span class="chart-filter">Last 6 Months</span></h3>
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                            <div class="dash-card chart-card">
+                                <h3>Activity <span class="chart-filter">This Week</span></h3>
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="dash-card courses-summary-card">
+                            <div class="card-header-flex">
+                                <h3>Courses</h3>
+                                <button class="btn-filter"><ion-icon name="filter-outline"></ion-icon> Filter</button>
+                            </div>
+                            <table class="dash-table">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Rating</th>
+                                        <th>Completion Rate</th>
+                                        <th>Earnings</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashCoursesTable">
+                                    <!-- Loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="dash-card feedback-card">
+                            <div class="card-header-flex">
+                                <h3>Feedback</h3>
+                                <button class="btn-view-all">View All</button>
+                            </div>
+                            <div class="feedback-scroll" id="feedbackList">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-courses" class="content-section dashboard-content" style="display:none;" style="display:none;" style="display:none;" >
                 <div class="page-header">
                     <h1>Courses Management</h1>
                     <button class="btn-primary" onclick="openModal('courseModal')">
@@ -318,6 +624,9 @@
                     closeModal('courseModal');
                     e.target.reset();
                     loadCourses();
+            loadDashboardData();
+            loadDashboardData();
+            loadDashboardData();
                 } else {
                     alert("Error: " + data.message);
                 }

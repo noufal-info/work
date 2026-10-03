@@ -603,3 +603,107 @@ body {
     justify-content: flex-end;
     gap: 12px;
 }
+
+
+/* --- Dashboard Revamp Styles --- */
+.dashboard-grid {
+    display: flex;
+    gap: 20px;
+}
+.dash-col-left {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.dash-col-right {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.dash-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+/* Profile Card */
+.profile-card {
+    position: relative;
+    text-align: center;
+    padding-top: 50px;
+    overflow: hidden;
+}
+.profile-header-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-radius: 16px 16px 0 0;
+}
+.profile-avatar {
+    position: relative;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    margin-bottom: 10px;
+    z-index: 1;
+}
+.profile-status {
+    position: absolute;
+    top: 100px; right: 20px;
+    background: #fef3c7; color: #d97706;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: bold;
+}
+.profile-role { color: #64748b; font-size: 13px; margin-bottom: 20px;}
+.profile-contact { text-align: left; background: #fef2f2; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+.contact-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #475569; margin-bottom: 8px;}
+.profile-socials { display: flex; align-items: center; gap: 15px; color: #475569; font-size: 20px; }
+.btn-edit-profile { margin-left: auto; background: #e2e8f0; border: none; padding: 6px 15px; border-radius: 8px; cursor:pointer;}
+
+/* Calendar Card */
+.calendar-days { display: flex; justify-content: space-between; margin: 15px 0;}
+.cal-day { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #64748b; }
+.cal-day strong { font-size: 16px; color: #1e293b; margin-top: 5px;}
+.cal-day.active strong { background: #fbbf24; color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.schedule-item { padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; }
+
+/* Charts */
+.charts-row { display: flex; gap: 20px; }
+.chart-card { flex: 1; }
+.chart-filter { float: right; font-size: 12px; color: #94a3b8; }
+
+/* Dashboard Table */
+.card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.dash-table { width: 100%; border-collapse: collapse; text-align: left; }
+.dash-table th { color: #64748b; font-size: 13px; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9; }
+.dash-table td { padding: 15px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px;}
+.dash-course-info { display: flex; align-items: center; gap: 10px; }
+.dash-course-info img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover;}
+.progress-bar { width: 100px; height: 6px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+.progress-bar .fill { background: #f472b6; height: 100%; }
+
+/* Feedback */
+.feedback-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;}
+.feedback-item { min-width: 250px; background: #f8fafc; padding: 15px; border-radius: 12px; }
+.fb-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px;}
+.fb-header img { width: 30px; height: 30px; border-radius: 50%; }
+.fb-meta { display: flex; flex-direction: column; }
+.fb-meta .rating { color: #fbbf24; font-size: 12px; }
+.fb-text { font-size: 13px; color: #475569; margin: 0 0 10px 0; font-style: italic;}
+.fb-course { color: #94a3b8; font-size: 11px; }
+
+/* Upgrade Card */
+.pro-upgrade-card {
+    background: #fbbf24;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin: 20px;
+}
+.pro-upgrade-card img { width: 100px; margin-top: -40px; }
+.pro-upgrade-card h4 { margin: 10px 0 5px; color: #fff;}
+.pro-upgrade-card p { font-size: 12px; color: #fff; margin-bottom: 15px; }
+.pro-upgrade-card button { width: 100%; background: #fff; color: #fbbf24; border: none; padding: 8px; border-radius: 8px; font-weight: bold;}

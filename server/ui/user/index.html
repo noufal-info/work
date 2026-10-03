@@ -225,7 +225,7 @@
 
                                 <div class="premium-actions">
                                     <span class="premium-status ${c.enrollment_status.toLowerCase()}">${c.enrollment_status}</span>
-                                    ${c.enrollment_status === 'Active' ? `<button class="premium-enroll-btn" onclick="openCourseViewer(${c.id}, '${c.title}')">Watch Course</button>` : ''}
+                                    ${c.enrollment_status === 'Active' ? `<button class="btn-secondary" style="border: 1px solid #cbd5e1; padding: 12px; border-radius: 12px; background: transparent; cursor: pointer;" onclick="openFeedbackModal(${c.id})">Leave Feedback</button><button class="premium-enroll-btn" onclick="openCourseViewer(${c.id}, '${c.title}')">Watch Course</button>` : ''}
                                 </div>
                             </div>
                         </div>`;

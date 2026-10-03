@@ -112,4 +112,17 @@ router.get('/me', async (req, res) => {
     }
 });
 
+router.post('/courses/feedback', async (req, res) => {
+    try {
+        const { course_id, student_email, rating, review_text } = req.body;
+        await db.execute(
+            'INSERT INTO course_reviews (course_id, student_email, rating, review_text) VALUES (?, ?, ?, ?)',
+            [course_id, student_email, rating, review_text]
+        );
+        res.json({ success: true, message: 'Feedback submitted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 module.exports = router;

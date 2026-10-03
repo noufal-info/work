@@ -58,6 +58,35 @@ const db = require('../db/database');
         try { await db.execute("ALTER TABLE courses ADD COLUMN thumbnail_url VARCHAR(255) DEFAULT '/uploads/images/default_course.jpg';"); } catch(e) {}
         try { await db.execute("ALTER TABLE course_lessons ADD COLUMN description TEXT;"); } catch(e) {}
         try { await db.execute("ALTER TABLE enrollments ADD COLUMN status VARCHAR(50) DEFAULT 'Pending';"); } catch(e) {}
+
+        // Teacher UI Schema Updates
+        try { await db.execute("ALTER TABLE teachers ADD COLUMN phone_number VARCHAR(50);"); } catch(e) {}
+        try { await db.execute("ALTER TABLE teachers ADD COLUMN address TEXT;"); } catch(e) {}
+        try { await db.execute("ALTER TABLE teachers ADD COLUMN avatar_url VARCHAR(255);"); } catch(e) {}
+        try { await db.execute("ALTER TABLE teachers ADD COLUMN social_links JSON;"); } catch(e) {}
+
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS calendar_events (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              teacher_email VARCHAR(255) NOT NULL,
+              title VARCHAR(255) NOT NULL,
+              start_time DATETIME NOT NULL,
+              end_time DATETIME NOT NULL,
+              event_type VARCHAR(100),
+              color_code VARCHAR(20) DEFAULT '#FFB74D'
+            )
+        `);
+
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS course_reviews (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              course_id INT NOT NULL,
+              student_email VARCHAR(255) NOT NULL,
+              rating DECIMAL(3,1) NOT NULL,
+              review_text TEXT,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
         await db.execute(`
             CREATE TABLE IF NOT EXISTS course_sections (
               id INT AUTO_INCREMENT PRIMARY KEY,
