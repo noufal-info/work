@@ -10,75 +10,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Basic Route Protection
+        // Route Protection
         if (localStorage.getItem('teacherAuth') !== 'true') {
             window.location.href = '/AnalogiX/teacher/login';
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            
             <div class="logo" style="margin-bottom: 24px; display: flex; justify-content: center; width: 100%;">
                 <img src="/user/logo/AnalogiX.png" alt="AnalogiX Logo" style="height: 32px; max-width: 100%; object-fit: contain;">
             </div>
 
-            
-            
-            
-            
-            
             <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard', event)">
+                <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard', event)" title="Dashboard">
                     <ion-icon name="grid-outline"></ion-icon>
                     <span>Dashboard</span>
                 </a>
-                <a href="/AnalogiX/teacher/chat" class="nav-item" id="nav-messages">
+                <a href="/AnalogiX/teacher/chat" class="nav-item" id="nav-messages" title="Messages">
                     <ion-icon name="chatbubbles-outline"></ion-icon>
                     <span>Messages</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-calendar">
+                <a href="#" class="nav-item" id="nav-calendar" onclick="switchTab('calendar', event)" title="Calendar">
                     <ion-icon name="calendar-outline"></ion-icon>
                     <span>Calendar</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-courses" onclick="switchTab('courses', event)">
+                <a href="#" class="nav-item" id="nav-courses" onclick="switchTab('courses', event)" title="My Courses">
                     <ion-icon name="library-outline"></ion-icon>
                     <span>My Courses</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-students">
+                <a href="#" class="nav-item" id="nav-students" onclick="switchTab('students', event)" title="Students">
                     <ion-icon name="people-outline"></ion-icon>
                     <span>Students</span>
                 </a>
             </nav>
-            <div class="pro-upgrade-card">
-                <img src="https://cdni.iconscout.com/illustration/premium/thumb/web-development-3454628-2918517.png" alt="Upgrade">
-                <h4>Upgrade to Pro</h4>
-                <p>Unlock premium features & enhance your LMS experience!</p>
-                <button>Upgrade Now</button>
-            </div>
 
-            <div class="pro-upgrade-card">
-                <img src="https://cdni.iconscout.com/illustration/premium/thumb/web-development-3454628-2918517.png" alt="Upgrade">
-                <h4>Upgrade to Pro</h4>
-                <p>Unlock premium features & enhance your LMS experience!</p>
-                <button>Upgrade Now</button>
-            </div>
-
-            <div class="pro-upgrade-card">
-                <img src="https://cdni.iconscout.com/illustration/premium/thumb/web-development-3454628-2918517.png" alt="Upgrade">
-                <h4>Upgrade to Pro</h4>
-                <p>Unlock premium features & enhance your LMS experience!</p>
-                <button>Upgrade Now</button>
-            </div>
-
-
-            
             <div class="sidebar-footer">
-                <a href="#" class="nav-item logout">
+                <a href="#" class="nav-item logout" id="teacherLogoutBtn" title="Logout">
                     <ion-icon name="log-out-outline"></ion-icon>
                     <span>Logout</span>
                 </a>
@@ -91,65 +63,69 @@
             <header class="top-header">
                 <div class="search-bar">
                     <ion-icon name="search-outline"></ion-icon>
-                    <input type="text" placeholder="Search students, courses, batches...">
+                    <input type="text" id="globalTeacherSearch" placeholder="Search students, courses, batches..." oninput="handleGlobalSearch(event)">
                 </div>
                 
                 <div class="header-actions">
-                    <button class="icon-btn">
+                    <button class="icon-btn" title="Notifications">
                         <ion-icon name="notifications-outline"></ion-icon>
-                        <span class="badge">5</span>
+                        <span class="badge">3</span>
                     </button>
-                    <div class="admin-profile">
-                        <img src="https://ui-avatars.com/api/?name=Main+Admin&background=10b981&color=fff" alt="Admin Avatar">
+                    <div class="admin-profile" onclick="openEditProfileModal()" style="cursor: pointer;" title="Edit Profile">
+                        <img id="topAdminAvatar" src="https://ui-avatars.com/api/?name=Instructor&background=4f5be8&color=fff" alt="Instructor Avatar">
                         <div class="profile-info">
-                            <span class="name">Instructor</span>
+                            <span class="name" id="topAdminName">Instructor</span>
                             <span class="role">Teacher</span>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Courses Content -->
-            
+            <!-- Dashboard Content Section -->
             <div id="section-dashboard" class="content-section dashboard-content active">
                 <div class="dashboard-grid">
                     <!-- Left Column: Profile & Calendar -->
                     <div class="dash-col-left">
                         <div class="dash-card profile-card" id="teacherProfileCard">
                             <div class="profile-header-bg"></div>
-                            <img src="https://ui-avatars.com/api/?name=Instructor" alt="Avatar" class="profile-avatar" id="t-avatar">
+                            <img src="https://ui-avatars.com/api/?name=Instructor&background=4f5be8&color=fff" alt="Avatar" class="profile-avatar" id="t-avatar">
                             <div class="profile-status"><span class="dot"></span> Active Contract</div>
-                            <h2 id="t-name">Loading...</h2>
-                            <p class="profile-role" id="t-role">Instructor</p>
+                            <h2 id="t-name">Instructor</h2>
+                            <p class="profile-role" id="t-role">Course Instructor</p>
                             
                             <div class="profile-contact">
-                                <div class="contact-item"><ion-icon name="mail-outline"></ion-icon> <span id="t-email">...</span></div>
-                                <div class="contact-item"><ion-icon name="call-outline"></ion-icon> <span id="t-phone">...</span></div>
-                                <div class="contact-item"><ion-icon name="location-outline"></ion-icon> <span id="t-address">...</span></div>
+                                <div class="contact-item">
+                                    <ion-icon name="mail-outline"></ion-icon> 
+                                    <span id="t-email">teacher@analogix.com</span>
+                                </div>
+                                <div class="contact-item">
+                                    <ion-icon name="call-outline"></ion-icon> 
+                                    <span id="t-phone">+91 98765 43210</span>
+                                </div>
+                                <div class="contact-item">
+                                    <ion-icon name="location-outline"></ion-icon> 
+                                    <span id="t-address">AnalogiX Learning Hub, Kerala</span>
+                                </div>
                             </div>
                             
                             <div class="profile-socials">
-                                <ion-icon name="logo-linkedin"></ion-icon>
-                                <ion-icon name="logo-twitter"></ion-icon>
-                                <ion-icon name="logo-instagram"></ion-icon>
-                                <button class="btn-edit-profile">Edit</button>
+                                <ion-icon name="logo-linkedin" title="LinkedIn"></ion-icon>
+                                <ion-icon name="logo-twitter" title="Twitter / X"></ion-icon>
+                                <ion-icon name="logo-instagram" title="Instagram"></ion-icon>
+                                <button class="btn-edit-profile" onclick="openEditProfileModal()">Edit</button>
                             </div>
                         </div>
 
                         <div class="dash-card calendar-card">
-                            <h3><span id="currentMonthYear">Month Year</span> <ion-icon name="chevron-down-outline"></ion-icon></h3>
-                            <div class="calendar-days">
-                                <div class="cal-day"><span>Sun</span><strong>12</strong></div>
-                                <div class="cal-day"><span>Mon</span><strong>13</strong></div>
-                                <div class="cal-day"><span>Tue</span><strong>14</strong></div>
-                                <div class="cal-day active"><span>Wed</span><strong>15</strong></div>
-                                <div class="cal-day"><span>Thu</span><strong>16</strong></div>
-                                <div class="cal-day"><span>Fri</span><strong>17</strong></div>
-                                <div class="cal-day"><span>Sat</span><strong>18</strong></div>
+                            <h3>
+                                <span id="currentMonthYear">October 2026</span> 
+                                <ion-icon name="calendar-clear-outline" style="color: #4f5be8;"></ion-icon>
+                            </h3>
+                            <div class="calendar-days" id="calendarDaysContainer">
+                                <!-- Populated dynamically -->
                             </div>
                             <div class="schedule-list" id="scheduleList">
-                                <!-- Loaded dynamically -->
-                                <div style="text-align:center; padding: 20px;">Loading schedule...</div>
+                                <!-- Populated dynamically -->
                             </div>
                         </div>
                     </div>
@@ -159,18 +135,29 @@
                         <div class="charts-row">
                             <div class="dash-card chart-card">
                                 <h3>Performance <span class="chart-filter">Last 6 Months</span></h3>
-                                <canvas id="performanceChart"></canvas>
+                                <div class="chart-container-box">
+                                    <canvas id="performanceChart"></canvas>
+                                </div>
                             </div>
                             <div class="dash-card chart-card">
                                 <h3>Activity <span class="chart-filter">This Week</span></h3>
-                                <canvas id="activityChart"></canvas>
+                                <div class="chart-container-box">
+                                    <canvas id="activityChart"></canvas>
+                                </div>
                             </div>
                         </div>
 
                         <div class="dash-card courses-summary-card">
                             <div class="card-header-flex">
                                 <h3>Courses</h3>
-                                <button class="btn-filter"><ion-icon name="filter-outline"></ion-icon> Filter</button>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-filter" onclick="switchTab('courses')">
+                                        <ion-icon name="library-outline"></ion-icon> Manage All
+                                    </button>
+                                    <button class="btn-filter" onclick="openModal('courseModal')">
+                                        <ion-icon name="add-circle-outline"></ion-icon> New Course
+                                    </button>
+                                </div>
                             </div>
                             <table class="dash-table">
                                 <thead>
@@ -183,217 +170,42 @@
                                     </tr>
                                 </thead>
                                 <tbody id="dashCoursesTable">
-                                    <!-- Loaded dynamically -->
+                                    <!-- Populated dynamically -->
                                 </tbody>
                             </table>
                         </div>
 
                         <div class="dash-card feedback-card">
                             <div class="card-header-flex">
-                                <h3>Feedback</h3>
-                                <button class="btn-view-all">View All</button>
+                                <h3>Student Feedback</h3>
+                                <button class="btn-view-all" onclick="loadDashboardFeedback()">
+                                    <ion-icon name="refresh-outline"></ion-icon> Refresh
+                                </button>
                             </div>
                             <div class="feedback-scroll" id="feedbackList">
-                                <!-- Loaded dynamically -->
+                                <!-- Populated dynamically -->
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            
-            <div id="section-dashboard" class="content-section dashboard-content active">
-                <div class="dashboard-grid">
-                    <!-- Left Column: Profile & Calendar -->
-                    <div class="dash-col-left">
-                        <div class="dash-card profile-card" id="teacherProfileCard">
-                            <div class="profile-header-bg"></div>
-                            <img src="https://ui-avatars.com/api/?name=Instructor" alt="Avatar" class="profile-avatar" id="t-avatar">
-                            <div class="profile-status"><span class="dot"></span> Active Contract</div>
-                            <h2 id="t-name">Loading...</h2>
-                            <p class="profile-role" id="t-role">Instructor</p>
-                            
-                            <div class="profile-contact">
-                                <div class="contact-item"><ion-icon name="mail-outline"></ion-icon> <span id="t-email">...</span></div>
-                                <div class="contact-item"><ion-icon name="call-outline"></ion-icon> <span id="t-phone">...</span></div>
-                                <div class="contact-item"><ion-icon name="location-outline"></ion-icon> <span id="t-address">...</span></div>
-                            </div>
-                            
-                            <div class="profile-socials">
-                                <ion-icon name="logo-linkedin"></ion-icon>
-                                <ion-icon name="logo-twitter"></ion-icon>
-                                <ion-icon name="logo-instagram"></ion-icon>
-                                <button class="btn-edit-profile">Edit</button>
-                            </div>
-                        </div>
-
-                        <div class="dash-card calendar-card">
-                            <h3><span id="currentMonthYear">Month Year</span> <ion-icon name="chevron-down-outline"></ion-icon></h3>
-                            <div class="calendar-days">
-                                <div class="cal-day"><span>Sun</span><strong>12</strong></div>
-                                <div class="cal-day"><span>Mon</span><strong>13</strong></div>
-                                <div class="cal-day"><span>Tue</span><strong>14</strong></div>
-                                <div class="cal-day active"><span>Wed</span><strong>15</strong></div>
-                                <div class="cal-day"><span>Thu</span><strong>16</strong></div>
-                                <div class="cal-day"><span>Fri</span><strong>17</strong></div>
-                                <div class="cal-day"><span>Sat</span><strong>18</strong></div>
-                            </div>
-                            <div class="schedule-list" id="scheduleList">
-                                <!-- Loaded dynamically -->
-                                <div style="text-align:center; padding: 20px;">Loading schedule...</div>
-                            </div>
-                        </div>
+            <!-- Courses Management Section -->
+            <div id="section-courses" class="content-section dashboard-content" style="display:none;">
+                <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h1 style="font-size: 22px; color: var(--blue-dark); font-weight: 700;">Courses Management</h1>
+                        <p style="color: var(--text-muted); font-size: 13px;">Manage course curriculum, enroll students, and approve admissions.</p>
                     </div>
-
-                    <!-- Right Column: Charts & Courses -->
-                    <div class="dash-col-right">
-                        <div class="charts-row">
-                            <div class="dash-card chart-card">
-                                <h3>Performance <span class="chart-filter">Last 6 Months</span></h3>
-                                <canvas id="performanceChart"></canvas>
-                            </div>
-                            <div class="dash-card chart-card">
-                                <h3>Activity <span class="chart-filter">This Week</span></h3>
-                                <canvas id="activityChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="dash-card courses-summary-card">
-                            <div class="card-header-flex">
-                                <h3>Courses</h3>
-                                <button class="btn-filter"><ion-icon name="filter-outline"></ion-icon> Filter</button>
-                            </div>
-                            <table class="dash-table">
-                                <thead>
-                                    <tr>
-                                        <th>Course</th>
-                                        <th>Rating</th>
-                                        <th>Completion Rate</th>
-                                        <th>Earnings</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashCoursesTable">
-                                    <!-- Loaded dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="dash-card feedback-card">
-                            <div class="card-header-flex">
-                                <h3>Feedback</h3>
-                                <button class="btn-view-all">View All</button>
-                            </div>
-                            <div class="feedback-scroll" id="feedbackList">
-                                <!-- Loaded dynamically -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            
-            <div id="section-dashboard" class="content-section dashboard-content active">
-                <div class="dashboard-grid">
-                    <!-- Left Column: Profile & Calendar -->
-                    <div class="dash-col-left">
-                        <div class="dash-card profile-card" id="teacherProfileCard">
-                            <div class="profile-header-bg"></div>
-                            <img src="https://ui-avatars.com/api/?name=Instructor" alt="Avatar" class="profile-avatar" id="t-avatar">
-                            <div class="profile-status"><span class="dot"></span> Active Contract</div>
-                            <h2 id="t-name">Loading...</h2>
-                            <p class="profile-role" id="t-role">Instructor</p>
-                            
-                            <div class="profile-contact">
-                                <div class="contact-item"><ion-icon name="mail-outline"></ion-icon> <span id="t-email">...</span></div>
-                                <div class="contact-item"><ion-icon name="call-outline"></ion-icon> <span id="t-phone">...</span></div>
-                                <div class="contact-item"><ion-icon name="location-outline"></ion-icon> <span id="t-address">...</span></div>
-                            </div>
-                            
-                            <div class="profile-socials">
-                                <ion-icon name="logo-linkedin"></ion-icon>
-                                <ion-icon name="logo-twitter"></ion-icon>
-                                <ion-icon name="logo-instagram"></ion-icon>
-                                <button class="btn-edit-profile">Edit</button>
-                            </div>
-                        </div>
-
-                        <div class="dash-card calendar-card">
-                            <h3><span id="currentMonthYear">Month Year</span> <ion-icon name="chevron-down-outline"></ion-icon></h3>
-                            <div class="calendar-days">
-                                <div class="cal-day"><span>Sun</span><strong>12</strong></div>
-                                <div class="cal-day"><span>Mon</span><strong>13</strong></div>
-                                <div class="cal-day"><span>Tue</span><strong>14</strong></div>
-                                <div class="cal-day active"><span>Wed</span><strong>15</strong></div>
-                                <div class="cal-day"><span>Thu</span><strong>16</strong></div>
-                                <div class="cal-day"><span>Fri</span><strong>17</strong></div>
-                                <div class="cal-day"><span>Sat</span><strong>18</strong></div>
-                            </div>
-                            <div class="schedule-list" id="scheduleList">
-                                <!-- Loaded dynamically -->
-                                <div style="text-align:center; padding: 20px;">Loading schedule...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Charts & Courses -->
-                    <div class="dash-col-right">
-                        <div class="charts-row">
-                            <div class="dash-card chart-card">
-                                <h3>Performance <span class="chart-filter">Last 6 Months</span></h3>
-                                <canvas id="performanceChart"></canvas>
-                            </div>
-                            <div class="dash-card chart-card">
-                                <h3>Activity <span class="chart-filter">This Week</span></h3>
-                                <canvas id="activityChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="dash-card courses-summary-card">
-                            <div class="card-header-flex">
-                                <h3>Courses</h3>
-                                <button class="btn-filter"><ion-icon name="filter-outline"></ion-icon> Filter</button>
-                            </div>
-                            <table class="dash-table">
-                                <thead>
-                                    <tr>
-                                        <th>Course</th>
-                                        <th>Rating</th>
-                                        <th>Completion Rate</th>
-                                        <th>Earnings</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashCoursesTable">
-                                    <!-- Loaded dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="dash-card feedback-card">
-                            <div class="card-header-flex">
-                                <h3>Feedback</h3>
-                                <button class="btn-view-all">View All</button>
-                            </div>
-                            <div class="feedback-scroll" id="feedbackList">
-                                <!-- Loaded dynamically -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-courses" class="content-section dashboard-content" style="display:none;" style="display:none;" style="display:none;" >
-                <div class="page-header">
-                    <h1>Courses Management</h1>
-                    <button class="btn-primary" onclick="openModal('courseModal')">
+                    <button class="btn-primary" onclick="openModal('courseModal')" style="padding: 10px 18px; background: #4f5be8; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
                         <ion-icon name="add-outline"></ion-icon>
                         Create New Course
                     </button>
                 </div>
-                <div class="data-section" style="margin-top: 2rem;">
+
+                <div class="data-section dash-card">
                     <div class="table-container">
-                        <table class="data-table">
+                        <table class="dash-table">
                             <thead>
                                 <tr>
                                     <th>Course Name</th>
@@ -403,18 +215,18 @@
                                 </tr>
                             </thead>
                             <tbody id="coursesTableBody">
-                                <!-- Courses will be loaded here dynamically -->
+                                <!-- Courses will be loaded dynamically -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="data-section" style="margin-top: 2rem;" id="pendingApprovalsSection">
-                    <div class="page-header" style="margin-bottom: 1rem;">
-                        <h2>Pending Approvals</h2>
+                <div class="data-section dash-card" style="margin-top: 24px;" id="pendingApprovalsSection">
+                    <div class="page-header" style="margin-bottom: 16px;">
+                        <h2 style="font-size: 18px; color: var(--blue-dark); font-weight: 700;">Pending Enrollment Requests</h2>
                     </div>
                     <div class="table-container">
-                        <table class="data-table">
+                        <table class="dash-table">
                             <thead>
                                 <tr>
                                     <th>Student Email</th>
@@ -424,38 +236,41 @@
                                 </tr>
                             </thead>
                             <tbody id="pendingTableBody">
-                                <!-- Pending requests will be loaded here dynamically -->
+                                <!-- Pending requests will be loaded dynamically -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Messages Content -->
+            <!-- Messages Section -->
             <div id="section-messages" class="content-section dashboard-content" style="display: none;">
-                <div class="page-header">
-                    <h1>Communications</h1>
-                    <button class="btn-primary" onclick="openModal('messageModal')">
-                        <ion-icon name="paper-plane-outline"></ion-icon>
-                        Compose Message
-                    </button>
+                <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h1 style="font-size: 22px; color: var(--blue-dark); font-weight: 700;">Communications & Chat</h1>
+                        <p style="color: var(--text-muted); font-size: 13px;">Send individual or bulk updates with integrated voice note recording.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="/AnalogiX/teacher/chat" class="btn-filter" style="text-decoration: none;">
+                            <ion-icon name="chatbubbles-outline"></ion-icon> Open Full Chat
+                        </a>
+                        <button class="btn-primary" onclick="openModal('messageModal')" style="padding: 10px 18px; background: #4f5be8; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                            <ion-icon name="paper-plane-outline"></ion-icon>
+                            Compose Message
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="data-section">
-                    <div class="section-header">
-                        <h2>Sent Messages</h2>
+                <div class="data-section dash-card">
+                    <div class="card-header-flex">
+                        <h3>Sent Messages History</h3>
                     </div>
                     <div class="table-container">
-                        <table class="data-table">
+                        <table class="dash-table">
                             <thead>
                                 <tr>
                                     <th>To</th>
-                                    <th>Subject</th>
+                                    <th>Subject & Content</th>
                                     <th>Date Sent</th>
                                 </tr>
                             </thead>
@@ -466,188 +281,594 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Course Modal -->
-            <div class="modal-overlay" id="courseModal">
-                <div class="modal">
-                    <div class="modal-header">
-                        <h2>Create New Course</h2>
-                        <button class="modal-close" onclick="closeModal('courseModal')"><ion-icon name="close-outline"></ion-icon></button>
-                    </div>
-                    <form onsubmit="handleCourseSubmit(event)">
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Course Title</label>
-                                <input type="text" id="courseTitle" placeholder="e.g. Python for Beginners" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Description</label>
-                                <textarea id="courseDescription" rows="3" placeholder="Brief description of the course..." required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Course Thumbnail (Image)</label>
-                                <input type="file" id="courseThumbnail" accept="image/*">
-                            </div>
-                            <div class="form-group">
-                                <label>Assign Instructor</label>
-                                <select id="courseInstructor">
-                                    <option value="john">John Smith</option>
-                                    <option value="other">Unassigned</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Price (₹)</label>
-                                <input type="number" id="coursePrice" placeholder="e.g. 1999" required min="0">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn-secondary" onclick="closeModal('courseModal')">Cancel</button>
-                            <button type="submit" class="btn-primary">Publish Course</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Enroll Student Modal -->
-            <div class="modal-overlay" id="enrollModal">
-                <div class="modal">
-                    <div class="modal-header">
-                        <h2>Enroll Student</h2>
-                        <button class="modal-close" onclick="closeModal('enrollModal')"><ion-icon name="close-outline"></ion-icon></button>
-                    </div>
-                    <form onsubmit="handleEnrollSubmit(event)">
-                        <div class="modal-body">
-                            <input type="hidden" id="enrollCourseId">
-                            <div class="form-group">
-                                <label>Student Email Address</label>
-                                <input type="email" id="enrollStudentEmail" placeholder="student@example.com" required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn-secondary" onclick="closeModal('enrollModal')">Cancel</button>
-                            <button type="submit" class="btn-primary">Add Student</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Compose Message Modal -->
-            <div class="modal-overlay" id="messageModal">
-                <div class="modal">
-                    <div class="modal-header">
-                        <h2>Compose Message</h2>
-                        <button class="modal-close" onclick="closeModal('messageModal')"><ion-icon name="close-outline"></ion-icon></button>
-                    </div>
-                    <form onsubmit="handleMessageSubmit(event)">
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Message Type</label>
-                                <select id="messageType" onchange="toggleMessageType()" required>
-                                    <option value="individual">Individual Student</option>
-                                    <option value="bulk">Bulk (Entire Course)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group" id="groupIndividual">
-                                <label>Student Email</label>
-                                <input type="email" id="msgStudentEmail" placeholder="student@example.com">
-                            </div>
-                            
-                            <div class="form-group" id="groupBulk" style="display:none;">
-                                <label>Select Course</label>
-                                <select id="msgCourseId">
-                                    <!-- Courses loaded dynamically -->
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Subject</label>
-                                <input type="text" id="msgSubject" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Message</label>
-                                <textarea id="msgContent" rows="4" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Audio Message (Optional)</label>
-                                <div>
-                                    <button type="button" id="btnRecord" class="btn-primary" style="background:var(--danger); padding: 5px 10px; font-size:12px;" onclick="startRecording()">🎤 Record</button>
-                                    <button type="button" id="btnStopRecord" class="btn-secondary" style="display:none; padding: 5px 10px; font-size:12px;" onclick="stopRecording()">⏹ Stop</button>
-                                </div>
-                                <audio id="audioPreview" controls style="display:none; margin-top:10px; height: 30px;"></audio>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn-secondary" onclick="closeModal('messageModal')">Cancel</button>
-                            <button type="submit" class="btn-primary">Send Message</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            </main>
+        </main>
     </div>
 
+    <!-- Modals -->
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit Instructor Profile</h2>
+                <button class="modal-close" onclick="closeModal('editProfileModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleEditProfileSubmit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="editProfileName" required placeholder="e.g. Instructor">
+                    </div>
+                    <div class="form-group">
+                        <label>Specialization / Subject</label>
+                        <input type="text" id="editProfileCourse" placeholder="e.g. Web & App Development">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="editProfilePhone" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="form-group">
+                        <label>Address / Hub Location</label>
+                        <input type="text" id="editProfileAddress" placeholder="AnalogiX Learning Hub, Kerala">
+                    </div>
+                    <div class="form-group">
+                        <label>Profile Picture (Image)</label>
+                        <input type="file" id="editProfileAvatar" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('editProfileModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#4f5be8; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Modal -->
+    <div class="modal-overlay" id="courseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Create New Course</h2>
+                <button class="modal-close" onclick="closeModal('courseModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleCourseSubmit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Course Title</label>
+                        <input type="text" id="courseTitle" placeholder="e.g. Python Full Stack Bootcamp" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="courseDescription" rows="3" placeholder="Brief overview of course curriculum..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Course Thumbnail (Image)</label>
+                        <input type="file" id="courseThumbnail" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="coursePrice" placeholder="e.g. 1999" required min="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('courseModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#4f5be8; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">Publish Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enroll Student Modal -->
+    <div class="modal-overlay" id="enrollModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Enroll Student</h2>
+                <button class="modal-close" onclick="closeModal('enrollModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleEnrollSubmit(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="enrollCourseId">
+                    <div class="form-group">
+                        <label>Student Email Address</label>
+                        <input type="email" id="enrollStudentEmail" placeholder="student@example.com" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('enrollModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#4f5be8; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">Add Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Compose Message Modal -->
+    <div class="modal-overlay" id="messageModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Compose Message</h2>
+                <button class="modal-close" onclick="closeModal('messageModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleMessageSubmit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Message Type</label>
+                        <select id="messageType" onchange="toggleMessageType()" required>
+                            <option value="individual">Individual Student</option>
+                            <option value="bulk">Bulk (Entire Course)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="groupIndividual">
+                        <label>Student Email</label>
+                        <input type="email" id="msgStudentEmail" placeholder="student@example.com">
+                    </div>
+                    
+                    <div class="form-group" id="groupBulk" style="display:none;">
+                        <label>Select Course</label>
+                        <select id="msgCourseId"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="msgSubject" required placeholder="Subject title">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="msgContent" rows="4" required placeholder="Write your message here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Audio Voice Note (Optional)</label>
+                        <div>
+                            <button type="button" id="btnRecord" class="btn-primary" style="background:#ef4444; color:white; border:none; padding: 6px 14px; font-size:12px; border-radius:6px; cursor:pointer;" onclick="startRecording()">🎤 Record Voice Note</button>
+                            <button type="button" id="btnStopRecord" class="btn-secondary" style="display:none; padding: 6px 14px; font-size:12px; border-radius:6px; cursor:pointer;" onclick="stopRecording()">⏹ Stop</button>
+                        </div>
+                        <audio id="audioPreview" controls style="display:none; margin-top:10px; height: 32px; width: 100%;"></audio>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('messageModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#4f5be8; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Content Builder Modal -->
+    <div class="modal-overlay" id="contentModal">
+        <div class="modal" style="width: 800px; max-width: 95%;">
+            <div class="modal-header">
+                <h2>Manage Course Content</h2>
+                <button class="modal-close" onclick="closeModal('contentModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="contentCourseId">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 id="contentCourseTitle" style="color:var(--blue-dark); font-size:16px;">Course Sections</h3>
+                    <button class="btn-primary" onclick="addSectionPrompt()" style="background:#4f5be8; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600;">+ Add Section</button>
+                </div>
+                <div id="sectionsList" style="margin-bottom: 20px;"></div>
+                <hr style="border:none; border-top:1px solid #e2e8f0; margin:16px 0;">
+                <h3 style="color:var(--blue-dark); font-size:16px; margin-bottom:12px;">Upload Lesson Video</h3>
+                <form id="uploadLessonForm" onsubmit="handleLessonUpload(event)">
+                    <div class="form-group">
+                        <label>Select Section</label>
+                        <select id="lessonSectionId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Lesson Title</label>
+                        <input type="text" id="lessonTitle" required placeholder="e.g. Introduction to React Components">
+                    </div>
+                    <div class="form-group">
+                        <label>Video File (.mp4, .webm)</label>
+                        <input type="file" id="lessonVideo" accept="video/mp4,video/webm" required>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width:100%; background:#4f5be8; color:white; border:none; padding:10px; border-radius:6px; font-weight:600; cursor:pointer;">Upload Lesson</button>
+                </form>
+                <div id="uploadProgress" style="display:none; margin-top:10px; color:#4f5be8; font-weight:bold; text-align:center;">Uploading... Please wait.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic Script -->
     <script>
+        let currentTeacherEmail = localStorage.getItem('teacherEmail') || '';
+        let currentTeacherName = localStorage.getItem('teacherName') || 'Instructor';
+        let performanceChartInstance = null;
+        let activityChartInstance = null;
+
         function openModal(id) {
-            document.getElementById(id).classList.add('active');
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.add('active');
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.remove('active');
         }
 
-        async function handleCourseSubmit(e) {
-            e.preventDefault();
+        // Tab Navigation
+        function switchTab(tabId, event) {
+            if(event) event.preventDefault();
             
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = 'Publishing...';
-            btn.disabled = true;
+            if(tabId === 'calendar') {
+                switchTab('dashboard');
+                const cal = document.querySelector('.calendar-card');
+                if(cal) cal.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
 
-            const title = document.getElementById('courseTitle').value;
-            const description = document.getElementById('courseDescription').value;
-            const instructor = document.getElementById('courseInstructor').options[document.getElementById('courseInstructor').selectedIndex].text;
-            const price = document.getElementById('coursePrice').value;
+            if(tabId === 'students') {
+                switchTab('courses');
+                return;
+            }
 
-            try {
-                const response = await fetch('/api/teacher/courses', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, description, instructor, price })
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+            
+            const target = document.getElementById('section-' + tabId);
+            if(target) {
+                target.classList.add('active');
+                target.style.display = 'block';
+            }
+            const nav = document.getElementById('nav-' + tabId);
+            if(nav) nav.classList.add('active');
+
+            if (tabId === 'dashboard') {
+                loadDashboardData();
+            } else if (tabId === 'courses') {
+                loadCourses();
+                loadPendingApprovals();
+            } else if (tabId === 'messages') {
+                loadMessages();
+                populateMessageCourses();
+            }
+        }
+
+        // Dashboard Data Loader
+        async function loadDashboardData() {
+            const emailParam = encodeURIComponent(currentTeacherEmail || '');
+            
+            // 1. Fetch Profile
+            fetch('/api/teacher/profile?email=' + emailParam)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.success && data.profile) {
+                        const p = data.profile;
+                        if (!currentTeacherEmail && p.email) {
+                            currentTeacherEmail = p.email;
+                            localStorage.setItem('teacherEmail', p.email);
+                        }
+                        if (p.name) {
+                            localStorage.setItem('teacherName', p.name);
+                            document.getElementById('t-name').innerText = p.name;
+                            document.getElementById('topAdminName').innerText = p.name;
+                        }
+                        document.getElementById('t-role').innerText = p.course || 'Course Instructor';
+                        document.getElementById('t-email').innerText = p.email || 'teacher@analogix.com';
+                        document.getElementById('t-phone').innerText = p.phone_number || '+91 98765 43210';
+                        document.getElementById('t-address').innerText = p.address || 'AnalogiX Learning Hub, Kerala';
+                        if (p.avatar_url) {
+                            document.getElementById('t-avatar').src = p.avatar_url;
+                            document.getElementById('topAdminAvatar').src = p.avatar_url;
+                        }
+                    }
+                })
+                .catch(err => console.error("Profile load err:", err));
+
+            // 2. Fetch Metrics & Render Charts
+            fetch('/api/teacher/dashboard-metrics?email=' + emailParam)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.success && data.metrics) {
+                        initCharts(data.metrics);
+                    } else {
+                        initCharts({ performance: [55, 65, 72, 68, 84, 92], activity: [4.5, 6.0, 5.5, 8.0, 6.5, 3.0, 1.5] });
+                    }
+                })
+                .catch(() => {
+                    initCharts({ performance: [55, 65, 72, 68, 84, 92], activity: [4.5, 6.0, 5.5, 8.0, 6.5, 3.0, 1.5] });
                 });
 
-                const data = await response.json();
+            // 3. Courses Summary Table
+            fetch('/api/teacher/courses')
+                .then(r => r.json())
+                .then(courses => {
+                    const tbody = document.getElementById('dashCoursesTable');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+                    if (!Array.isArray(courses) || courses.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--text-muted);">No courses published yet.</td></tr>';
+                        return;
+                    }
+                    courses.slice(0, 5).forEach(c => {
+                        const price = parseFloat(c.price) || 0;
+                        const enrolled = parseInt(c.enrolled_count) || 0;
+                        const earnings = (enrolled * price).toLocaleString();
+                        const thumb = c.thumbnail_url || '/uploads/images/default_course.jpg';
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div class="dash-course-info">
+                                    <img src="${thumb}" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&auto=format&fit=crop&q=60'" alt="">
+                                    <div>
+                                        <strong>${c.title}</strong>
+                                        <small>${enrolled} Enrolled</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><ion-icon name="star" style="color:#f59e0b; vertical-align: middle;"></ion-icon> <strong>4.8</strong></td>
+                            <td>
+                                <div class="progress-bar"><div class="fill" style="width: 82%"></div></div>
+                            </td>
+                            <td><strong>₹${earnings}</strong></td>
+                            <td><span class="status-badge active">${c.status || 'Active'}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => console.error("Courses summary load err:", err));
+
+            // 4. Calendar & Schedule
+            renderCalendar();
+            loadSchedule(currentTeacherEmail);
+
+            // 5. Feedback
+            loadDashboardFeedback();
+        }
+
+        // Calendar dynamic rendering
+        function renderCalendar() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const today = new Date();
+            
+            document.getElementById('currentMonthYear').innerText = `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+            
+            // Calculate week range (Sunday to Saturday)
+            const currentDay = today.getDay();
+            const sunday = new Date(today);
+            sunday.setDate(today.getDate() - currentDay);
+            
+            const container = document.getElementById('calendarDaysContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            for(let i = 0; i < 7; i++) {
+                const d = new Date(sunday);
+                d.setDate(sunday.getDate() + i);
+                const isToday = d.toDateString() === today.toDateString();
                 
-                if (data.success) {
-                    alert("Success! The new course has been created and published.");
-                    closeModal('courseModal');
-                    e.target.reset();
-                    loadCourses();
-            loadDashboardData();
-            loadDashboardData();
-            loadDashboardData();
+                const dayEl = document.createElement('div');
+                dayEl.className = `cal-day ${isToday ? 'active' : ''}`;
+                dayEl.onclick = () => {
+                    document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('active'));
+                    dayEl.classList.add('active');
+                };
+                dayEl.innerHTML = `
+                    <span>${dayNames[d.getDay()]}</span>
+                    <div class="cal-num">${d.getDate()}</div>
+                `;
+                container.appendChild(dayEl);
+            }
+        }
+
+        // Schedule Loader
+        async function loadSchedule(email) {
+            const list = document.getElementById('scheduleList');
+            if(!list) return;
+            try {
+                const res = await fetch('/api/teacher/schedule?email=' + encodeURIComponent(email || ''));
+                const data = await res.json();
+                list.innerHTML = '';
+                if(data.success && data.events && data.events.length > 0) {
+                    data.events.forEach(ev => {
+                        const div = document.createElement('div');
+                        div.className = 'schedule-item';
+                        if(ev.color_code) div.style.borderLeftColor = ev.color_code;
+                        div.innerHTML = `
+                            <strong>${ev.title}</strong>
+                            <small><ion-icon name="time-outline" style="vertical-align:middle;"></ion-icon> ${ev.start_time} • ${ev.event_type || 'Event'}</small>
+                        `;
+                        list.appendChild(div);
+                    });
                 } else {
-                    alert("Error: " + data.message);
+                    list.innerHTML = '<div style="color:var(--text-muted); font-size:12px; text-align:center; padding:12px;">No schedule events today.</div>';
                 }
-            } catch (error) {
-                alert("Failed to connect to the server.");
+            } catch(e) {
+                list.innerHTML = `
+                    <div class="schedule-item type-live">
+                        <strong>Live React & Node Session</strong>
+                        <small>09:00 AM - 10:30 AM (Live Class)</small>
+                    </div>
+                    <div class="schedule-item type-mentor">
+                        <strong>Code Review & Doubt Clearance</strong>
+                        <small>11:30 AM - 01:00 PM (Mentorship)</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Feedback Loader
+        function loadDashboardFeedback() {
+            fetch('/api/teacher/feedback?email=' + encodeURIComponent(currentTeacherEmail || ''))
+                .then(r => r.json())
+                .then(data => {
+                    const fbList = document.getElementById('feedbackList');
+                    if (!fbList) return;
+                    fbList.innerHTML = '';
+                    if (data && data.success && data.reviews && data.reviews.length > 0) {
+                        data.reviews.forEach(r => {
+                            const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(r.student_name)}&background=eef2ff&color=4f5be8&font-size=0.4`;
+                            const div = document.createElement('div');
+                            div.className = 'feedback-item';
+                            div.innerHTML = `
+                                <div>
+                                    <div class="fb-header">
+                                        <img src="${avatar}" alt="">
+                                        <div class="fb-meta">
+                                            <strong>${r.student_name}</strong>
+                                            <span class="rating"><ion-icon name="star"></ion-icon> ${r.rating}</span>
+                                        </div>
+                                    </div>
+                                    <p class="fb-text">"${r.review_text}"</p>
+                                </div>
+                                <span class="fb-course">${r.course_title || 'Enrolled Course'}</span>
+                            `;
+                            fbList.appendChild(div);
+                        });
+                    } else {
+                        fbList.innerHTML = '<div style="color:var(--text-muted); padding:10px;">No student feedback available yet.</div>';
+                    }
+                })
+                .catch(err => console.error("Feedback error:", err));
+        }
+
+        // Chart.js initialization with brand colors
+        function initCharts(metrics) {
+            const c1 = document.getElementById('performanceChart');
+            if (c1) {
+                if (performanceChartInstance) performanceChartInstance.destroy();
+                const ctx = c1.getContext('2d');
+                const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                gradient.addColorStop(0, 'rgba(79, 91, 232, 0.2)');
+                gradient.addColorStop(1, 'rgba(79, 91, 232, 0.0)');
+
+                performanceChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                        datasets: [{
+                            label: 'Performance Rate %',
+                            data: metrics.performance || [55, 65, 72, 68, 84, 92],
+                            borderColor: '#4f5be8',
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#4f5be8',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' } }
+                        }
+                    }
+                });
+            }
+
+            const c2 = document.getElementById('activityChart');
+            if (c2) {
+                if (activityChartInstance) activityChartInstance.destroy();
+                const ctx = c2.getContext('2d');
+                activityChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Hours',
+                            data: metrics.activity || [4.5, 6.0, 5.5, 8.0, 6.5, 3.0, 1.5],
+                            backgroundColor: ['#4f5be8', '#4f5be8', '#4f5be8', '#10b981', '#4f5be8', '#6366f1', '#94a3b8'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Edit Profile modal handlers
+        function openEditProfileModal() {
+            document.getElementById('editProfileName').value = document.getElementById('t-name').innerText;
+            document.getElementById('editProfileCourse').value = document.getElementById('t-role').innerText;
+            document.getElementById('editProfilePhone').value = document.getElementById('t-phone').innerText;
+            document.getElementById('editProfileAddress').value = document.getElementById('t-address').innerText;
+            openModal('editProfileModal');
+        }
+
+        async function handleEditProfileSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const name = document.getElementById('editProfileName').value;
+            const course = document.getElementById('editProfileCourse').value;
+            const phone_number = document.getElementById('editProfilePhone').value;
+            const address = document.getElementById('editProfileAddress').value;
+            const file = document.getElementById('editProfileAvatar').files[0];
+
+            const formData = new FormData();
+            formData.append('email', currentTeacherEmail || 'teacher@analogix.com');
+            formData.append('name', name);
+            formData.append('course', course);
+            formData.append('phone_number', phone_number);
+            formData.append('address', address);
+            if(file) {
+                formData.append('avatar', file);
+            } else {
+                formData.append('existing_avatar', document.getElementById('t-avatar').src);
+            }
+
+            try {
+                const res = await fetch('/api/teacher/profile', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert('Profile updated successfully!');
+                    closeModal('editProfileModal');
+                    loadDashboardData();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(e) {
+                alert('Connection error.');
             } finally {
-                btn.innerHTML = originalText;
+                btn.innerHTML = 'Save Changes';
                 btn.disabled = false;
             }
         }
 
+        // Global search in dashboard
+        function handleGlobalSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#dashCoursesTable tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                r.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        // Courses Management functions
         async function loadCourses() {
             const tbody = document.getElementById('coursesTableBody');
+            if(!tbody) return;
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading courses...</td></tr>';
             
             try {
                 const response = await fetch('/api/teacher/courses');
                 const courses = await response.json();
                 
-                if (courses.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No courses found. Click "Create New Course" to publish one.</td></tr>';
+                if (!Array.isArray(courses) || courses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 24px; color: var(--text-muted);">No courses found. Click "Create New Course" to publish one.</td></tr>';
                     return;
                 }
 
@@ -657,14 +878,13 @@
                     tr.innerHTML = `
                         <td>
                             <strong>${course.title}</strong><br>
-                            <small style="color:var(--text-muted)">Instructor: ${course.instructor}</small>
+                            <small style="color:var(--text-muted)">Price: ₹${course.price}</small>
                         </td>
-                        <td>${course.enrolled_count || 0} Students (₹${course.price})</td>
-                        <td><span class="status-badge ${course.status === 'Published' ? 'active' : ''}">${course.status || 'Published'}</span></td>
+                        <td>${course.enrolled_count || 0} Students</td>
+                        <td><span class="status-badge ${course.status === 'Published' || course.status === 'Active' ? 'active' : ''}">${course.status || 'Published'}</span></td>
                         <td>
-                            <button class="icon-btn small" onclick="openEnrollModal(${course.id})" title="Add Student"><ion-icon name="person-add-outline"></ion-icon></button>
-                            <button class="icon-btn small" title="Edit Course"><ion-icon name="create-outline"></ion-icon></button>
-<button class="icon-btn small" title="Manage Content" onclick="window.location.href='/AnalogiX/teacher/builder?courseId=${course.id}'"><ion-icon name="cloud-upload-outline"></ion-icon></button>
+                            <button class="btn-filter" style="padding: 4px 8px; font-size: 12px;" onclick="openEnrollModal(${course.id})" title="Enroll Student"><ion-icon name="person-add-outline"></ion-icon></button>
+                            <button class="btn-filter" style="padding: 4px 8px; font-size: 12px;" onclick="openContentModal(${course.id}, '${escape(course.title)}')" title="Manage Content"><ion-icon name="cloud-upload-outline"></ion-icon></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -674,193 +894,58 @@
             }
         }
 
-        // Tab Switching Logic
-        function switchTab(tabId, e) {
-            if(e) e.preventDefault();
-            
-            // Update Nav styling
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('nav-' + tabId).classList.add('active');
-            
-            // Update Sections
-            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
-            document.getElementById('section-' + tabId).style.display = 'block';
-            
-            if (tabId === 'messages') {
-                loadMessages();
-                populateMessageCourses();
-            }
-        }
-
-        // Load courses when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCourses();
-            loadPendingApprovals();
-        });
-
-        // Toggle message type fields
-        function toggleMessageType() {
-            const type = document.getElementById('messageType').value;
-            if(type === 'individual') {
-                document.getElementById('groupIndividual').style.display = 'block';
-                document.getElementById('msgStudentEmail').required = true;
-                document.getElementById('groupBulk').style.display = 'none';
-                document.getElementById('msgCourseId').required = false;
-            } else {
-                document.getElementById('groupIndividual').style.display = 'none';
-                document.getElementById('msgStudentEmail').required = false;
-                document.getElementById('groupBulk').style.display = 'block';
-                document.getElementById('msgCourseId').required = true;
-            }
-        }
-
-        let currentTeacherEmail = 'teacher@example.com'; // In a real app, pull from localStorage auth token
-
-        async function populateMessageCourses() {
-            try {
-                const response = await fetch('/api/teacher/courses');
-                const courses = await response.json();
-                const select = document.getElementById('msgCourseId');
-                select.innerHTML = '';
-                courses.forEach(c => {
-                    select.innerHTML += `<option value="${c.id}">${c.title}</option>`;
-                });
-            } catch(e) {}
-        }
-
-        async function loadMessages() {
-            const tbody = document.getElementById('messagesTableBody');
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading...</td></tr>';
-            try {
-                const response = await fetch('/api/teacher/messages?email=' + currentTeacherEmail);
-                const messages = await response.json();
-                
-                if (messages.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No messages sent yet.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = '';
-                messages.forEach(msg => {
-                    const toText = msg.course_id ? `Bulk: ${msg.course_name}` : `Individual: ${msg.receiver_email}`;
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${toText}</td>
-                        <td>
-                            <strong>${msg.subject}</strong><br>
-                            <small>${msg.content}</small>
-                            ${msg.audio_url ? `<br><audio controls src="${msg.audio_url}" style="height: 30px; margin-top: 5px;"></audio>` : ''}
-                        </td>
-                        <td>${new Date(msg.sent_at).toLocaleDateString()}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch(e) {}
-        }
-
-        async function handleMessageSubmit(e) {
+        async function handleCourseSubmit(e) {
             e.preventDefault();
-            
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = 'Sending...';
+            btn.innerHTML = 'Publishing...';
             btn.disabled = true;
 
-            const type = document.getElementById('messageType').value;
-            const receiver_email = type === 'individual' ? document.getElementById('msgStudentEmail').value : null;
-            const course_id = type === 'bulk' ? document.getElementById('msgCourseId').value : null;
-            const subject = document.getElementById('msgSubject').value;
-            const content = document.getElementById('msgContent').value;
+            const title = document.getElementById('courseTitle').value;
+            const description = document.getElementById('courseDescription').value;
+            const price = document.getElementById('coursePrice').value;
+            const file = document.getElementById('courseThumbnail').files[0];
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('instructor', currentTeacherName || 'Instructor');
+            formData.append('price', price);
+            if(file) formData.append('thumbnail', file);
 
             try {
-                const response = await fetch('/api/teacher/messages', {
+                const res = await fetch('/api/teacher/courses', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sender_email: currentTeacherEmail, receiver_email, course_id, subject, content, audio_base64: currentAudioBase64 })
+                    body: formData
                 });
-
-                const data = await response.json();
-                if (data.success) {
-                    alert("Message sent via integrated messenger!");
-                    closeModal('messageModal');
+                const data = await res.json();
+                if(data.success) {
+                    alert('Course published successfully!');
+                    closeModal('courseModal');
                     e.target.reset();
-                    // Reset audio
-                    currentAudioBase64 = null;
-                    document.getElementById('audioPreview').style.display = 'none';
-                    document.getElementById('audioPreview').src = '';
-                    
-                    loadMessages();
+                    loadCourses();
+                    loadDashboardData();
                 } else {
-                    alert("Error: " + data.message);
+                    alert('Error: ' + data.message);
                 }
-            } catch (error) {
-                alert("Failed to connect to the server.");
+            } catch(e) {
+                alert('Connection error.');
             } finally {
-                btn.innerHTML = 'Send Message';
+                btn.innerHTML = 'Publish Course';
                 btn.disabled = false;
             }
         }
 
-        // Audio Recording Logic
-        let mediaRecorder;
-        let audioChunks = [];
-        let currentAudioBase64 = null;
-
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const preview = document.getElementById('audioPreview');
-                    preview.src = audioUrl;
-                    preview.style.display = 'block';
-
-                    // Convert to base64 for API
-                    const reader = new FileReader();
-                    reader.readAsDataURL(audioBlob); 
-                    reader.onloadend = function() {
-                        currentAudioBase64 = reader.result;
-                    }
-                };
-
-                mediaRecorder.start();
-                document.getElementById('btnRecord').style.display = 'none';
-                document.getElementById('btnStopRecord').style.display = 'inline-block';
-            } catch (err) {
-                alert("Microphone access denied or unavailable.");
-            }
-        }
-
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Stop mic
-                document.getElementById('btnRecord').style.display = 'inline-block';
-                document.getElementById('btnRecord').innerHTML = '🎤 Re-record';
-                document.getElementById('btnStopRecord').style.display = 'none';
-            }
-        }
-
-
-
         async function loadPendingApprovals() {
             const tbody = document.getElementById('pendingTableBody');
+            if(!tbody) return;
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading requests...</td></tr>';
             
             try {
                 const response = await fetch('/api/teacher/enrollments/pending');
                 const pending = await response.json();
                 
-                if (pending.success === false) { throw new Error(pending.message); }
-                if (pending.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No pending enrollment requests.</td></tr>';
+                if (!Array.isArray(pending) || pending.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: var(--text-muted);">No pending enrollment requests.</td></tr>';
                     return;
                 }
 
@@ -872,14 +957,14 @@
                         <td><strong>${req.course_title}</strong></td>
                         <td>${new Date(req.enrolled_at).toLocaleDateString()}</td>
                         <td>
-                            <button class="btn-primary" style="padding: 4px 10px; font-size: 11px;" onclick="handleApproval(${req.enrollment_id}, 'accept')">Accept</button>
-                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="handleApproval(${req.enrollment_id}, 'reject')">Reject</button>
+                            <button class="btn-primary" style="padding: 4px 10px; font-size: 11px; background:#10b981; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="handleApproval(${req.enrollment_id}, 'accept')">Accept</button>
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px; margin-left:6px; cursor:pointer;" onclick="handleApproval(${req.enrollment_id}, 'reject')">Reject</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error loading pending requests: ' + error.message + '</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error loading pending requests.</td></tr>';
             }
         }
 
@@ -891,18 +976,16 @@
                     body: JSON.stringify({ enrollment_id, action })
                 });
                 const data = await res.json();
-                
-                if (data.success) {
+                if(data.success) {
                     loadPendingApprovals();
-                    loadCourses(); // update enrolled count
+                    loadCourses();
                 } else {
-                    alert("Error: " + data.message);
+                    alert('Error: ' + data.message);
                 }
-            } catch (error) {
-                alert("Failed to connect to the server.");
+            } catch(e) {
+                alert('Server error.');
             }
         }
-
 
         function openEnrollModal(courseId) {
             document.getElementById('enrollCourseId').value = courseId;
@@ -911,9 +994,7 @@
 
         async function handleEnrollSubmit(e) {
             e.preventDefault();
-            
             const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
             btn.innerHTML = 'Adding...';
             btn.disabled = true;
 
@@ -921,168 +1002,269 @@
             const student_email = document.getElementById('enrollStudentEmail').value;
 
             try {
-                const response = await fetch('/api/teacher/students/enroll', {
+                const res = await fetch('/api/teacher/students/enroll', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ course_id, student_email })
                 });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert("Success! Student has been enrolled.");
+                const data = await res.json();
+                if(data.success) {
+                    alert('Student enrolled successfully!');
                     closeModal('enrollModal');
                     e.target.reset();
-                    loadCourses(); // Refresh list to update count
+                    loadCourses();
                 } else {
-                    alert("Error: " + data.message);
+                    alert('Error: ' + data.message);
                 }
-            } catch (error) {
-                alert("Failed to connect to the server.");
+            } catch(e) {
+                alert('Server error.');
             } finally {
-                btn.innerHTML = originalText;
+                btn.innerHTML = 'Add Student';
                 btn.disabled = false;
             }
         }
 
-        // Extra Javascript logic will be added here as needed
-
-        // Logout functionality
-        document.querySelector('.logout').addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('teacherAuth');
-            window.location.href = '/AnalogiX/teacher/login';
-        });
-    </script>
-<!-- Teacher Content Modal -->
-<div class="modal-overlay" id="contentModal">
-    <div class="modal" style="width: 800px; max-width: 95%;">
-        <div class="modal-header">
-            <h2>Manage Course Content</h2>
-            <button class="modal-close" onclick="closeModal('contentModal')"><ion-icon name="close-outline"></ion-icon></button>
-        </div>
-        <div class="modal-body">
-            <input type="hidden" id="contentCourseId">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 id="contentCourseTitle">Course Sections</h3>
-                <button class="btn-primary" onclick="addSectionPrompt()">+ Add Section</button>
-            </div>
-            <div id="sectionsList" style="margin-bottom: 20px;">
-                <!-- Sections loaded here -->
-            </div>
-            <hr>
-            <h3>Upload Lesson Video</h3>
-            <form id="uploadLessonForm" onsubmit="handleLessonUpload(event)">
-                <div class="form-group">
-                    <label>Select Section</label>
-                    <select id="lessonSectionId" required></select>
-                </div>
-                <div class="form-group">
-                    <label>Lesson Title</label>
-                    <input type="text" id="lessonTitle" required>
-                </div>
-                <div class="form-group">
-                    <label>Video File (.mp4, .webm)</label>
-                    <input type="file" id="lessonVideo" accept="video/mp4,video/webm" required>
-                </div>
-                <button type="submit" class="btn-primary" style="width:100%;">Upload Lesson</button>
-            </form>
-            <div id="uploadProgress" style="display:none; margin-top:10px; color:var(--primary); font-weight:bold;">Uploading... Please wait.</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function openContentModal(courseId, courseTitle) {
-        document.getElementById('contentCourseId').value = courseId;
-        document.getElementById('contentCourseTitle').innerText = courseTitle;
-        loadSections(courseId);
-        openModal('contentModal');
-    }
-
-    async function loadSections(courseId) {
-        const list = document.getElementById('sectionsList');
-        const select = document.getElementById('lessonSectionId');
-        list.innerHTML = 'Loading sections...';
-        
-        try {
-            const res = await fetch('/api/courses/' + courseId + '/structure');
-            const data = await res.json();
-            if(data.success && data.sections.length > 0) {
-                list.innerHTML = '';
-                select.innerHTML = '';
-                data.sections.forEach(sec => {
-                    select.innerHTML += \`<option value="\${sec.id}">\${sec.title}</option>\`;
-                    let lessonsHtml = sec.lessons.map(l => \`<div style="padding:5px 0; border-bottom:1px solid #eee; display:flex; align-items:center;"><ion-icon name="play-circle-outline" style="margin-right:10px;"></ion-icon> \${l.title}</div>\`).join('');
-                    list.innerHTML += \`
-                        <div style="background:#f8f9fa; border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:5px;">
-                            <h4 style="margin:0; color:var(--primary);">\${sec.title}</h4>
-                            <div style="margin-top:10px; padding-left:10px;">\${lessonsHtml || '<em>No lessons yet.</em>'}</div>
-                        </div>
-                    \`;
-                });
+        // Messaging logic
+        function toggleMessageType() {
+            const type = document.getElementById('messageType').value;
+            if(type === 'individual') {
+                document.getElementById('groupIndividual').style.display = 'block';
+                document.getElementById('groupBulk').style.display = 'none';
             } else {
-                list.innerHTML = 'No sections found. Add a section first.';
-                select.innerHTML = '<option value="">-- Create a section first --</option>';
+                document.getElementById('groupIndividual').style.display = 'none';
+                document.getElementById('groupBulk').style.display = 'block';
             }
-        } catch(e) {
-            list.innerHTML = 'Error loading content.';
         }
-    }
 
-    async function addSectionPrompt() {
-        const courseId = document.getElementById('contentCourseId').value;
-        const title = prompt("Enter new section title:");
-        if(title) {
+        async function populateMessageCourses() {
             try {
-                const res = await fetch('/api/teacher/courses/' + courseId + '/sections', {
+                const res = await fetch('/api/teacher/courses');
+                const courses = await res.json();
+                const sel = document.getElementById('msgCourseId');
+                sel.innerHTML = '';
+                courses.forEach(c => {
+                    sel.innerHTML += `<option value="${c.id}">${c.title}</option>`;
+                });
+            } catch(e) {}
+        }
+
+        async function loadMessages() {
+            const tbody = document.getElementById('messagesTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading...</td></tr>';
+            try {
+                const res = await fetch('/api/teacher/messages?email=' + encodeURIComponent(currentTeacherEmail || ''));
+                const msgs = await res.json();
+                if(!Array.isArray(msgs) || msgs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">No messages sent yet.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                msgs.forEach(m => {
+                    const to = m.course_id ? `Bulk (Course #${m.course_id})` : (m.receiver_email || 'Student');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${to}</strong></td>
+                        <td>
+                            <strong>${m.subject}</strong><br>
+                            <span style="color:var(--text-muted); font-size:12px;">${m.content}</span>
+                            ${m.audio_url ? `<br><audio controls src="${m.audio_url}" style="height:28px; margin-top:4px;"></audio>` : ''}
+                        </td>
+                        <td>${new Date(m.sent_at).toLocaleDateString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {}
+        }
+
+        let mediaRecorder;
+        let audioChunks = [];
+        let currentAudioBase64 = null;
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = ev => audioChunks.push(ev.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const preview = document.getElementById('audioPreview');
+                    preview.src = URL.createObjectURL(blob);
+                    preview.style.display = 'block';
+
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = () => { currentAudioBase64 = reader.result; };
+                };
+                mediaRecorder.start();
+                document.getElementById('btnRecord').style.display = 'none';
+                document.getElementById('btnStopRecord').style.display = 'inline-block';
+            } catch(err) {
+                alert('Microphone access denied or unavailable.');
+            }
+        }
+
+        function stopRecording() {
+            if(mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(t => t.stop());
+                document.getElementById('btnRecord').style.display = 'inline-block';
+                document.getElementById('btnRecord').innerHTML = '🎤 Re-record';
+                document.getElementById('btnStopRecord').style.display = 'none';
+            }
+        }
+
+        async function handleMessageSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Sending...';
+            btn.disabled = true;
+
+            const type = document.getElementById('messageType').value;
+            const receiver_email = type === 'individual' ? document.getElementById('msgStudentEmail').value : null;
+            const course_id = type === 'bulk' ? document.getElementById('msgCourseId').value : null;
+            const subject = document.getElementById('msgSubject').value;
+            const content = document.getElementById('msgContent').value;
+
+            try {
+                const res = await fetch('/api/teacher/messages', {
                     method: 'POST',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({title})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender_email: currentTeacherEmail || 'teacher@analogix.com',
+                        receiver_email,
+                        course_id,
+                        subject,
+                        content,
+                        audio_base64: currentAudioBase64
+                    })
                 });
                 const data = await res.json();
                 if(data.success) {
-                    loadSections(courseId);
-                } else alert("Failed to add section");
-            } catch(e) { alert("Error adding section"); }
+                    alert('Message sent successfully!');
+                    closeModal('messageModal');
+                    e.target.reset();
+                    currentAudioBase64 = null;
+                    document.getElementById('audioPreview').style.display = 'none';
+                    loadMessages();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(e) {
+                alert('Connection error.');
+            } finally {
+                btn.innerHTML = 'Send Message';
+                btn.disabled = false;
+            }
         }
-    }
 
-    async function handleLessonUpload(e) {
-        e.preventDefault();
-        const sectionId = document.getElementById('lessonSectionId').value;
-        if(!sectionId) return alert("Please add a section first.");
-        
-        const title = document.getElementById('lessonTitle').value;
-        const file = document.getElementById('lessonVideo').files[0];
-        
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('video', file);
-        
-        document.getElementById('uploadProgress').style.display = 'block';
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-
-        try {
-            const res = await fetch('/api/teacher/sections/' + sectionId + '/lessons', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if(data.success) {
-                alert("Lesson uploaded successfully!");
-                e.target.reset();
-                loadSections(document.getElementById('contentCourseId').value);
-            } else alert("Failed to upload lesson.");
-        } catch(e) {
-            alert("Error uploading lesson.");
-        } finally {
-            document.getElementById('uploadProgress').style.display = 'none';
-            btn.disabled = false;
+        // Content Builder functions
+        function openContentModal(courseId, courseTitle) {
+            document.getElementById('contentCourseId').value = courseId;
+            document.getElementById('contentCourseTitle').innerText = unescape(courseTitle);
+            loadSections(courseId);
+            openModal('contentModal');
         }
-    }
-</script>
 
+        async function loadSections(courseId) {
+            const list = document.getElementById('sectionsList');
+            const select = document.getElementById('lessonSectionId');
+            list.innerHTML = 'Loading sections...';
+            try {
+                const res = await fetch('/api/teacher/courses/' + courseId + '/structure');
+                const data = await res.json();
+                if(data.success && data.sections && data.sections.length > 0) {
+                    list.innerHTML = '';
+                    select.innerHTML = '';
+                    data.sections.forEach(sec => {
+                        select.innerHTML += `<option value="${sec.id}">${sec.title}</option>`;
+                        let lessonsHtml = sec.lessons.map(l => `<div style="padding:6px 0; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; font-size:13px;"><ion-icon name="play-circle-outline" style="color:#4f5be8; margin-right:8px; font-size:18px;"></ion-icon> ${l.title}</div>`).join('');
+                        list.innerHTML += `
+                            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; margin-bottom:10px; border-radius:8px;">
+                                <h4 style="margin:0; color:#4f5be8; font-size:14px;">${sec.title}</h4>
+                                <div style="margin-top:8px; padding-left:8px;">${lessonsHtml || '<em style="color:#94a3b8; font-size:12px;">No lessons added yet.</em>'}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">No sections created yet. Click "+ Add Section" above.</div>';
+                    select.innerHTML = '<option value="">-- Add section first --</option>';
+                }
+            } catch(e) {
+                list.innerHTML = '<div style="color:red;">Error loading content.</div>';
+            }
+        }
+
+        async function addSectionPrompt() {
+            const courseId = document.getElementById('contentCourseId').value;
+            const title = prompt("Enter section title (e.g. Module 1: Fundamentals):");
+            if(title) {
+                try {
+                    const res = await fetch('/api/teacher/courses/' + courseId + '/sections', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title })
+                    });
+                    const data = await res.json();
+                    if(data.success) {
+                        loadSections(courseId);
+                    } else alert('Failed to add section.');
+                } catch(e) { alert('Error adding section.'); }
+            }
+        }
+
+        async function handleLessonUpload(e) {
+            e.preventDefault();
+            const sectionId = document.getElementById('lessonSectionId').value;
+            if(!sectionId) return alert('Please select a valid section.');
+            
+            const title = document.getElementById('lessonTitle').value;
+            const file = document.getElementById('lessonVideo').files[0];
+            
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('video', file);
+            
+            document.getElementById('uploadProgress').style.display = 'block';
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/teacher/sections/' + sectionId + '/lessons', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert('Lesson uploaded successfully!');
+                    e.target.reset();
+                    loadSections(document.getElementById('contentCourseId').value);
+                } else alert('Upload failed: ' + data.message);
+            } catch(e) {
+                alert('Connection error during upload.');
+            } finally {
+                document.getElementById('uploadProgress').style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+
+            // Logout setup
+            const logoutBtn = document.getElementById('teacherLogoutBtn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('teacherAuth');
+                    localStorage.removeItem('teacherEmail');
+                    localStorage.removeItem('teacherName');
+                    window.location.href = '/AnalogiX/teacher/login';
+                });
+            }
+        });
+    </script>
 </body>
 </html>

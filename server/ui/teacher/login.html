@@ -446,6 +446,8 @@
                 
                 if (data.success) {
                     localStorage.setItem('teacherAuth', 'true');
+                    localStorage.setItem('teacherEmail', data.teacher ? data.teacher.email : email);
+                    localStorage.setItem('teacherName', data.teacher ? data.teacher.name : 'Instructor');
                     window.location.href = '/AnalogiX/teacher';
                 } else {
                     alert(data.message);
