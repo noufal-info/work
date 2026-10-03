@@ -128,5 +128,6 @@ CREATE TABLE IF NOT EXISTS course_reviews (
   student_email VARCHAR(255) NOT NULL,
   rating DECIMAL(3,1) NOT NULL,
   review_text TEXT,
+  is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

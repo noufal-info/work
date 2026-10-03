@@ -104,9 +104,135 @@
             align-items: center;
         }
         .delete-msg-btn:hover { background: #fee2e2; }
+
+        /* App-like In-Web Notification Card */
+        .app-notification-toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            width: 92%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(79, 91, 232, 0.18);
+            border-radius: 18px;
+            box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.15), 0 8px 16px -4px rgba(79, 91, 232, 0.12);
+            padding: 16px 18px;
+            z-index: 999999;
+            opacity: 0;
+            pointer-events: auto;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+        .app-notification-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .app-notif-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .app-notif-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #4f5be8;
+            background: #eef2ff;
+            padding: 3px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+        .app-notif-time {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .app-notif-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .app-notif-close:hover { color: #0f172a; }
+        .app-notif-body {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .app-notif-icon-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #4f5be8, #10b981);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(79, 91, 232, 0.3);
+        }
+        .app-notif-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .app-notif-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 2px 0;
+        }
+        .app-notif-sub {
+            font-size: 12px;
+            color: #475569;
+            margin: 0 0 8px 0;
+            line-height: 1.4;
+        }
+        .app-notif-quote {
+            background: #f8fafc;
+            border-left: 3px solid #f59e0b;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            color: #334155;
+            font-style: italic;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .app-notif-stars {
+            color: #f59e0b;
+            font-size: 13px;
+            display: inline-flex;
+            gap: 2px;
+            align-items: center;
+        }
+        .app-notif-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #4f5be8;
+            width: 100%;
+            transition: width linear;
+        }
     </style>
 </head>
 <body>
+    <!-- In-App Notification Card Container -->
+    <div id="appNotificationContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 0; z-index: 1000000; pointer-events: none;"></div>
     <header class="app-header">
         <div class="user-profile">
             <div class="avatar">
@@ -814,6 +940,134 @@
             });
         }
 
+        function playChime() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(587.33, now); // D5
+                gain1.gain.setValueAtTime(0.12, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.25);
+
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(880, now + 0.1); // A5
+                gain2.gain.setValueAtTime(0.15, now + 0.1);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(now + 0.1);
+                osc2.stop(now + 0.45);
+            } catch(e) {}
+        }
+
+        function showFeedbackDeliveredCard({ courseTitle, rating, reviewText }) {
+            playChime();
+            const container = document.getElementById('appNotificationContainer');
+            if (!container) return;
+
+            // Generate gold stars
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHtml += `<ion-icon name="star" style="color: ${i <= rating ? '#f59e0b' : '#cbd5e1'}; font-size: 15px;"></ion-icon>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'app-notification-toast';
+            card.innerHTML = `
+                <div class="app-notif-header">
+                    <div class="app-notif-tag">
+                        <ion-icon name="sparkles"></ion-icon> Feedback Delivered
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="app-notif-time">Just now</span>
+                        <button class="app-notif-close" onclick="dismissAppCard(this.closest('.app-notification-toast'))">
+                            <ion-icon name="close"></ion-icon>
+                        </button>
+                    </div>
+                </div>
+                <div class="app-notif-body">
+                    <div class="app-notif-icon-circle">
+                        <ion-icon name="star"></ion-icon>
+                    </div>
+                    <div class="app-notif-info">
+                        <h4 class="app-notif-title">Review Sent to Instructor! 🎉</h4>
+                        <div style="display:flex; align-items:center; gap:6px; margin: 3px 0 6px 0;">
+                            <div class="app-notif-stars">${starsHtml}</div>
+                            <span style="font-size:12px; font-weight:700; color:#f59e0b;">${rating}.0</span>
+                        </div>
+                        <div style="font-size:11px; font-weight:700; color:#4f5be8; background:#eef2ff; display:inline-block; padding:2px 8px; border-radius:6px; margin-bottom:6px;">
+                            ${courseTitle || 'Course Review'}
+                        </div>
+                        <div class="app-notif-quote">"${reviewText}"</div>
+                        <p class="app-notif-sub" style="margin:6px 0 0 0; color:#10b981; font-weight:600; font-size:11px; display:flex; align-items:center; gap:4px;">
+                            <ion-icon name="checkmark-done-circle-outline" style="font-size:14px;"></ion-icon> Your review is now live on the instructor's dashboard.
+                        </p>
+                    </div>
+                </div>
+                <div class="app-notif-progress" style="width: 100%;"></div>
+            `;
+
+            container.appendChild(card);
+            requestAnimationFrame(() => {
+                card.classList.add('show');
+                const prog = card.querySelector('.app-notif-progress');
+                if (prog) {
+                    prog.style.transition = 'width 5.5s linear';
+                    prog.style.width = '0%';
+                }
+            });
+
+            setTimeout(() => {
+                dismissAppCard(card);
+            }, 5500);
+        }
+
+        function dismissAppCard(card) {
+            if (!card || card.dataset.dismissed) return;
+            card.dataset.dismissed = 'true';
+            card.style.transform = 'translateX(-50%) translateY(-30px) scale(0.9)';
+            card.style.opacity = '0';
+            setTimeout(() => {
+                if (card && card.parentNode) card.parentNode.removeChild(card);
+            }, 400);
+        }
+
+        function showAppToast(message, type = 'info') {
+            const container = document.getElementById('appNotificationContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'app-notification-toast';
+            const icon = type === 'error' ? 'alert-circle' : 'checkmark-circle';
+            const color = type === 'error' ? '#ef4444' : '#10b981';
+            toast.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:${color}; color:white; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+                        <ion-icon name="${icon}"></ion-icon>
+                    </div>
+                    <div style="flex:1; font-size:13px; font-weight:600; color:#0f172a;">${message}</div>
+                    <button class="app-notif-close" onclick="dismissAppCard(this.closest('.app-notification-toast'))">
+                        <ion-icon name="close"></ion-icon>
+                    </button>
+                </div>
+            `;
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+            setTimeout(() => {
+                dismissAppCard(toast);
+            }, 4000);
+        }
+
         async function handleFeedbackSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmitFeedback');
@@ -821,6 +1075,7 @@
             btn.disabled = true;
 
             const course_id = document.getElementById('fbCourseId').value;
+            const course_title = document.getElementById('fbCourseTitle').innerText;
             const review_text = document.getElementById('fbReviewText').value;
 
             try {
@@ -836,13 +1091,17 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert('Thank you! Your feedback has been sent directly to the instructor.');
                     closeFeedbackModal();
+                    showFeedbackDeliveredCard({
+                        courseTitle: course_title,
+                        rating: currentRating,
+                        reviewText: review_text
+                    });
                 } else {
-                    alert('Error: ' + data.message);
+                    showAppToast('Error: ' + (data.message || 'Could not submit feedback'), 'error');
                 }
             } catch(err) {
-                alert('Server connection error.');
+                showAppToast('Server connection error. Please try again.', 'error');
             } finally {
                 btn.innerHTML = 'Submit Feedback';
                 btn.disabled = false;
@@ -898,15 +1157,15 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert('Your doubt has been submitted to your instructor!');
                     closeDoubtModal();
                     e.target.reset();
+                    showAppToast('Your doubt has been submitted to your instructor!', 'success');
                     loadMessages();
                 } else {
-                    alert('Error: ' + data.message);
+                    showAppToast('Error: ' + data.message, 'error');
                 }
             } catch(err) {
-                alert('Server connection error.');
+                showAppToast('Server connection error.', 'error');
             } finally {
                 btn.innerHTML = 'Send to Instructor';
                 btn.disabled = false;
