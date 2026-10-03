@@ -90,6 +90,8 @@ const db = require('../db/database');
         await db.execute("INSERT IGNORE INTO courses (id, title, description, instructor, price, status, icon) VALUES (1, 'Complete Web Development Bootcamp', 'Learn HTML, CSS, JavaScript and Node.js', 'smith@example.com', 99.99, 'Published', 'globe-outline')");
         await db.execute("INSERT IGNORE INTO course_sections (id, course_id, title, order_index) VALUES (1, 1, 'Introduction to Web Development', 1), (2, 1, 'HTML5 Fundamentals', 2)");
         await db.execute("INSERT IGNORE INTO course_lessons (id, section_id, title, video_url, order_index) VALUES (1, 1, 'What is the web?', 'https://www.w3schools.com/html/mov_bbb.mp4', 1), (2, 1, 'How the internet works', 'https://www.w3schools.com/html/mov_bbb.mp4', 2), (3, 2, 'HTML Basics', 'https://www.w3schools.com/html/mov_bbb.mp4', 1)");
+        // Remove 'Alex' from students if present
+        await db.execute("DELETE FROM students WHERE name LIKE '%Alex%'");
 
         console.log("Teachers, Courses, Enrollments, and Messages tables initialized.");
     } catch (err) {

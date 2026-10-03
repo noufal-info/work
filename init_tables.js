@@ -26,6 +26,9 @@ async function createTables() {
         `);
         console.log("Courses table created or exists.");
 
+        await pool.execute("DELETE FROM students WHERE name LIKE '%Alex%'");
+        console.log("Removed any 'Alex' students.");
+
     } catch (err) {
         console.error("Error creating tables:", err);
     } finally {
