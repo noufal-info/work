@@ -125,4 +125,24 @@ router.post('/courses/feedback', async (req, res) => {
     }
 });
 
+router.get('/events', async (req, res) => {
+    try {
+        const { email } = req.query;
+        // Fetch events from teachers of courses the student is enrolled in
+        const [rows] = await db.execute(`
+            SELECT e.*, c.title as course_title, t.name as teacher_name 
+            FROM calendar_events e
+            JOIN teachers t ON e.teacher_email = t.email
+            JOIN courses c ON c.instructor = t.email
+            JOIN enrollments en ON en.course_id = c.id
+            WHERE en.student_email = ? AND en.status = 'Active'
+            GROUP BY e.id
+            ORDER BY e.start_time ASC LIMIT 5
+        `, [email]);
+        res.json({ success: true, events: rows });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 module.exports = router;
