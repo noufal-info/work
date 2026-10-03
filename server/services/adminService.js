@@ -288,4 +288,58 @@ router.get('/courses', async (req, res) => {
     }
 });
 
+// Section management routes for admin
+router.get('/courses/:id/structure', async (req, res) => {
+    try {
+        const [sections] = await db.execute('SELECT * FROM course_sections WHERE course_id = ? ORDER BY order_index', [req.params.id]);
+        for (let section of sections) {
+            const [lessons] = await db.execute('SELECT * FROM course_lessons WHERE section_id = ? ORDER BY order_index', [section.id]);
+            section.lessons = lessons;
+        }
+        res.json({ success: true, sections });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/courses/:id/sections', async (req, res) => {
+    try {
+        const { title, order_index } = req.body;
+        const [result] = await db.execute('INSERT INTO course_sections (course_id, title, order_index) VALUES (?, ?, ?)', [req.params.id, title, order_index || 0]);
+        res.json({ success: true, section_id: result.insertId });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/sections/:id/update', async (req, res) => {
+    try {
+        const { title } = req.body;
+        await db.execute('UPDATE course_sections SET title = ? WHERE id = ?', [title.trim(), req.params.id]);
+        res.json({ success: true, message: 'Section updated successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.delete('/sections/:id', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM course_lessons WHERE section_id = ?', [req.params.id]);
+        await db.execute('DELETE FROM course_sections WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Section and lessons deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/sections/:id/delete', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM course_lessons WHERE section_id = ?', [req.params.id]);
+        await db.execute('DELETE FROM course_sections WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Section and lessons deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 module.exports = router;

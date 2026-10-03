@@ -12,13 +12,35 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Route Protection
+        // Route Protection & Super Access Handling
+        const urlParams = new URLSearchParams(window.location.search);
+        const impEmail = urlParams.get('impersonate');
+        if (impEmail) {
+            localStorage.setItem('teacherAuth', 'true');
+            localStorage.setItem('teacherEmail', impEmail);
+            localStorage.setItem('superAdminImpersonating', 'true');
+        }
         if (localStorage.getItem('teacherAuth') !== 'true') {
             window.location.href = '/AnalogiX/teacher/login';
         }
     </script>
 </head>
 <body>
+    <!-- Super Admin Access Banner -->
+    <div id="superAdminBanner" style="display:none; background: linear-gradient(90deg, #1e1b4b, #312e81); color: #e0e7ff; padding: 10px 24px; font-size: 13px; font-weight: 500; align-items: center; justify-content: space-between; border-bottom: 2px solid #6366f1; width: 100%; box-sizing: border-box; position: sticky; top: 0; z-index: 10000;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span style="background:#6366f1; color:white; padding:3px 9px; border-radius:4px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">👑 Super Admin Access</span>
+            <span>You are managing instructor: <strong id="superAdminTeacherLabel" style="color:#ffffff;">Instructor</strong> (<span id="superAdminTeacherEmailLabel" style="color:#a5b4fc;">teacher@analogix.com</span>)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <a href="/AnalogiX/admin/teachers" style="background:#4f5be8; color:white; padding:6px 14px; border-radius:6px; font-size:12px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                <ion-icon name="arrow-back-outline"></ion-icon> Return to Admin Portal
+            </a>
+            <a href="/AnalogiX/admin" style="background:rgba(255,255,255,0.1); color:#e0e7ff; padding:6px 12px; border-radius:6px; font-size:12px; text-decoration:none;">
+                Admin Dashboard
+            </a>
+        </div>
+    </div>
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -553,6 +575,29 @@
         </div>
     </div>
 
+    <!-- Edit Course Section Modal -->
+    <div class="modal-overlay" id="editSectionModal">
+        <div class="modal" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2>Update Section Title</h2>
+                <button class="modal-close" onclick="closeModal('editSectionModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form onsubmit="handleUpdateSectionSubmit(event)">
+                <input type="hidden" id="editSectionId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Section Title</label>
+                        <input type="text" id="editSectionTitle" required placeholder="e.g. Module 1: Core Fundamentals">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('editSectionModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" style="background:#4f5be8; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Create / Schedule Live Session Modal -->
     <div class="modal-overlay" id="createSessionModal">
         <div class="modal">
@@ -714,10 +759,29 @@
         </div>
     </div>
     <script>
-        let currentTeacherEmail = localStorage.getItem('teacherEmail') || '';
+        const urlParams = new URLSearchParams(window.location.search);
+        const impEmail = urlParams.get('impersonate');
+        if (impEmail) {
+            localStorage.setItem('teacherAuth', 'true');
+            localStorage.setItem('teacherEmail', impEmail);
+            localStorage.setItem('superAdminImpersonating', 'true');
+        }
+        let currentTeacherEmail = impEmail || localStorage.getItem('teacherEmail') || '';
         let currentTeacherName = localStorage.getItem('teacherName') || 'Instructor';
+        let isSuperAdmin = localStorage.getItem('superAdminImpersonating') === 'true' || localStorage.getItem('adminAuth') === 'true';
         let performanceChartInstance = null;
         let activityChartInstance = null;
+
+        function checkSuperAdminBanner() {
+            const banner = document.getElementById('superAdminBanner');
+            if (banner && (isSuperAdmin || impEmail)) {
+                banner.style.display = 'flex';
+                const nameLabel = document.getElementById('superAdminTeacherLabel');
+                const emailLabel = document.getElementById('superAdminTeacherEmailLabel');
+                if (nameLabel) nameLabel.innerText = currentTeacherName;
+                if (emailLabel) emailLabel.innerText = currentTeacherEmail;
+            }
+        }
 
         function openModal(id) {
             const modal = document.getElementById(id);
@@ -780,6 +844,12 @@
                             localStorage.setItem('teacherName', p.name);
                             document.getElementById('t-name').innerText = p.name;
                             document.getElementById('topAdminName').innerText = p.name;
+                            const superName = document.getElementById('superAdminTeacherLabel');
+                            if (superName) superName.innerText = p.name;
+                        }
+                        if (p.email) {
+                            const superEmail = document.getElementById('superAdminTeacherEmailLabel');
+                            if (superEmail) superEmail.innerText = p.email;
                         }
                         document.getElementById('t-role').innerText = p.course || 'Course Instructor';
                         document.getElementById('t-email').innerText = p.email || 'teacher@analogix.com';
@@ -1794,47 +1864,152 @@
         async function loadSections(courseId) {
             const list = document.getElementById('sectionsList');
             const select = document.getElementById('lessonSectionId');
-            list.innerHTML = 'Loading sections...';
+            list.innerHTML = '<div style="color:var(--text-muted); font-size:13px; text-align:center; padding:12px;">Loading curriculum sections...</div>';
             try {
                 const res = await fetch('/api/teacher/courses/' + courseId + '/structure');
                 const data = await res.json();
                 if(data.success && data.sections && data.sections.length > 0) {
                     list.innerHTML = '';
                     select.innerHTML = '';
-                    data.sections.forEach(sec => {
+                    data.sections.forEach((sec, idx) => {
                         select.innerHTML += `<option value="${sec.id}">${sec.title}</option>`;
-                        let lessonsHtml = sec.lessons.map(l => `<div style="padding:6px 0; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; font-size:13px;"><ion-icon name="play-circle-outline" style="color:#4f5be8; margin-right:8px; font-size:18px;"></ion-icon> ${l.title}</div>`).join('');
+                        let lessonsHtml = sec.lessons.map((l, lidx) => `
+                            <div style="padding:8px 6px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <ion-icon name="play-circle" style="color:#4f5be8; font-size:18px;"></ion-icon>
+                                    <span style="color:#334155; font-weight:500;">Lesson ${lidx + 1}: ${l.title}</span>
+                                    ${l.video_url ? `<a href="${l.video_url}" target="_blank" rel="noopener noreferrer" style="color:#10b981; font-size:11px; text-decoration:none; margin-left:6px; display:inline-flex; align-items:center; gap:3px;"><ion-icon name="open-outline"></ion-icon> Preview</a>` : ''}
+                                </div>
+                                <button type="button" onclick="deleteLesson(${l.id}, '${encodeURIComponent(l.title)}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:16px; padding:2px 6px; display:inline-flex; align-items:center;" title="Delete Lesson">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </button>
+                            </div>
+                        `).join('');
+
                         list.innerHTML += `
-                            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; margin-bottom:10px; border-radius:8px;">
-                                <h4 style="margin:0; color:#4f5be8; font-size:14px;">${sec.title}</h4>
-                                <div style="margin-top:8px; padding-left:8px;">${lessonsHtml || '<em style="color:#94a3b8; font-size:12px;">No lessons added yet.</em>'}</div>
+                            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; margin-bottom:12px; border-radius:8px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <ion-icon name="folder-open" style="color:#4f5be8; font-size:18px;"></ion-icon>
+                                        <h4 style="margin:0; color:#0f172a; font-size:14px; font-weight:700;">Section ${idx + 1}: ${sec.title}</h4>
+                                        <span style="background:#e0e7ff; color:#4338ca; font-size:11px; font-weight:600; padding:2px 8px; border-radius:12px;">${sec.lessons ? sec.lessons.length : 0} lesson${sec.lessons && sec.lessons.length === 1 ? '' : 's'}</span>
+                                    </div>
+                                    <div style="display:flex; gap:6px;">
+                                        <button type="button" class="btn-filter" style="padding:4px 10px; font-size:11px; background:white; border:1px solid #cbd5e1; border-radius:5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; color:#334155;" onclick="openEditSectionModal(${sec.id}, '${encodeURIComponent(sec.title)}')" title="Rename Section">
+                                            <ion-icon name="create-outline"></ion-icon> Rename / Update
+                                        </button>
+                                        <button type="button" class="btn-filter" style="padding:4px 10px; font-size:11px; background:#fff1f2; border:1px solid #fecdd3; border-radius:5px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; color:#e11d48;" onclick="deleteSection(${sec.id}, '${encodeURIComponent(sec.title)}')" title="Delete Section">
+                                            <ion-icon name="trash-outline"></ion-icon> Delete Section
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style="background:white; border-radius:6px; border:1px solid #f1f5f9; padding:4px 10px;">
+                                    ${lessonsHtml || '<div style="color:#94a3b8; font-size:12px; padding:8px 0; font-style:italic;">No lessons added to this section yet. Use the form below to upload video lessons.</div>'}
+                                </div>
                             </div>
                         `;
                     });
                 } else {
-                    list.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">No sections created yet. Click "+ Add Section" above.</div>';
+                    list.innerHTML = '<div style="color:var(--text-muted); font-size:13px; text-align:center; padding:14px; background:#f8fafc; border-radius:8px; border:1px dashed #cbd5e1;">No sections created yet. Click "+ Add Section" above to get started.</div>';
                     select.innerHTML = '<option value="">-- Add section first --</option>';
                 }
             } catch(e) {
-                list.innerHTML = '<div style="color:red;">Error loading content.</div>';
+                list.innerHTML = '<div style="color:red; text-align:center; padding:10px;">Error loading content.</div>';
             }
         }
 
         async function addSectionPrompt() {
             const courseId = document.getElementById('contentCourseId').value;
-            const title = prompt("Enter section title (e.g. Module 1: Fundamentals):");
-            if(title) {
+            const title = prompt("Enter new section title (e.g. Module 1: Introduction):");
+            if(title && title.trim()) {
                 try {
                     const res = await fetch('/api/teacher/courses/' + courseId + '/sections', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ title })
+                        body: JSON.stringify({ title: title.trim() })
                     });
                     const data = await res.json();
                     if(data.success) {
                         loadSections(courseId);
-                    } else alert('Failed to add section.');
+                    } else alert('Failed to add section: ' + (data.message || 'Server error'));
                 } catch(e) { alert('Error adding section.'); }
+            }
+        }
+
+        function openEditSectionModal(sectionId, encodedTitle) {
+            const title = decodeURIComponent(encodedTitle);
+            document.getElementById('editSectionId').value = sectionId;
+            document.getElementById('editSectionTitle').value = title;
+            openModal('editSectionModal');
+        }
+
+        async function handleUpdateSectionSubmit(e) {
+            e.preventDefault();
+            const sectionId = document.getElementById('editSectionId').value;
+            const newTitle = document.getElementById('editSectionTitle').value.trim();
+            const courseId = document.getElementById('contentCourseId').value;
+            
+            if (!newTitle) return alert('Section title cannot be empty.');
+            
+            try {
+                const res = await fetch('/api/teacher/sections/' + sectionId + '/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newTitle })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    closeModal('editSectionModal');
+                    loadSections(courseId);
+                } else {
+                    alert('Failed to update section: ' + (data.message || 'Server error'));
+                }
+            } catch (err) {
+                alert('Error updating section.');
+            }
+        }
+
+        async function deleteSection(sectionId, encodedTitle) {
+            const title = decodeURIComponent(encodedTitle);
+            if (!confirm(`Are you sure you want to delete section "${title}" and all its lessons? This action cannot be undone.`)) {
+                return;
+            }
+            const courseId = document.getElementById('contentCourseId').value;
+            try {
+                const res = await fetch('/api/teacher/sections/' + sectionId + '/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    loadSections(courseId);
+                } else {
+                    alert('Failed to delete section: ' + (data.message || 'Server error'));
+                }
+            } catch (err) {
+                alert('Error deleting section.');
+            }
+        }
+
+        async function deleteLesson(lessonId, encodedTitle) {
+            const title = decodeURIComponent(encodedTitle);
+            if (!confirm(`Are you sure you want to delete lesson "${title}"?`)) {
+                return;
+            }
+            const courseId = document.getElementById('contentCourseId').value;
+            try {
+                const res = await fetch('/api/teacher/lessons/' + lessonId + '/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    loadSections(courseId);
+                } else {
+                    alert('Failed to delete lesson.');
+                }
+            } catch (err) {
+                alert('Error deleting lesson.');
             }
         }
 
@@ -1875,6 +2050,7 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
+            checkSuperAdminBanner();
             loadDashboardData();
 
             // Logout setup
@@ -1882,10 +2058,16 @@
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    const wasSuperAdmin = localStorage.getItem('superAdminImpersonating') === 'true';
                     localStorage.removeItem('teacherAuth');
                     localStorage.removeItem('teacherEmail');
                     localStorage.removeItem('teacherName');
-                    window.location.href = '/AnalogiX/teacher/login';
+                    localStorage.removeItem('superAdminImpersonating');
+                    if (wasSuperAdmin && localStorage.getItem('adminAuth') === 'true') {
+                        window.location.href = '/AnalogiX/admin/teachers';
+                    } else {
+                        window.location.href = '/AnalogiX/teacher/login';
+                    }
                 });
             }
         });

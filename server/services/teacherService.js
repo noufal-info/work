@@ -58,6 +58,102 @@ router.get('/courses/:id/structure', async (req, res) => {
     } catch (error) { res.status(500).json({ success: false }); }
 });
 
+// Update course section
+router.put('/sections/:id', async (req, res) => {
+    try {
+        const { title } = req.body;
+        if (!title || !title.trim()) {
+            return res.status(400).json({ success: false, message: 'Section title is required' });
+        }
+        await db.execute('UPDATE course_sections SET title = ? WHERE id = ?', [title.trim(), req.params.id]);
+        res.json({ success: true, message: 'Section updated successfully' });
+    } catch (error) {
+        console.error("Error updating section:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/sections/:id/update', async (req, res) => {
+    try {
+        const { title } = req.body;
+        if (!title || !title.trim()) {
+            return res.status(400).json({ success: false, message: 'Section title is required' });
+        }
+        await db.execute('UPDATE course_sections SET title = ? WHERE id = ?', [title.trim(), req.params.id]);
+        res.json({ success: true, message: 'Section updated successfully' });
+    } catch (error) {
+        console.error("Error updating section:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// Delete course section and all its lessons
+router.delete('/sections/:id', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM course_lessons WHERE section_id = ?', [req.params.id]);
+        await db.execute('DELETE FROM course_sections WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Section and associated lessons deleted successfully' });
+    } catch (error) {
+        console.error("Error deleting section:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/sections/:id/delete', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM course_lessons WHERE section_id = ?', [req.params.id]);
+        await db.execute('DELETE FROM course_sections WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Section and associated lessons deleted successfully' });
+    } catch (error) {
+        console.error("Error deleting section:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// Delete lesson
+router.delete('/lessons/:id', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM course_lessons WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Lesson deleted successfully' });
+    } catch (error) {
+        console.error("Error deleting lesson:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/lessons/:id/delete', async (req, res) => {
+    try {
+        await db.execute('DELETE FROM course_lessons WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Lesson deleted successfully' });
+    } catch (error) {
+        console.error("Error deleting lesson:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// Update lesson
+router.put('/lessons/:id', async (req, res) => {
+    try {
+        const { title, description } = req.body;
+        await db.execute('UPDATE course_lessons SET title = ?, description = ? WHERE id = ?', [title, description || '', req.params.id]);
+        res.json({ success: true, message: 'Lesson updated successfully' });
+    } catch (error) {
+        console.error("Error updating lesson:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+router.post('/lessons/:id/update', async (req, res) => {
+    try {
+        const { title, description } = req.body;
+        await db.execute('UPDATE course_lessons SET title = ?, description = ? WHERE id = ?', [title, description || '', req.params.id]);
+        res.json({ success: true, message: 'Lesson updated successfully' });
+    } catch (error) {
+        console.error("Error updating lesson:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;

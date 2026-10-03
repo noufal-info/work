@@ -237,16 +237,19 @@
                 });
                 const data = await res.json();
                 
-                if (data.success) {
-                    // Set teacher auth token and redirect to teacher dashboard
+                if (data.success && data.teacher) {
+                    // Set teacher auth token and credentials for teacher dashboard
                     localStorage.setItem('teacherAuth', 'true');
-                    // Store who we are impersonating if needed
+                    localStorage.setItem('teacherEmail', data.teacher.email);
+                    localStorage.setItem('teacherName', data.teacher.name);
                     localStorage.setItem('currentTeacherId', data.teacher.id);
                     localStorage.setItem('currentTeacherName', data.teacher.name);
+                    localStorage.setItem('superAdminImpersonating', 'true');
                     
-                    window.open('/AnalogiX/teacher', '_blank');
+                    // Direct navigation ensures reliable redirection without popup blocker issues
+                    window.location.href = '/AnalogiX/teacher?impersonate=' + encodeURIComponent(data.teacher.email);
                 } else {
-                    alert("Error: " + data.message);
+                    alert("Error: " + (data.message || 'Unable to access teacher account.'));
                 }
             } catch (err) {
                 alert("Failed to connect to the server.");

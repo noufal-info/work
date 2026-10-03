@@ -117,6 +117,24 @@
         </div>
     </div>
 
+    <!-- Edit Section Modal -->
+    <div class="modal-overlay" id="editSectionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Update Section Title</h3>
+                <button class="modal-close" onclick="closeModal('editSectionModal')"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editSectionId">
+                <div class="form-group">
+                    <label>Section Title</label>
+                    <input type="text" id="editSectionTitle" placeholder="e.g. Introduction">
+                </div>
+                <button class="btn-primary" onclick="updateSection()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Lesson Modal -->
     <div class="modal-overlay" id="lessonModal">
         <div class="modal">
@@ -180,20 +198,35 @@
                     container.innerHTML = '';
                     data.sections.forEach((sec, idx) => {
                         let lessonsHtml = sec.lessons.map((l, lidx) => `
-                            <div class="lesson-item">
-                                <ion-icon name="play-circle" class="type-icon"></ion-icon>
-                                <div class="lesson-info">
-                                    <div class="lesson-title">Lesson ${lidx + 1}: ${l.title}</div>
-                                    ${l.description ? `<div class="lesson-desc">${l.description}</div>` : ''}
+                            <div class="lesson-item" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <ion-icon name="play-circle" class="type-icon"></ion-icon>
+                                    <div class="lesson-info">
+                                        <div class="lesson-title">Lesson ${lidx + 1}: ${l.title}</div>
+                                        ${l.description ? `<div class="lesson-desc">${l.description}</div>` : ''}
+                                    </div>
                                 </div>
+                                <button type="button" onclick="deleteLesson(${l.id}, '${encodeURIComponent(l.title)}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:16px; padding:4px 8px;" title="Delete Lesson">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </button>
                             </div>
                         `).join('');
 
                         container.innerHTML += `
                             <div class="section-card">
-                                <div class="section-header">
-                                    <ion-icon name="menu-outline" class="drag-handle"></ion-icon>
-                                    <span>Section ${idx + 1}: ${sec.title}</span>
+                                <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <ion-icon name="menu-outline" class="drag-handle"></ion-icon>
+                                        <span>Section ${idx + 1}: ${sec.title}</span>
+                                    </div>
+                                    <div style="display:flex; gap:6px;">
+                                        <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:12px; cursor:pointer; border-radius:4px; border:1px solid #d1d5db; background:white;" onclick="openEditSectionModal(${sec.id}, '${encodeURIComponent(sec.title)}')" title="Rename Section">
+                                            <ion-icon name="create-outline"></ion-icon> Rename
+                                        </button>
+                                        <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:12px; color:#ef4444; cursor:pointer; border-radius:4px; border:1px solid #fecdd3; background:#fff1f2;" onclick="deleteSection(${sec.id}, '${encodeURIComponent(sec.title)}')" title="Delete Section">
+                                            <ion-icon name="trash-outline"></ion-icon> Delete
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="lesson-list">
                                     ${lessonsHtml}
@@ -216,6 +249,60 @@
         function openSectionModal() {
             document.getElementById('sectionTitle').value = '';
             openModal('sectionModal');
+        }
+
+        function openEditSectionModal(id, encodedTitle) {
+            document.getElementById('editSectionId').value = id;
+            document.getElementById('editSectionTitle').value = decodeURIComponent(encodedTitle);
+            openModal('editSectionModal');
+        }
+
+        async function updateSection() {
+            const sectionId = document.getElementById('editSectionId').value;
+            const title = document.getElementById('editSectionTitle').value.trim();
+            if(!title) return alert('Section title cannot be empty');
+            try {
+                const res = await fetch('/api/teacher/sections/' + sectionId + '/update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ title })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    closeModal('editSectionModal');
+                    loadCurriculum();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(e) { alert('Error updating section'); }
+        }
+
+        async function deleteSection(id, encodedTitle) {
+            const title = decodeURIComponent(encodedTitle);
+            if(!confirm(`Are you sure you want to delete section "${title}" and all its lessons?`)) return;
+            try {
+                const res = await fetch('/api/teacher/sections/' + id + '/delete', { method: 'POST' });
+                const data = await res.json();
+                if(data.success) {
+                    loadCurriculum();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(e) { alert('Error deleting section'); }
+        }
+
+        async function deleteLesson(id, encodedTitle) {
+            const title = decodeURIComponent(encodedTitle);
+            if(!confirm(`Are you sure you want to delete lesson "${title}"?`)) return;
+            try {
+                const res = await fetch('/api/teacher/lessons/' + id + '/delete', { method: 'POST' });
+                const data = await res.json();
+                if(data.success) {
+                    loadCurriculum();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch(e) { alert('Error deleting lesson'); }
         }
 
         function openLessonModal(sectionId) {
