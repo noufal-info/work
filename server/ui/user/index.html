@@ -62,7 +62,12 @@
 
         <!-- CHAT TAB -->
         <section id="tab-chat" class="tab-content">
-            <h2 class="section-title">Inbox</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 class="section-title" style="margin: 0;">Inbox & Announcements</h2>
+                <button onclick="openDoubtModal()" style="background: #4f5be8; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <ion-icon name="help-circle-outline" style="font-size: 16px;"></ion-icon> Ask Doubt
+                </button>
+            </div>
             <div id="messagesList">Loading...</div>
         </section>
 
@@ -243,11 +248,38 @@
                     html = '<p>You are not enrolled in any courses yet.</p>';
                 } else {
                     courses.forEach(c => {
+                        const statusClass = (c.enrollment_status || 'pending').toLowerCase();
+                        let statusBadgeHtml = '';
+                        let actionsHtml = '';
+
+                        if (c.enrollment_status === 'Active') {
+                            statusBadgeHtml = `<span class="premium-status active"><ion-icon name="checkmark-circle"></ion-icon> Enrolled & Active</span>`;
+                            actionsHtml = `
+                                <div style="display:flex; gap:10px; width:100%; margin-top:14px; flex-wrap:wrap;">
+                                    <button class="btn-secondary" style="flex:1; border: 1px solid #4f5be8; color:#4f5be8; padding: 10px 14px; border-radius: 12px; background: #eef2ff; cursor: pointer; font-weight:600; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:140px;" onclick="openFeedbackModal(${c.id}, '${escape(c.title)}')">
+                                        <ion-icon name="star-outline"></ion-icon> Leave Feedback
+                                    </button>
+                                    <button class="premium-enroll-btn" style="flex:1; padding: 10px 16px; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:140px;" onclick="openCourseViewer(${c.id}, '${escape(c.title)}')">
+                                        <ion-icon name="play-circle-outline"></ion-icon> Watch Course
+                                    </button>
+                                </div>
+                            `;
+                        } else if (c.enrollment_status === 'Pending') {
+                            statusBadgeHtml = `<span class="premium-status pending"><ion-icon name="time-outline"></ion-icon> Pending Instructor Approval</span>`;
+                            actionsHtml = `
+                                <div style="background:#fffbeb; color:#92400e; border:1px solid #fde68a; padding:10px 14px; border-radius:10px; font-size:12px; margin-top:12px; line-height:1.5; width:100%;">
+                                    <strong>Request Sent to Instructor:</strong> Your enrollment is awaiting approval. Once the teacher accepts your request, all sections and video lessons will unlock here.
+                                </div>
+                            `;
+                        } else {
+                            statusBadgeHtml = `<span class="premium-status rejected"><ion-icon name="close-circle-outline"></ion-icon> Application Rejected</span>`;
+                        }
+
                         html += `
                         <div class="premium-course-card">
                             <div class="premium-thumbnail">
                                 <img src="${c.thumbnail_url || '/uploads/images/default_course.jpg'}" alt="Course Thumbnail" onerror="this.src='/uploads/images/default_course.jpg'">
-                                <div class="premium-badge"><ion-icon name="bookmark"></ion-icon> Saved</div>
+                                <div class="premium-badge"><ion-icon name="bookmark"></ion-icon> Enrolled</div>
                             </div>
                             <div class="premium-details">
                                 <h3 class="premium-title">${c.title}</h3>
@@ -259,12 +291,12 @@
                                 </div>
                                 
                                 <div class="premium-meta">
-                                    <div class="premium-meta-item"><ion-icon name="school-outline"></ion-icon> Enrolled</div>
+                                    <div class="premium-meta-item"><ion-icon name="school-outline"></ion-icon> ₹${c.price}</div>
                                 </div>
 
-                                <div class="premium-actions">
-                                    <span class="premium-status ${c.enrollment_status.toLowerCase()}">${c.enrollment_status}</span>
-                                    ${c.enrollment_status === 'Active' ? `<button class="btn-secondary" style="border: 1px solid #cbd5e1; padding: 12px; border-radius: 12px; background: transparent; cursor: pointer;" onclick="openFeedbackModal(${c.id})">Leave Feedback</button><button class="premium-enroll-btn" onclick="openCourseViewer(${c.id}, '${c.title}')">Watch Course</button>` : ''}
+                                <div class="premium-actions" style="flex-direction:column; align-items:flex-start; width:100%;">
+                                    ${statusBadgeHtml}
+                                    ${actionsHtml}
                                 </div>
                             </div>
                         </div>`;
@@ -447,7 +479,195 @@
             if(firstItem) firstItem.classList.add('active');
         }
     }
+
+    // Feedback Modal Logic
+    let currentRating = 5.0;
+
+    function openFeedbackModal(courseId, courseTitle) {
+        document.getElementById('fbCourseId').value = courseId;
+        document.getElementById('fbCourseTitle').innerText = unescape(courseTitle);
+        setRating(5.0);
+        document.getElementById('fbReviewText').value = '';
+        document.getElementById('feedbackModal').classList.add('active');
+    }
+
+    function closeFeedbackModal() {
+        document.getElementById('feedbackModal').classList.remove('active');
+    }
+
+    function setRating(val) {
+        currentRating = val;
+        document.getElementById('ratingValText').innerText = val.toFixed(1);
+        const stars = document.querySelectorAll('#starPicker ion-icon');
+        stars.forEach(s => {
+            const sVal = parseInt(s.getAttribute('data-val'));
+            if (sVal <= val) {
+                s.classList.add('filled');
+            } else {
+                s.classList.remove('filled');
+            }
+        });
+    }
+
+    async function handleFeedbackSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSubmitFeedback');
+        btn.innerHTML = 'Submitting...';
+        btn.disabled = true;
+
+        const course_id = document.getElementById('fbCourseId').value;
+        const review_text = document.getElementById('fbReviewText').value;
+
+        try {
+            const res = await fetch('/api/courses/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    course_id,
+                    student_email: studentEmail,
+                    rating: currentRating,
+                    review_text
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Thank you! Your feedback has been sent directly to the instructor.');
+                closeFeedbackModal();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch(err) {
+            alert('Server connection error.');
+        } finally {
+            btn.innerHTML = 'Submit Feedback';
+            btn.disabled = false;
+        }
+    }
+
+    // Ask Doubt Modal Logic
+    async function openDoubtModal() {
+        const sel = document.getElementById('doubtCourseSelect');
+        sel.innerHTML = '<option value="">Loading your courses...</option>';
+        document.getElementById('doubtModal').classList.add('active');
+
+        try {
+            const res = await fetch('/api/courses/enrolled?email=' + encodeURIComponent(studentEmail));
+            const courses = await res.json();
+            if (Array.isArray(courses) && courses.length > 0) {
+                sel.innerHTML = '<option value="">-- Choose Course --</option>';
+                courses.forEach(c => {
+                    sel.innerHTML += `<option value="${c.id}">${c.title}</option>`;
+                });
+            } else {
+                sel.innerHTML = '<option value="">No enrolled courses found</option>';
+            }
+        } catch(e) {
+            sel.innerHTML = '<option value="">Error loading courses</option>';
+        }
+    }
+
+    function closeDoubtModal() {
+        document.getElementById('doubtModal').classList.remove('active');
+    }
+
+    async function handleDoubtSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSubmitDoubt');
+        btn.innerHTML = 'Sending...';
+        btn.disabled = true;
+
+        const course_id = document.getElementById('doubtCourseSelect').value;
+        const subject = document.getElementById('doubtSubject').value;
+        const content = document.getElementById('doubtContent').value;
+
+        try {
+            const res = await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sender_email: studentEmail,
+                    course_id: course_id || null,
+                    subject,
+                    content
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Your doubt has been submitted to your instructor!');
+                closeDoubtModal();
+                e.target.reset();
+                loadMessages();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch(err) {
+            alert('Server connection error.');
+        } finally {
+            btn.innerHTML = 'Send to Instructor';
+            btn.disabled = false;
+        }
+    }
 </script>
+
+<!-- Feedback Modal Sheet -->
+<div class="modal-overlay" id="feedbackModal">
+    <div class="modal-sheet">
+        <div class="modal-sheet-header">
+            <h3>Rate & Review Course</h3>
+            <button class="close-sheet-btn" onclick="closeFeedbackModal()"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+        <form onsubmit="handleFeedbackSubmit(event)" style="padding: 20px;">
+            <input type="hidden" id="fbCourseId">
+            <h4 id="fbCourseTitle" style="color: var(--blue-dark); margin: 0 0 16px 0; font-size: 15px; font-weight:700;">Course Title</h4>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Your Rating for the Instructor</label>
+                <div class="star-rating-picker" id="starPicker">
+                    <ion-icon name="star" class="filled" data-val="1" onclick="setRating(1)"></ion-icon>
+                    <ion-icon name="star" class="filled" data-val="2" onclick="setRating(2)"></ion-icon>
+                    <ion-icon name="star" class="filled" data-val="3" onclick="setRating(3)"></ion-icon>
+                    <ion-icon name="star" class="filled" data-val="4" onclick="setRating(4)"></ion-icon>
+                    <ion-icon name="star" class="filled" data-val="5" onclick="setRating(5)"></ion-icon>
+                    <span id="ratingValText" style="font-weight: 700; margin-left: 8px; color: #f59e0b; font-size: 16px;">5.0</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">Your Feedback / Review</label>
+                <textarea id="fbReviewText" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:12px; font-size:14px; outline:none; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Write a review about the course quality, instructor explanation, or doubts support..." required></textarea>
+            </div>
+
+            <button type="submit" id="btnSubmitFeedback" style="width:100%; background:#4f5be8; color:white; border:none; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s;">Submit Feedback</button>
+        </form>
+    </div>
+</div>
+
+<!-- Ask Doubt Modal Sheet -->
+<div class="modal-overlay" id="doubtModal">
+    <div class="modal-sheet">
+        <div class="modal-sheet-header">
+            <h3>Ask Instructor a Doubt</h3>
+            <button class="close-sheet-btn" onclick="closeDoubtModal()"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+        <form onsubmit="handleDoubtSubmit(event)" style="padding: 20px;">
+            <div style="margin-bottom: 14px;">
+                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Select Course</label>
+                <select id="doubtCourseSelect" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" required>
+                    <option value="">-- Choose Course --</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 14px;">
+                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Subject / Topic</label>
+                <input type="text" id="doubtSubject" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="e.g. Query on Lesson 4" required>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Your Question</label>
+                <textarea id="doubtContent" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:12px; font-size:14px; outline:none; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="Describe your doubt in detail..." required></textarea>
+            </div>
+            <button type="submit" id="btnSubmitDoubt" style="width:100%; background:#4f5be8; color:white; border:none; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s;">Send to Instructor</button>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>
