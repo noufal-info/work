@@ -13,16 +13,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Route Protection & Super Access Handling
-        const urlParams = new URLSearchParams(window.location.search);
-        const impEmail = urlParams.get('impersonate');
-        if (impEmail) {
-            localStorage.setItem('teacherAuth', 'true');
-            localStorage.setItem('teacherEmail', impEmail);
-            localStorage.setItem('superAdminImpersonating', 'true');
-        }
-        if (localStorage.getItem('teacherAuth') !== 'true') {
-            window.location.href = '/AnalogiX/teacher/login';
-        }
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const impEmail = urlParams.get('impersonate');
+            if (impEmail) {
+                localStorage.setItem('teacherAuth', 'true');
+                localStorage.setItem('teacherEmail', impEmail);
+                localStorage.setItem('superAdminImpersonating', 'true');
+            }
+            if (localStorage.getItem('teacherAuth') !== 'true') {
+                window.location.href = '/AnalogiX/teacher/login';
+            }
+        })();
     </script>
     <style>
         /* Floating App-like Notification Card */
@@ -1065,6 +1067,10 @@
         let isSuperAdmin = localStorage.getItem('superAdminImpersonating') === 'true' || localStorage.getItem('adminAuth') === 'true';
         let performanceChartInstance = null;
         let activityChartInstance = null;
+        let teacherCoursesCache = [];
+        let allStudentsProgressCache = [];
+        let seenReviewIds = new Set(JSON.parse(sessionStorage.getItem('seenReviewIds') || '[]'));
+        let hasShownInitialNotif = sessionStorage.getItem('hasShownInitialNotif') === 'true';
 
         function checkSuperAdminBanner() {
             const banner = document.getElementById('superAdminBanner');
@@ -1349,8 +1355,6 @@
         }
 
         // In-Web App Notification Card & Feedback System
-        let seenReviewIds = new Set(JSON.parse(sessionStorage.getItem('seenReviewIds') || '[]'));
-        let hasShownInitialNotif = sessionStorage.getItem('hasShownInitialNotif') === 'true';
 
         function playTeacherNotifChime() {
             try {
@@ -1752,8 +1756,6 @@
         }
 
         // Courses Management functions
-        let teacherCoursesCache = [];
-        let allStudentsProgressCache = [];
 
         // Courses Management functions
         async function loadCourses() {
