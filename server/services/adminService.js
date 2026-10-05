@@ -130,7 +130,8 @@ const db = require('../db/database');
         // Remove 'Alex' from students if present
         await db.execute("DELETE FROM students WHERE name LIKE '%Alex%'");
         // Ensure a dummy student exists for testing
-        await db.execute("INSERT IGNORE INTO students (email, password, name) VALUES ('student@example.com', 'password123', 'John Doe')");
+        await db.execute("INSERT IGNORE INTO students (email, password, name) VALUES ('student@example.com', 'password123', 'Rahul Nair')");
+        await db.execute("UPDATE students SET name = 'Rahul Nair' WHERE name = 'John Doe'");
 
 
         console.log("Teachers, Courses, Enrollments, and Messages tables initialized.");

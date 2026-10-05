@@ -235,12 +235,13 @@
     <div id="appNotificationContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 0; z-index: 1000000; pointer-events: none;"></div>
     <header class="app-header">
         <div class="user-profile">
-            <div class="avatar">
-                <ion-icon name="person-outline"></ion-icon>
+            <div class="avatar" id="headerAvatarContainer" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[4])" style="cursor:pointer; overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #4f5be8, #7c3aed);">
+                <span id="headerAvatarInitials" style="font-weight:700; font-size:14px; color:white;">RN</span>
+                <img id="headerAvatarImg" src="" style="display:none; width:100%; height:100%; border-radius:50%; object-fit:cover;" alt="Avatar">
             </div>
             <div class="greeting">
                 <p>Hello,</p>
-                <h1 id="studentGreetingName">Student</h1>
+                <h1 id="studentGreetingName">Rahul Nair</h1>
             </div>
         </div>
     </header>
@@ -301,22 +302,61 @@
 
         <!-- PROFILE TAB -->
         <section id="tab-profile" class="tab-content">
-            <h2 class="section-title">Profile</h2>
-            <div class="msg-card" style="text-align: center; padding: 30px 20px;">
-                <div style="font-size: 60px; color: var(--blue-dark);"><ion-icon name="person-circle"></ion-icon></div>
-                <h3 id="profileName" style="margin: 10px 0 4px 0;">Student Name</h3>
-                <p id="profileEmail" style="color: var(--text-muted); margin-bottom: 20px;">student@example.com</p>
-                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin-bottom:20px; text-align:left;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
-                        <span style="color:#64748b;">Account Status:</span>
-                        <span style="color:#10b981; font-weight:bold;">Active Student</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 class="section-title" style="margin: 0;">My Profile</h2>
+                <button onclick="openEditProfileModal()" style="background:#4f5be8; color:white; border:none; padding:8px 16px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 4px 10px rgba(79, 91, 232, 0.25);">
+                    <ion-icon name="create-outline" style="font-size: 16px;"></ion-icon> Edit Profile
+                </button>
+            </div>
+
+            <!-- Profile Summary Card -->
+            <div class="msg-card" style="text-align: center; padding: 28px 20px; position: relative;">
+                <!-- Avatar with Quick Edit Button -->
+                <div style="position: relative; width: 88px; height: 88px; margin: 0 auto 14px;">
+                    <div id="profileAvatarContainer" style="width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, #4f5be8 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: 700; box-shadow: 0 8px 20px rgba(79, 91, 232, 0.3); overflow: hidden;">
+                        <span id="profileAvatarInitials">RN</span>
+                        <img id="profileAvatarImg" src="" style="display:none; width: 100%; height: 100%; object-fit: cover;" alt="Profile Picture">
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:13px;">
-                        <span style="color:#64748b;">Portal:</span>
+                    <button type="button" onclick="openEditProfileModal()" title="Change Profile Photo" style="position: absolute; bottom: 0; right: 0; width: 30px; height: 30px; border-radius: 50%; background: #4f5be8; border: 2px solid #ffffff; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                        <ion-icon name="camera-outline" style="font-size: 15px;"></ion-icon>
+                    </button>
+                </div>
+
+                <h3 id="profileName" style="margin: 4px 0 2px 0; font-size: 20px; color: #0f172a; font-weight: 700;">Rahul Nair</h3>
+                <p id="profileEmail" style="color: var(--text-muted); font-size: 13px; margin: 0 0 6px 0;">student@example.com</p>
+                <div style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#475569; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; margin-bottom: 20px;">
+                    <ion-icon name="call-outline" style="color:#4f5be8;"></ion-icon>
+                    <span id="profilePhone">+91 98765 43210</span>
+                </div>
+
+                <!-- Info Table -->
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; margin-bottom:20px; text-align:left;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px;">
+                        <span style="color:#64748b;">Full Name</span>
+                        <strong id="profileInfoName" style="color:#0f172a;">Rahul Nair</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px;">
+                        <span style="color:#64748b;">Phone Number</span>
+                        <strong id="profileInfoPhone" style="color:#0f172a;">+91 98765 43210</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px;">
+                        <span style="color:#64748b;">Account Status</span>
+                        <span style="color:#10b981; font-weight:700; background:#dcfce7; padding:2px 8px; border-radius:12px; font-size:11px; display:inline-flex; align-items:center; gap:4px;">
+                            <span style="width:6px; height:6px; border-radius:50%; background:#10b981;"></span> Active Student
+                        </span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+                        <span style="color:#64748b;">Portal</span>
                         <span style="color:#1e293b; font-weight:600;">AnalogiX LMS Learning Hub</span>
                     </div>
                 </div>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="openEditProfileModal()" style="flex:1; background:#eef2ff; color:#4f5be8; border:1px solid #c7d2fe; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                        <ion-icon name="create-outline"></ion-icon> Edit Profile
+                    </button>
+                    <button class="logout-btn" onclick="logout()" style="flex:1; margin:0;">Logout</button>
+                </div>
             </div>
         </section>
     </main>
@@ -350,18 +390,97 @@
             window.location.href = '/AnalogiX';
         }
 
-        const studentEmail = localStorage.getItem('studentEmail');
-        const studentName = localStorage.getItem('studentName') || 'Student';
-        document.getElementById('studentGreetingName').innerText = studentName;
-        document.getElementById('profileName').innerText = studentName;
-        document.getElementById('profileEmail').innerText = studentEmail;
+        let studentEmail = localStorage.getItem('studentEmail');
+        let studentName = localStorage.getItem('studentName');
+        if (!studentName || studentName === 'John Doe' || studentName === 'Student') {
+            studentName = 'Rahul Nair';
+            localStorage.setItem('studentName', 'Rahul Nair');
+        }
+        let studentPhone = localStorage.getItem('studentPhone') || '+91 98765 43210';
+        let studentAvatar = localStorage.getItem('studentAvatar') || '';
 
-        // Verify session
+        function getInitials(name) {
+            if (!name) return 'RN';
+            const parts = name.trim().split(/\s+/);
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        function updateStudentProfileUI(name, email, phone, avatar) {
+            if (name) {
+                studentName = name;
+                const gName = document.getElementById('studentGreetingName');
+                if (gName) gName.innerText = name;
+                const pName = document.getElementById('profileName');
+                if (pName) pName.innerText = name;
+                const pInfoName = document.getElementById('profileInfoName');
+                if (pInfoName) pInfoName.innerText = name;
+                const mName = document.getElementById('editStudentName');
+                if (mName) mName.value = name;
+            }
+            if (email) {
+                studentEmail = email;
+                const pEmail = document.getElementById('profileEmail');
+                if (pEmail) pEmail.innerText = email;
+            }
+            if (phone !== undefined && phone !== null) {
+                studentPhone = phone;
+                const pPhone = document.getElementById('profilePhone');
+                if (pPhone) pPhone.innerText = phone;
+                const pInfoPhone = document.getElementById('profileInfoPhone');
+                if (pInfoPhone) pInfoPhone.innerText = phone;
+                const mPhone = document.getElementById('editStudentPhone');
+                if (mPhone) mPhone.value = phone;
+            }
+
+            const initials = getInitials(studentName || 'Rahul Nair');
+            const hInitials = document.getElementById('headerAvatarInitials');
+            if (hInitials) hInitials.innerText = initials;
+            const pInitials = document.getElementById('profileAvatarInitials');
+            if (pInitials) pInitials.innerText = initials;
+            const mInitials = document.getElementById('modalAvatarInitials');
+            if (mInitials) mInitials.innerText = initials;
+
+            const hImg = document.getElementById('headerAvatarImg');
+            const pImg = document.getElementById('profileAvatarImg');
+            const mImg = document.getElementById('modalAvatarPreview');
+
+            if (avatar) {
+                studentAvatar = avatar;
+                if (hImg) { hImg.src = avatar; hImg.style.display = 'block'; }
+                if (pImg) { pImg.src = avatar; pImg.style.display = 'block'; }
+                if (mImg) { mImg.src = avatar; mImg.style.display = 'block'; }
+                if (hInitials) hInitials.style.display = 'none';
+                if (pInitials) pInitials.style.display = 'none';
+                if (mInitials) mInitials.style.display = 'none';
+            } else {
+                if (hImg) hImg.style.display = 'none';
+                if (pImg) pImg.style.display = 'none';
+                if (mImg) mImg.style.display = 'none';
+                if (hInitials) hInitials.style.display = 'block';
+                if (pInitials) pInitials.style.display = 'block';
+                if (mInitials) mInitials.style.display = 'block';
+            }
+        }
+
+        // Initialize UI with cached/default profile
+        updateStudentProfileUI(studentName, studentEmail, studentPhone, studentAvatar);
+
+        // Verify session & sync with server
         fetch('/api/me?email=' + encodeURIComponent(studentEmail))
             .then(res => res.json())
             .then(data => {
                 if (!data.success) {
                     logout();
+                    return;
+                }
+                if (data.user) {
+                    const u = data.user;
+                    const serverName = (u.name && u.name !== 'John Doe') ? u.name : 'Rahul Nair';
+                    localStorage.setItem('studentName', serverName);
+                    if (u.phone_number) localStorage.setItem('studentPhone', u.phone_number);
+                    if (u.avatar_url) localStorage.setItem('studentAvatar', u.avatar_url);
+                    updateStudentProfileUI(serverName, u.email || studentEmail, u.phone_number || studentPhone, u.avatar_url || studentAvatar);
                 }
             })
             .catch(() => {});
@@ -370,6 +489,8 @@
             localStorage.removeItem('studentAuth');
             localStorage.removeItem('studentEmail');
             localStorage.removeItem('studentName');
+            localStorage.removeItem('studentPhone');
+            localStorage.removeItem('studentAvatar');
             window.location.href = '/AnalogiX';
         }
 
@@ -1233,5 +1354,155 @@
         </div>
     </div>
 
+    <!-- Edit Student Profile Modal Sheet -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal-sheet">
+            <div class="modal-sheet-header">
+                <h3>Edit Student Profile</h3>
+                <button class="close-sheet-btn" onclick="closeEditProfileModal()"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <form id="editStudentProfileForm" onsubmit="handleEditStudentProfile(event)" style="padding: 20px;">
+                <!-- Avatar Preview & Upload -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="position: relative; width: 84px; height: 84px; margin: 0 auto 10px;">
+                        <div id="modalAvatarContainer" style="width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, #4f5be8 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 700; overflow: hidden; box-shadow: 0 4px 12px rgba(79, 91, 232, 0.25);">
+                            <span id="modalAvatarInitials">RN</span>
+                            <img id="modalAvatarPreview" src="" style="display:none; width: 100%; height: 100%; object-fit: cover;" alt="Avatar Preview">
+                        </div>
+                        <label for="studentAvatarInput" title="Choose Photo" style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: #4f5be8; border: 2px solid white; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                            <ion-icon name="camera" style="font-size: 14px;"></ion-icon>
+                        </label>
+                        <input type="file" id="studentAvatarInput" accept="image/*" style="display: none;" onchange="previewStudentAvatar(event)">
+                    </div>
+                    <label for="studentAvatarInput" style="font-size: 12px; color: #4f5be8; font-weight: 600; cursor: pointer;">Tap to Change Profile Photo</label>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Full Name</label>
+                    <input type="text" id="editStudentName" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="e.g. Rahul Nair or Arun Kumar" required>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Phone Number</label>
+                    <input type="tel" id="editStudentPhone" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="+91 98765 43210">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">New Password <small style="color:#94a3b8; font-weight:400;">(optional, leave blank to keep current)</small></label>
+                    <input type="password" id="editStudentPassword" style="width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="Enter new password if changing">
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="closeEditProfileModal()" style="flex:1; background:#f1f5f9; color:#475569; border:none; padding:12px; border-radius:12px; font-weight:600; cursor:pointer; font-size:14px;">Cancel</button>
+                    <button type="submit" id="btnSaveStudentProfile" style="flex:2; background:#4f5be8; color:white; border:none; padding:12px; border-radius:12px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s; box-shadow: 0 4px 10px rgba(79, 91, 232, 0.25);">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditProfileModal() {
+            const modal = document.getElementById('editProfileModal');
+            if (modal) {
+                document.getElementById('editStudentName').value = studentName || 'Rahul Nair';
+                document.getElementById('editStudentPhone').value = studentPhone || '+91 98765 43210';
+                document.getElementById('editStudentPassword').value = '';
+                const mImg = document.getElementById('modalAvatarPreview');
+                const mInit = document.getElementById('modalAvatarInitials');
+                if (studentAvatar) {
+                    if (mImg) { mImg.src = studentAvatar; mImg.style.display = 'block'; }
+                    if (mInit) mInit.style.display = 'none';
+                } else {
+                    if (mImg) mImg.style.display = 'none';
+                    if (mInit) {
+                        mInit.innerText = getInitials(studentName);
+                        mInit.style.display = 'block';
+                    }
+                }
+                modal.classList.add('active');
+            }
+        }
+
+        function closeEditProfileModal() {
+            const modal = document.getElementById('editProfileModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function previewStudentAvatar(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const mImg = document.getElementById('modalAvatarPreview');
+                    const mInit = document.getElementById('modalAvatarInitials');
+                    if (mImg) {
+                        mImg.src = event.target.result;
+                        mImg.style.display = 'block';
+                    }
+                    if (mInit) mInit.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function handleEditStudentProfile(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSaveStudentProfile');
+            const origText = btn.innerHTML;
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const name = document.getElementById('editStudentName').value.trim();
+            const phone = document.getElementById('editStudentPhone').value.trim();
+            const password = document.getElementById('editStudentPassword').value.trim();
+            const file = document.getElementById('studentAvatarInput').files[0];
+
+            const formData = new FormData();
+            formData.append('email', studentEmail);
+            formData.append('name', name);
+            formData.append('phone_number', phone);
+            if (password) formData.append('password', password);
+            if (file) {
+                formData.append('avatar', file);
+            } else if (studentAvatar) {
+                formData.append('existing_avatar', studentAvatar);
+            }
+
+            try {
+                const res = await fetch('/api/profile', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const u = data.user || {};
+                    const newName = u.name || name;
+                    const newPhone = u.phone_number !== undefined ? u.phone_number : phone;
+                    const newAvatar = u.avatar_url || studentAvatar;
+
+                    localStorage.setItem('studentName', newName);
+                    localStorage.setItem('studentPhone', newPhone);
+                    if (newAvatar) localStorage.setItem('studentAvatar', newAvatar);
+
+                    updateStudentProfileUI(newName, studentEmail, newPhone, newAvatar);
+                    closeEditProfileModal();
+
+                    if (typeof showAppToast === 'function') {
+                        showAppToast('Profile updated successfully, ' + newName + '!', 'success');
+                    } else {
+                        alert('Profile updated successfully!');
+                    }
+                } else {
+                    alert(data.message || 'Failed to update profile.');
+                }
+            } catch (err) {
+                console.error("Profile update error:", err);
+                alert('Connection error while updating profile.');
+            } finally {
+                btn.innerHTML = origText;
+                btn.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>

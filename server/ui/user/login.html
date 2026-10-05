@@ -455,7 +455,10 @@
                 if (data.success) {
                     localStorage.setItem('studentAuth', 'true');
                     localStorage.setItem('studentEmail', email);
-                    localStorage.setItem('studentName', data.user.name);
+                    const sName = (data.user && data.user.name && data.user.name !== 'John Doe') ? data.user.name : 'Rahul Nair';
+                    localStorage.setItem('studentName', sName);
+                    if (data.user && data.user.phone_number) localStorage.setItem('studentPhone', data.user.phone_number);
+                    if (data.user && data.user.avatar_url) localStorage.setItem('studentAvatar', data.user.avatar_url);
                     window.location.href = '/AnalogiX/user';
                 } else {
                     alert(data.message);

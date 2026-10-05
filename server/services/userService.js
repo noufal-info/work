@@ -1,6 +1,21 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 const router = express.Router();
 const db = require('../db/database');
+
+const imageStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = path.join(__dirname, '..', 'uploads', 'images');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const uploadImage = multer({ storage: imageStorage });
 
 router.post('/login', async (req, res) => {
     try {
@@ -138,7 +153,19 @@ router.get('/me', async (req, res) => {
     try {
         const { email } = req.query;
         if (!email) return res.json({ success: false });
-        const [rows] = await db.execute('SELECT id, name, email FROM students WHERE email = ?', [email]);
+
+        // Ensure columns exist
+        try {
+            await db.execute('ALTER TABLE students ADD COLUMN phone_number VARCHAR(50) NULL');
+        } catch (e) {}
+        try {
+            await db.execute('ALTER TABLE students ADD COLUMN avatar_url VARCHAR(255) NULL');
+        } catch (e) {}
+
+        // Migrate legacy 'John Doe' placeholder to 'Rahul Nair'
+        await db.execute("UPDATE students SET name = 'Rahul Nair' WHERE email = ? AND name = 'John Doe'", [email]);
+
+        const [rows] = await db.execute('SELECT id, name, email, phone_number, avatar_url FROM students WHERE email = ?', [email]);
         if (rows.length > 0) {
             res.json({ success: true, user: rows[0] });
         } else {
@@ -148,6 +175,73 @@ router.get('/me', async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
+async function handleStudentProfileUpdate(req, res) {
+    try {
+        const { email, name, phone_number, password } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Student email is required.' });
+        }
+
+        // Ensure columns exist
+        try {
+            await db.execute('ALTER TABLE students ADD COLUMN phone_number VARCHAR(50) NULL');
+        } catch (e) {}
+        try {
+            await db.execute('ALTER TABLE students ADD COLUMN avatar_url VARCHAR(255) NULL');
+        } catch (e) {}
+
+        let avatar_url = req.body.existing_avatar || null;
+        if (req.file) {
+            avatar_url = '/uploads/images/' + req.file.filename;
+        }
+
+        const setClauses = [];
+        const params = [];
+
+        if (name && name.trim()) {
+            setClauses.push('name = ?');
+            params.push(name.trim());
+        }
+
+        if (phone_number !== undefined && phone_number !== null) {
+            setClauses.push('phone_number = ?');
+            params.push(phone_number.trim());
+        }
+
+        if (avatar_url) {
+            setClauses.push('avatar_url = ?');
+            params.push(avatar_url);
+        }
+
+        if (password && password.trim()) {
+            setClauses.push('password = ?');
+            params.push(password.trim());
+        }
+
+        if (setClauses.length > 0) {
+            const query = 'UPDATE students SET ' + setClauses.join(', ') + ' WHERE email = ?';
+            params.push(email);
+            await db.execute(query, params);
+        }
+
+        const [rows] = await db.execute('SELECT id, name, email, phone_number, avatar_url FROM students WHERE email = ?', [email]);
+        const updatedUser = rows[0] || { name, email, phone_number, avatar_url };
+
+        res.json({
+            success: true,
+            message: 'Profile updated successfully!',
+            user: updatedUser
+        });
+    } catch (error) {
+        console.error("Error updating student profile:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+router.post('/profile', uploadImage.single('avatar'), handleStudentProfileUpdate);
+router.post('/student/profile', uploadImage.single('avatar'), handleStudentProfileUpdate);
+router.put('/profile', uploadImage.single('avatar'), handleStudentProfileUpdate);
 
 router.post('/courses/feedback', async (req, res) => {
     try {

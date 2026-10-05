@@ -3,11 +3,14 @@ CREATE TABLE IF NOT EXISTS students (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  name VARCHAR(255) NOT NULL
+  name VARCHAR(255) NOT NULL,
+  phone_number VARCHAR(50) DEFAULT '+91 98765 43210',
+  avatar_url VARCHAR(255) NULL
 );
 
 -- Insert dummy student
-INSERT IGNORE INTO students (email, password, name) VALUES ('student@example.com', 'password123', 'John Doe');
+INSERT IGNORE INTO students (email, password, name, phone_number) VALUES ('student@example.com', 'password123', 'Rahul Nair', '+91 98765 43210');
+UPDATE students SET name = 'Rahul Nair' WHERE email = 'student@example.com' AND name = 'John Doe';
 
 -- Create Admins table
 CREATE TABLE IF NOT EXISTS admins (
